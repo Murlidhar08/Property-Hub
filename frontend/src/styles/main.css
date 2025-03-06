@@ -1,0 +1,26 @@
+/* Themes */
+@import '../theme/neon.css';
+@import '../theme/swiss.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* color theme  */
+@layer base {
+  .theme-default {
+    --color-primary: 202, 240, 248;
+    --color-secondary: 25, 22, 69;
+    --color-action: 67, 198, 172;
+  }
+
+  html.dark .theme-default {
+    --color-primary: 31, 35, 65;
+    --color-secondary: 209, 214, 255;
+    --color-action: 255, 75, 75;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}

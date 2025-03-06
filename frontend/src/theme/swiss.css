@@ -1,0 +1,15 @@
+@tailwind base;
+
+@layer base {
+  .theme-swiss {
+    --color-primary: 248, 202, 202;
+    --color-secondary: 69, 22, 22;
+    --color-action: 198, 67, 67;
+  }
+
+  html.dark .theme-swiss {
+    --color-primary: 53, 31, 31;
+    --color-secondary: 255, 209, 209;
+    --color-action: 75, 231, 255;
+  }
+}

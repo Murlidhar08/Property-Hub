@@ -1,0 +1,15 @@
+@tailwind base;
+
+@layer base {
+  .theme-neon {
+    --color-primary: 211, 248, 202;
+    --color-secondary: 24, 69, 22;
+    --color-action: 71, 198, 67;
+  }
+
+  html.dark .theme-neon {
+    --color-primary: 31, 53, 31;
+    --color-secondary: 209, 255, 218;
+    --color-action: 255, 75, 75;
+  }
+}
