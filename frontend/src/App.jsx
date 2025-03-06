@@ -12,6 +12,7 @@ import { ProtectedLayout } from '@/components/ProtectedLayout';
 import LoginPage from '@/pages/login/Login';
 import { Register } from '@/pages/register/Register';
 import { Admin } from '@/pages/admin/Admin';
+import { Clients } from './pages/clients/Clients';
 
 // Components design
 function App() {
@@ -35,6 +36,11 @@ function App() {
           {/* Protected routes */}
           <Route element={<ProtectedLayout />}>
             <Route path="/dashboard" element={<Admin />} />
+          </Route>
+
+          {/* Protected routes */}
+          <Route element={<ProtectedLayout />}>
+            <Route path="/clients" element={<Clients />} />
           </Route>
 
           {/* Redirect root to login */}
