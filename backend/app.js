@@ -33,6 +33,7 @@ logger.info('Allowed origins-' + process.env.allow_cors);
 
 app.use('/api', apiRouter);
 app.use('/server', serverRoute);
+
 logger.info('Routes are configured.');
 
 // catch 404 and forward to error handler
