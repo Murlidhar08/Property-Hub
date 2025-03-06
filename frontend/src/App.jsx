@@ -1,14 +1,17 @@
 import { useEffect } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AOS from "aos";
 
 // Styles
-import "./styles/App.css";
+import "@/assets/styles/App.css";
 import "aos/dist/aos.css";
 
-import * as React from "react";
-import Stack from "@mui/material/Stack";
-import Button from "@mui/material/Button";
+// Components
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthLayout } from '@/components/AuthLayout';
+import { ProtectedLayout } from '@/components/ProtectedLayout';
+import LoginPage from '@/pages/login/Login';
+import { Register } from '@/pages/register/Register';
+import { Admin } from '@/pages/admin/Admin';
 
 // Components design
 function App() {
@@ -21,12 +24,26 @@ function App() {
 
   return (
     <>
-      <h1 className="text-8xl text-skin-secondary">Hello world!</h1>
-      <Stack spacing={2} direction="row">
-        <Button variant="text">Text</Button>
-        <Button variant="contained">Contained</Button>
-        <Button variant="outlined">Outlined</Button>
-      </Stack>
+      <BrowserRouter>
+        <Routes>
+          {/* Public routes */}
+          <Route element={<AuthLayout />}>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<Register />} />
+          </Route>
+
+          {/* Protected routes */}
+          <Route element={<ProtectedLayout />}>
+            <Route path="/dashboard" element={<Admin />} />
+          </Route>
+
+          {/* Redirect root to login */}
+          <Route path="/" element={<Navigate to="/login" replace />} />
+
+          {/* Catch all unmatched routes */}
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </Routes>
+      </BrowserRouter>
     </>
   );
 }
