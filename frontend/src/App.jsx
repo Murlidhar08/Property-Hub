@@ -6,6 +6,10 @@ import AOS from "aos";
 import "./styles/App.css";
 import "aos/dist/aos.css";
 
+import * as React from "react";
+import Stack from "@mui/material/Stack";
+import Button from "@mui/material/Button";
+
 // Components design
 function App() {
   useEffect(() => {
@@ -18,6 +22,11 @@ function App() {
   return (
     <>
       <h1 className="text-8xl text-skin-secondary">Hello world!</h1>
+      <Stack spacing={2} direction="row">
+        <Button variant="text">Text</Button>
+        <Button variant="contained">Contained</Button>
+        <Button variant="outlined">Outlined</Button>
+      </Stack>
     </>
   );
 }
