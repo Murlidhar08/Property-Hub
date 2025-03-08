@@ -71,7 +71,7 @@ export default function Register() {
             Register
           </button>
           <div className="mt-4">
-            <Link to="/" className="text-blue-600 hover:underline">
+            <Link to="/login" className="text-blue-600 hover:underline">
               Back to Sign in
             </Link>
           </div>
