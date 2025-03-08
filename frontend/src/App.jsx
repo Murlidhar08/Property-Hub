@@ -17,6 +17,7 @@ import Requirements from './pages/requirements/Requirements';
 // Add/Update Pages
 import AddUpdateClient from "./pages/clients/AddUpdateClient";
 import AddUpdateProperty from "./pages/property/AddUpdateProperty";
+import AddRequirementPage from './pages/requirements/AddRequirementPage';
 
 // Error Pages
 import Unauthorized from "./pages/errors/Unauthorized";
@@ -54,6 +55,8 @@ function App() {
           <Route path="/clients/edit/:id" element={<AddUpdateClient />} />
           <Route path="/properties/add" element={<AddUpdateProperty />} />
           <Route path="/properties/edit/:id" element={<AddUpdateProperty />} />
+          <Route path="/requirements/add" element={<AddRequirementPage />} />
+          <Route path="/requirements/edit/:id" element={<AddRequirementPage />} />
         </Route>
 
         <Route path="*" element={<NotFound />} />

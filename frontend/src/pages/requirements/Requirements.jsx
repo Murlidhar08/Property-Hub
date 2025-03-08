@@ -3,9 +3,9 @@ import { Plus, Grid, List } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const requirements = [
-    { id: 1, type: "Flat", location: "New York, NY", measurement: "1200 sq ft", priceRange: "20-30 Lakh/Hundred" },
-    { id: 2, type: "Agriculture", location: "Texas, USA", measurement: "4 Acres", priceRange: "15-25 Lakh/Hundred" },
-    { id: 3, type: "NonAgriculture", location: "California, USA", measurement: "5000 sq ft", priceRange: "25-40 Lakh/Hundred" },
+    { id: 1, type: "Flat", location: "New York, NY", measurement: "1200 sq ft", priceRange: "20-30 Lakh" },
+    { id: 2, type: "Agriculture", location: "Texas, USA", measurement: "4 Acres", priceRange: "15-25 Lakh" },
+    { id: 3, type: "NonAgriculture", location: "California, USA", measurement: "5000 sq ft", priceRange: "1000-2000 Hundred" },
 ];
 
 export default function RequirementsPage() {

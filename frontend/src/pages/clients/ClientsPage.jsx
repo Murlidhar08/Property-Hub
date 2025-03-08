@@ -42,7 +42,7 @@ export default function ClientsPage() {
     <div className="p-6 bg-gray-100 min-h-screen w-full">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Clients</h1>
-        <Link to="/requirements/add">
+        <Link to="/clients/add">
           <button className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 text-sm flex items-center">
             <Plus className="mr-2" size={16} /> Add New
           </button>
