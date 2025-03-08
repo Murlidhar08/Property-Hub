@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { FiUnlock } from "react-icons/fi";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -74,6 +75,11 @@ export default function ForgotPassword() {
             Send Reset Link
           </motion.button>
         </motion.div>
+        <div className="mt-4">
+          <Link to="/login" className="text-blue-600 hover:underline">
+            Back to Login
+          </Link>
+        </div>
       </motion.div>
     </motion.div>
   );

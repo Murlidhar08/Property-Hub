@@ -2,6 +2,7 @@ import { useState } from "react";
 import { FaGoogle, FaFacebook, FaApple } from "react-icons/fa";
 import { FiLogIn } from "react-icons/fi";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -48,7 +49,12 @@ export default function Login() {
             whileFocus={{ scale: 1.05 }}
           />
           <div className="text-right text-sm text-blue-500 cursor-pointer">
-            Forgot password?
+            <Link
+              to="/forgot-password"
+              className="text-blue-600 hover:underline"
+            >
+              Forgot password?
+            </Link>
           </div>
           <motion.button
             className="w-full bg-black text-white py-2 rounded-lg font-medium hover:bg-gray-800"
@@ -56,6 +62,13 @@ export default function Login() {
             whileTap={{ scale: 0.95 }}
           >
             Get Started
+          </motion.button>
+          <motion.button
+            className="w-full py-2 rounded-lg font-medium hover:bg-gray-200"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Link to="/register">Create account</Link>
           </motion.button>
         </div>
 

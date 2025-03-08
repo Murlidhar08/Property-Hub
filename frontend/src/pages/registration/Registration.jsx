@@ -2,6 +2,7 @@ import { useState } from "react";
 import { FaGoogle, FaFacebook, FaApple } from "react-icons/fa";
 import { FiUserPlus } from "react-icons/fi";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
 export default function Register() {
   const [name, setName] = useState("");
@@ -69,6 +70,11 @@ export default function Register() {
           <button className="w-full bg-black text-white py-2 rounded-lg font-medium hover:bg-gray-800">
             Register
           </button>
+          <div className="mt-4">
+            <Link to="/" className="text-blue-600 hover:underline">
+              Back to Login
+            </Link>
+          </div>
         </motion.div>
 
         <div className="my-4 text-gray-400 flex items-center">
