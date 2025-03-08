@@ -12,6 +12,7 @@ import ForgotPassword from "./pages/authentication/forgetPassword";
 import AdminPage from "./pages/admin/AdminPage";
 import ClientsPage from "./pages/clients/ClientsPage";
 import PropertyPage from "./pages/property/PropertyPage";
+import Requirements from './pages/requirements/Requirements';
 
 // Add/Update Pages
 import AddUpdateClient from "./pages/clients/AddUpdateClient";
@@ -24,6 +25,7 @@ import ServerError from "./pages/errors/ServerError";
 
 // Layout
 import NavLayout from "./layouts/NavLayout";
+import Dashboard from './pages/dashboard/Dashboard';
 
 function App() {
   return (
@@ -40,10 +42,12 @@ function App() {
 
         {/* Protected Routes (With Navbar) */}
         <Route element={<NavLayout />}>
-          <Route path="/" element={<AdminPage />} />
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/clients" element={<ClientsPage />} />
           <Route path="/properties" element={<PropertyPage />} />
+          <Route path="/requirements" element={<Requirements />} />
 
           {/* Add/Update Pages */}
           <Route path="/clients/add" element={<AddUpdateClient />} />

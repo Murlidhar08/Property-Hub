@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Home, Users, Workflow, Settings, Bell, User } from "lucide-react";
+import { Home, Users, Workflow, Bell, User, AlbumIcon } from "lucide-react";
 import clsx from "clsx";
 
 const menuItems = [
-  { name: "Dashboard", icon: Home, path: "/admin" },
-  { name: "Clients", icon: Users, path: "/clients" },
+  { name: "Dashboard", icon: Home, path: "/dashboard" },
   { name: "Properties", icon: Workflow, path: "/properties" },
+  { name: "Requirements", icon: AlbumIcon, path: "/requirements" },
+  { name: "Clients", icon: Users, path: "/clients" },
   // { name: "Settings", icon: Settings, path: "/settings" },
 ];
 
@@ -14,7 +15,7 @@ export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
-  const [selected, setSelected] = useState("");
+  const [selected, setSelected] = useState("Dashboard");
 
   // Update selected menu item when route changes
   useEffect(() => {

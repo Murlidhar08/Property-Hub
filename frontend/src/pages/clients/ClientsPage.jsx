@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Search, Plus, Grid, List } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const clients = [
   {
@@ -39,7 +40,14 @@ export default function ClientsPage() {
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen w-full">
-      <h1 className="text-2xl font-bold">Clients</h1>
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold">Clients</h1>
+        <Link to="/requirements/add">
+          <button className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 text-sm flex items-center">
+            <Plus className="mr-2" size={16} /> Add New
+          </button>
+        </Link>
+      </div>
       <hr className="my-4" />
       <div className="flex justify-between items-center mb-4">
         <div className="relative w-full max-w-sm">
@@ -52,25 +60,20 @@ export default function ClientsPage() {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center ml-5">
           <button
-            className={`p-2 rounded-md ${
-              view === "grid" ? "bg-gray-300" : "bg-gray-200"
-            }`}
+            className={`p-2 rounded-md ${view === "grid" ? "bg-gray-300" : "bg-gray-200"
+              }`}
             onClick={() => setView("grid")}
           >
             <Grid size={20} />
           </button>
           <button
-            className={`p-2 rounded-md ${
-              view === "list" ? "bg-gray-300" : "bg-gray-200"
-            }`}
+            className={`p-2 rounded-md ${view === "list" ? "bg-gray-300" : "bg-gray-200"
+              }`}
             onClick={() => setView("list")}
           >
             <List size={20} />
-          </button>
-          <button className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700">
-            <Plus className="mr-2 inline" /> Add New
           </button>
         </div>
       </div>
