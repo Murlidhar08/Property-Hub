@@ -8,7 +8,7 @@ import "./styles/App.css";
 
 // Comonents
 import Login from "./pages/login/Login";
-import Register from "./pages/registration/Registration";
+import Register from "./pages/register/Register";
 import ForgotPassword from "./pages/forgetPassword/forgetPassword";
 
 // Components design
