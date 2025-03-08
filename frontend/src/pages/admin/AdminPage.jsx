@@ -8,8 +8,7 @@ export default function AdminPage() {
   return (
     <>
       <div className="flex flex-row">
-        <Navbar />
-        <AddUpdateClient />
+        <h1>Admin page</h1>
       </div>
     </>
   );
