@@ -1,79 +1,96 @@
 import { useState } from "react";
-import { MdEdit, MdDelete } from "react-icons/md";
-const clientsData = [
-    { id: 1, name: "John Doe", contact: "9876543210", email: "john@example.com", address: "New York, USA", occupation: "Investor" },
-    { id: 2, name: "Jane Smith", contact: "9876543211", email: "jane@example.com", address: "Los Angeles, USA", occupation: "Realtor" },
-    { id: 3, name: "Alice Johnson", contact: "9876543212", email: "alice@example.com", address: "San Francisco, USA", occupation: "Engineer" }
+import { Search, Plus, Grid, List } from "lucide-react";
+
+const clients = [
+  {
+    name: "Linnie Richardson",
+    role: "Account Manager",
+    email: "binhan628@gmail.com",
+    phone: "(302) 555-0107",
+  },
+  {
+    name: "Miguel Daniels",
+    role: "Salon Owner",
+    email: "tienlapspktnd@gmail.com",
+    phone: "(629) 555-0129",
+  },
+  {
+    name: "Rose Walker",
+    role: "Account Manager",
+    email: "nvt.isst.nute@gmail.com",
+    phone: "(480) 555-0103",
+  },
+  {
+    name: "Edwin Frank",
+    role: "Account Manager",
+    email: "manhhatk08@gmail.com",
+    phone: "(405) 555-0128",
+  },
+  // Add more clients as needed
 ];
 
-export const Clients = () => {
+export default function ClientsPage() {
+  const [search, setSearch] = useState("");
+  const [view, setView] = useState("grid");
 
-    const [search, setSearch] = useState("");
+  const filteredClients = clients.filter((client) =>
+    client.name.toLowerCase().includes(search.toLowerCase())
+  );
 
-    const filteredClients = clientsData.filter(client =>
-        client.name.toLowerCase().includes(search.toLowerCase()) ||
-        client.email.toLowerCase().includes(search.toLowerCase()) ||
-        client.contact.includes(search)
-    );
-    return (
-        <div className="p-6 bg-gray-100 dark:bg-gray-900 min-h-screen">
-            <div className="max-w-5xl mx-auto bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6">
-                <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-4">Clients List</h2>
-
-                {/* Search Input */}
-                <div className="mb-4">
-                    <input
-                        type="text"
-                        placeholder="Search clients..."
-                        className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                    />
-                </div>
-
-                {/* Clients Table */}
-                <div className="overflow-x-auto">
-                    <table className="w-full border-collapse border border-gray-200 dark:border-gray-700">
-                        <thead className="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white">
-                            <tr>
-                                <th className="py-2 px-4 border">#</th>
-                                <th className="py-2 px-4 border">Name</th>
-                                <th className="py-2 px-4 border">Contact</th>
-                                <th className="py-2 px-4 border">Email</th>
-                                <th className="py-2 px-4 border">Address</th>
-                                <th className="py-2 px-4 border">Occupation</th>
-                                <th className="py-2 px-4 border">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filteredClients.length > 0 ? (
-                                filteredClients.map((client, index) => (
-                                    <tr key={client.id} className="hover:bg-gray-100 dark:hover:bg-gray-800">
-                                        <td className="py-2 px-4 border text-center">{index + 1}</td>
-                                        <td className="py-2 px-4 border">{client.name}</td>
-                                        <td className="py-2 px-4 border">{client.contact}</td>
-                                        <td className="py-2 px-4 border">{client.email}</td>
-                                        <td className="py-2 px-4 border">{client.address}</td>
-                                        <td className="py-2 px-4 border">{client.occupation}</td>
-                                        <td className="py-2 px-4 border flex justify-center space-x-2">
-                                            <button className="text-blue-500 hover:text-blue-700">
-                                                <MdEdit size={20} />
-                                            </button>
-                                            <button className="text-red-500 hover:text-red-700">
-                                                <MdDelete size={20} />
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan="7" className="text-center py-4 text-gray-500">No clients found.</td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+  return (
+    <div className="p-6 bg-gray-100 min-h-screen w-full">
+      <h1 className="text-2xl font-bold">Clients</h1>
+      <hr className="my-4" />
+      <div className="flex justify-between items-center mb-4">
+        <div className="relative w-full max-w-sm">
+          <Search className="absolute left-3 top-2.5 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search Clients"
+            className="pl-10 pr-4 py-2 border rounded-md shadow-sm focus:outline-none w-full"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
         </div>
-    );
-};
+        <div className="flex items-center space-x-4">
+          <button
+            className={`p-2 rounded-md ${
+              view === "grid" ? "bg-gray-300" : "bg-gray-200"
+            }`}
+            onClick={() => setView("grid")}
+          >
+            <Grid size={20} />
+          </button>
+          <button
+            className={`p-2 rounded-md ${
+              view === "list" ? "bg-gray-300" : "bg-gray-200"
+            }`}
+            onClick={() => setView("list")}
+          >
+            <List size={20} />
+          </button>
+          <button className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700">
+            <Plus className="mr-2 inline" /> Add New
+          </button>
+        </div>
+      </div>
+      <hr className="my-4" />
+      <div
+        className={
+          view === "grid"
+            ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+            : "space-y-4"
+        }
+      >
+        {filteredClients.map((client, index) => (
+          <div key={index} className="bg-white p-4 rounded-lg shadow-md border">
+            <h2 className="text-lg font-semibold">{client.name}</h2>
+            <p className="text-sm text-gray-500">{client.role}</p>
+            <p className="text-sm mt-2">📧 {client.email}</p>
+            <p className="text-sm">📞 {client.phone}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
