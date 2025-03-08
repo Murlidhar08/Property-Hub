@@ -72,7 +72,7 @@ export default function Register() {
           </button>
           <div className="mt-4">
             <Link to="/" className="text-blue-600 hover:underline">
-              Back to Login
+              Back to Sign in
             </Link>
           </div>
         </motion.div>
