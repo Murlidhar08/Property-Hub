@@ -9,6 +9,9 @@ import "aos/dist/aos.css";
 import * as React from "react";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
+import Login from "./pages/login/Login";
+import Register from "./pages/registration/Registration";
+import ForgotPassword from "./pages/forgetPassword/forgetPassword";
 
 // Components design
 function App() {
@@ -21,12 +24,7 @@ function App() {
 
   return (
     <>
-      <h1 className="text-8xl text-skin-secondary">Hello world!</h1>
-      <Stack spacing={2} direction="row">
-        <Button variant="text">Text</Button>
-        <Button variant="contained">Contained</Button>
-        <Button variant="outlined">Outlined</Button>
-      </Stack>
+      <Login />
     </>
   );
 }
