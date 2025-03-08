@@ -1,12 +1,12 @@
 import Navbar from "../../components/Navbar";
-import ClientsPage from "../clients/Clients";
+import PropertyPage from "../propertyPage/PropertyPage";
 
 export default function Admin() {
   return (
     <>
       <div className="flex flex-row">
         <Navbar />
-        <ClientsPage />
+        <PropertyPage />
       </div>
     </>
   );
