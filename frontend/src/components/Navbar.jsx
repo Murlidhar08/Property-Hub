@@ -19,8 +19,9 @@ const menuItems = [
   { name: "Archive", icon: Archive },
 ];
 
-export default function Navbar() {
+export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(true);
+  const [selected, setSelected] = useState("Dashboard");
 
   return (
     <div
@@ -44,20 +45,53 @@ export default function Navbar() {
         {menuItems.map(({ name, icon: Icon }) => (
           <div
             key={name}
-            className="flex items-center gap-4 p-3 rounded-md hover:bg-gray-700 cursor-pointer"
+            className={clsx(
+              "flex items-center gap-4 p-3 rounded-md cursor-pointer",
+              selected === name ? "bg-white text-black" : "hover:bg-gray-700"
+            )}
+            onClick={() => setSelected(name)}
           >
-            <Icon className="h-5 w-5 text-white" />
+            <Icon
+              className={clsx(
+                "h-5 w-5",
+                selected === name ? "text-black" : "text-white"
+              )}
+            />
             <span className={clsx(!isOpen && "hidden")}>{name}</span>
           </div>
         ))}
       </nav>
       <div className="mt-auto">
-        <div className="flex items-center gap-4 p-3 rounded-md hover:bg-gray-700 cursor-pointer">
-          <Bell className="h-5 w-5 text-white" />
+        <div
+          className={clsx(
+            "flex items-center gap-4 p-3 rounded-md cursor-pointer",
+            selected === "Notifications"
+              ? "bg-white text-black"
+              : "hover:bg-gray-700"
+          )}
+          onClick={() => setSelected("Notifications")}
+        >
+          <Bell
+            className={clsx(
+              "h-5 w-5",
+              selected === "Notifications" ? "text-black" : "text-white"
+            )}
+          />
           <span className={clsx(!isOpen && "hidden")}>Notifications</span>
         </div>
-        <div className="flex items-center gap-4 p-3 rounded-md hover:bg-gray-700 cursor-pointer">
-          <User className="h-5 w-5 text-white" />
+        <div
+          className={clsx(
+            "flex items-center gap-4 p-3 rounded-md cursor-pointer",
+            selected === "Account" ? "bg-white text-black" : "hover:bg-gray-700"
+          )}
+          onClick={() => setSelected("Account")}
+        >
+          <User
+            className={clsx(
+              "h-5 w-5",
+              selected === "Account" ? "text-black" : "text-white"
+            )}
+          />
           <span className={clsx(!isOpen && "hidden")}>Account</span>
         </div>
       </div>
