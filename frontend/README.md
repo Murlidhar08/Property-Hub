@@ -1,77 +1,87 @@
-# Portfolio v2
-Welcome to my portfolio site project! This README file will guide you through the project setup and provide an overview of its structure.
+# Property Hub
 
-## Project Description
-This project is a portfolio website created using React JS. It showcases my job experience, education qualifications, projects I've worked on, and list of my skills.
+## Tagline
 
-## Getting Started
-How to clone and run project on your local machine.
+**Organize, Track, and Manage Your Property with Ease.**
+
+## Overview
+
+Property Hub is a centralized platform for managing real estate properties, client interactions, and agent activities. It provides role-based access control to ensure efficient management and security.
+
+## Features
+
+- **Authentication:** Google authentication with admin approval for new users.
+- **Role-Based Access:**
+  - **Admin:** Manage properties, clients, agents, and application settings.
+  - **Agent:** Manage only the properties they have added.
+  - **Client:** View and print properties shared by an agent or admin (if access is granted).
+- **Advanced Property Search:** Filter properties by location, type, price, and more.
+- **Property Details Management:** Includes title, location, measurement, type, address, price, and WYSIWYG description editor.
+- **Media Uploads:** Support for high-quality images and videos.
+- **Audit Tracking:** Logs interactions with properties and clients.
+- **Print Feature:** Generate and print property details if access is granted.
+- **PWA Support:** Access the platform as a Progressive Web App (PWA).
+
+## Pages
+
+1. **Login/Registration Page** – Google Authentication only; new users must wait for admin approval.
+2. **Admin Page** – Manage properties, clients, agents, and application settings.
+3. **Agent Page** – Manage only the properties they have added.
+4. **Client Page** – View properties shared by an agent or admin; print if access is granted.
+5. **Property Search Page** – Advanced search with filters and sorting.
+6. **Profile Management Page** – Update user details and preferences.
+7. **Print Property Page** – Print or download property details if access is granted.
+8. **Unauthorized Access Page** – Displayed when a user tries to access restricted content.
+
+## Technology Stack
+
+- **Frontend:** React.js, React Router, MUI, Tailwind CSS, Vite.js.
+- **Backend:** Node.js, Express.js, MySQL.
+- **Authentication:** Google Authentication.
+- **Container Support:** Docker (if required in deployment).
+
+## Setup Instructions
+
+### Prerequisites
+
+- Node.js & npm
+- MySQL database
 
 ### Installation
 
-1. Clone the repository from GitHub:
+```sh
+# Clone the repository
+git clone https://github.com/your-repo/property-hub.git
+cd property-hub
 
-   ```bash
-   git clone https://github.com/Chavda2772/Portfolio-v2.0.git
-   ```
-   ```bash
-   cd Portfolio_v2
-   ```
+# Install dependencies
+npm install
 
-2. Install dependencies:
-
-   ```command
-   npm install
-   ```
-
-### Running the Development Server
-
-To start the development server and view the website in your browser, use:
-
-```command
+# Start the development server
 npm run dev
 ```
 
-This will open the project in your default browser at `http://localhost:3000`.
+### Backend Setup
 
-### Building the Project
+```sh
+# Navigate to backend folder
+cd backend
 
-If you need to build the project for deployment, use:
+# Install dependencies
+npm install
 
-```command
-npm run build
+# Start backend server
+npm start
 ```
 
-This creates an optimized production build in the `dist` folder.
+### Database Setup
 
-## Project Structure
+- Configure MySQL database and update environment variables in `.env` file.
 
-The project structure is organized as follows:
+## Contribution
 
-```
-Portfolio_v2/
-├─── public/             # Public assets
-├─── resource/           # Development resource
-├─── src/                # Source files
-|    ├─── components/    # React components
-|    ├─── pages/         # Page components (e.g., MainView, Projects)
-|    ├─── theme/         # Application theme css files
-|    ├─ App.css          # Style files
-|    ├─ App.jsx          # React Application file
-|    ├─ main.css         # Style files
-|    └─ main.jsx         # React Main component file
-|    
-├─ index.html            # Entry point
-├─ package.json          # npm package configuration
-├─ postcss.config.js     # post css configuration file
-├─ tailwind.config.js    # Tailwind configuration file
-├─ vite.config.js        # Vite configuration file
-└── ...                  # Other project configuration files
-```
+Feel free to submit pull requests and raise issues to improve the platform.
 
-### Prerequisites
- - Node JS
- - NPM
+## License
 
-## Live Preview
- [Preview](https://www.chavdamahesh.com/)
+This project is licensed under the MIT License.
