@@ -68,7 +68,7 @@ export default function ClientsPage() {
         <div className={view === "grid" ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" : "space-y-4"}>
           {filteredClients.map((client, index) => (
             <Link key={index} to={`/clients/${index}`} className="block">
-              <div className="bg-white p-4 rounded-lg shadow-md border hover:shadow-lg transition">
+              <div className="bg-white p-4 rounded-lg border hover:shadow-lg transition">
                 <h2 className="text-lg font-semibold">{client.name}</h2>
                 <p className="text-sm text-gray-500">{client.role}</p>
                 <p className="text-sm mt-2">📧 {client.email}</p>

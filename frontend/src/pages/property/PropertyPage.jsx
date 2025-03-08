@@ -77,54 +77,56 @@ export default function PropertyPage() {
       </div>
       <hr className="my-4" />
       <div className={view === "grid" ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" : "space-y-4"}>
-        {filteredProperties.map((property) => (
-          <div key={property.id} className="bg-white rounded-xl shadow-md overflow-hidden">
-            {view === "grid" ? (
-              <>
-                <img src={property.img} alt={property.name} className="w-full h-48 object-cover" />
-                <div className="p-4">
-                  <h2 className="text-lg font-semibold">{property.name}</h2>
-                  <p className="text-sm text-gray-500 flex items-center gap-1">
-                    <MapPin className="h-4 w-4" /> {property.location}
-                  </p>
-                  <p className="text-lg font-bold mt-2">{property.price}</p>
-                  <div className="flex items-center gap-4 text-gray-500 text-sm mt-2">
-                    <span className="flex items-center gap-1">
-                      <Bed className="h-4 w-4" /> 8
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Bath className="h-4 w-4" /> 2.5
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Ruler className="h-4 w-4" /> 4413 sq ft
-                    </span>
+        {filteredProperties.map((property, index) => (
+          <Link key={index} to={`/properties/${index}`} className="block">
+            <div key={property.id} className="bg-white rounded-xl hover:shadow-lg overflow-hidden">
+              {view === "grid" ? (
+                <>
+                  <img src={property.img} alt={property.name} className="w-full h-48 object-cover" />
+                  <div className="p-4">
+                    <h2 className="text-lg font-semibold">{property.name}</h2>
+                    <p className="text-sm text-gray-500 flex items-center gap-1">
+                      <MapPin className="h-4 w-4" /> {property.location}
+                    </p>
+                    <p className="text-lg font-bold mt-2">{property.price}</p>
+                    <div className="flex items-center gap-4 text-gray-500 text-sm mt-2">
+                      <span className="flex items-center gap-1">
+                        <Bed className="h-4 w-4" /> 8
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Bath className="h-4 w-4" /> 2.5
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Ruler className="h-4 w-4" /> 4413 sq ft
+                      </span>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="flex items-center p-4 space-x-4">
+                  <img src={property.img} alt={property.name} className="w-32 h-32 object-cover rounded-md" />
+                  <div>
+                    <h2 className="text-lg font-semibold">{property.name}</h2>
+                    <p className="text-sm text-gray-500 flex items-center gap-1">
+                      <MapPin className="h-4 w-4" /> {property.location}
+                    </p>
+                    <p className="text-lg font-bold mt-2">{property.price}</p>
+                    <div className="flex items-center gap-4 text-gray-500 text-sm mt-2">
+                      <span className="flex items-center gap-1">
+                        <Bed className="h-4 w-4" /> 8
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Bath className="h-4 w-4" /> 2.5
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Ruler className="h-4 w-4" /> 4413 sq ft
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </>
-            ) : (
-              <div className="flex items-center p-4 space-x-4">
-                <img src={property.img} alt={property.name} className="w-32 h-32 object-cover rounded-md" />
-                <div>
-                  <h2 className="text-lg font-semibold">{property.name}</h2>
-                  <p className="text-sm text-gray-500 flex items-center gap-1">
-                    <MapPin className="h-4 w-4" /> {property.location}
-                  </p>
-                  <p className="text-lg font-bold mt-2">{property.price}</p>
-                  <div className="flex items-center gap-4 text-gray-500 text-sm mt-2">
-                    <span className="flex items-center gap-1">
-                      <Bed className="h-4 w-4" /> 8
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Bath className="h-4 w-4" /> 2.5
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Ruler className="h-4 w-4" /> 4413 sq ft
-                    </span>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          </Link>
         ))}
       </div>
     </div>

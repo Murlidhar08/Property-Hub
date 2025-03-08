@@ -103,14 +103,16 @@ export default function RequirementsPage() {
 
             {/* List/Grid View */}
             <div className={view === "grid" ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" : "space-y-4"}>
-                {filteredRequirements.map((req) => (
-                    <div key={req.id} className="bg-white p-4 rounded-lg shadow-md border">
-                        <h2 className="text-lg font-semibold">{req.type}</h2>
-                        <p className="text-sm text-gray-500">📍 {req.location}</p>
-                        <p className="text-sm">📏 {req.measurement}</p>
-                        <p className="text-sm">💰 {req.priceRange}</p>
-                        <p className="text-sm font-semibold text-gray-700">👤 {req.client}</p>
-                    </div>
+                {filteredRequirements.map((req, index) => (
+                    <Link key={index} to={`/requirements/${index}`} className="block">
+                        <div key={req.id} className="bg-white p-4 rounded-lg hover:shadow-lg border">
+                            <h2 className="text-lg font-semibold">{req.type}</h2>
+                            <p className="text-sm text-gray-500">📍 {req.location}</p>
+                            <p className="text-sm">📏 {req.measurement}</p>
+                            <p className="text-sm">💰 {req.priceRange}</p>
+                            <p className="text-sm font-semibold text-gray-700">👤 {req.client}</p>
+                        </div>
+                    </Link>
                 ))}
             </div>
         </div>
