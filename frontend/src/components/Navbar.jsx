@@ -1,27 +1,32 @@
-import { useState } from "react";
-import {
-  Home,
-  Users,
-  Workflow,
-  Settings,
-  Archive,
-  Bell,
-  User,
-} from "lucide-react";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { Home, Users, Workflow, Settings, Bell, User } from "lucide-react";
 import clsx from "clsx";
 
 const menuItems = [
-  { name: "Dashboard", icon: Home },
-  { name: "Clients", icon: Users },
-  { name: "Workflows", icon: Workflow },
-  { name: "Templates", icon: Archive },
-  { name: "Settings", icon: Settings },
-  { name: "Archive", icon: Archive },
+  { name: "Dashboard", icon: Home, path: "/admin" },
+  { name: "Clients", icon: Users, path: "/clients" },
+  { name: "Properties", icon: Workflow, path: "/properties" },
+  // { name: "Settings", icon: Settings, path: "/settings" },
 ];
 
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(true);
-  const [selected, setSelected] = useState("Dashboard");
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [selected, setSelected] = useState("");
+
+  // Update selected menu item when route changes
+  useEffect(() => {
+    const currentItem = menuItems.find((item) =>
+      location.pathname.startsWith(item.path)
+    );
+    setSelected(currentItem ? currentItem.name : "");
+  }, [location.pathname]);
+
+  const handleNavigation = (name, path) => {
+    navigate(path);
+  };
 
   return (
     <div
@@ -41,55 +46,65 @@ export default function Sidebar() {
           {isOpen ? "➖" : "➕"}
         </button>
       </div>
+
+      {/* Main Navigation */}
       <nav className="flex-1 mt-8">
-        {menuItems.map(({ name, icon: Icon }) => (
+        {menuItems.map(({ name, icon: Icon, path }) => (
           <div
             key={name}
             className={clsx(
-              "flex items-center gap-4 p-3 rounded-md cursor-pointer",
-              selected === name ? "bg-white text-black" : "hover:bg-gray-700"
+              "flex items-center gap-4 p-3 rounded-md cursor-pointer transition",
+              location.pathname.startsWith(path)
+                ? "bg-white text-black"
+                : "hover:bg-gray-700"
             )}
-            onClick={() => setSelected(name)}
+            onClick={() => handleNavigation(name, path)}
           >
             <Icon
               className={clsx(
                 "h-5 w-5",
-                selected === name ? "text-black" : "text-white"
+                location.pathname.startsWith(path) ? "text-black" : "text-white"
               )}
             />
             <span className={clsx(!isOpen && "hidden")}>{name}</span>
           </div>
         ))}
       </nav>
+
+      {/* Bottom Section */}
       <div className="mt-auto">
         <div
           className={clsx(
-            "flex items-center gap-4 p-3 rounded-md cursor-pointer",
-            selected === "Notifications"
+            "flex items-center gap-4 p-3 rounded-md cursor-pointer transition",
+            location.pathname === "/notifications"
               ? "bg-white text-black"
               : "hover:bg-gray-700"
           )}
-          onClick={() => setSelected("Notifications")}
+          onClick={() => navigate("/notifications")}
         >
           <Bell
             className={clsx(
               "h-5 w-5",
-              selected === "Notifications" ? "text-black" : "text-white"
+              location.pathname === "/notifications"
+                ? "text-black"
+                : "text-white"
             )}
           />
           <span className={clsx(!isOpen && "hidden")}>Notifications</span>
         </div>
         <div
           className={clsx(
-            "flex items-center gap-4 p-3 rounded-md cursor-pointer",
-            selected === "Account" ? "bg-white text-black" : "hover:bg-gray-700"
+            "flex items-center gap-4 p-3 rounded-md cursor-pointer transition",
+            location.pathname === "/account"
+              ? "bg-white text-black"
+              : "hover:bg-gray-700"
           )}
-          onClick={() => setSelected("Account")}
+          onClick={() => navigate("/account")}
         >
           <User
             className={clsx(
               "h-5 w-5",
-              selected === "Account" ? "text-black" : "text-white"
+              location.pathname === "/account" ? "text-black" : "text-white"
             )}
           />
           <span className={clsx(!isOpen && "hidden")}>Account</span>
