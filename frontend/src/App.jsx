@@ -10,6 +10,7 @@ import "./styles/App.css";
 import Login from "./pages/login/Login";
 import Register from "./pages/register/Register";
 import ForgotPassword from "./pages/forgetPassword/forgetPassword";
+import Admin from "./pages/admin/Admin";
 
 // Components design
 function App() {
@@ -19,7 +20,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="*" element={<Login />} />
+        <Route path="*" element={<Admin />} />
       </Routes>
     </Router>
   );
