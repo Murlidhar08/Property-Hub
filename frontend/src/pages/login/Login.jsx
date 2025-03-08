@@ -61,7 +61,7 @@ export default function Login() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            Get Started
+            Sign In
           </motion.button>
           <motion.button
             className="w-full py-2 rounded-lg font-medium hover:bg-gray-200"
