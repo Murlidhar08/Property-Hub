@@ -6,7 +6,7 @@ import "./styles/App.css";
 // Authentication
 import Login from "./pages/authentication/Login";
 import Register from "./pages/authentication/Register";
-import ForgotPassword from "./pages/authentication/forgetPassword";
+import ForgotPassword from "./pages/authentication/ForgetPassword";
 
 // Main Pages
 import AdminPage from "./pages/admin/AdminPage";
@@ -68,8 +68,8 @@ function App() {
             path="/requirements/edit/:id"
             element={<AddRequirementPage />}
           />
-          <Route path="/agents/add" element={<AgentsPage />} />
-          <Route path="/agents/edit/:id" element={<AgentsPage />} />
+          <Route path="/agents/add" element={<AddUpdateClient />} />
+          <Route path="/agents/edit/:id" element={<AddUpdateClient />} />
         </Route>
 
         <Route path="*" element={<NotFound />} />
