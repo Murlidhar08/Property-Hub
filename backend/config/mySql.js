@@ -13,6 +13,8 @@ var pool = createPool({
   connectionLimit: 10,
   charset: 'utf8mb4',
   timezone: 'UTC',
+  waitForConnections: true,
+  queueLimit: 0
 });
 
 module.exports = pool;

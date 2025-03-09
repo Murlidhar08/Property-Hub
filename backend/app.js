@@ -9,8 +9,9 @@ const cors = require('cors');
 logger.info('Environment Mode: ' + process.env.NODE_ENV);
 
 // Routes
-const apiRouter = require('./routes/apiRoute');
-const serverRoute = require('./routes/serverRoute');
+import agentsRouter from "./routes/agents.js";
+import clientsRouter from "./routes/clients.js";
+import requirementsRouter from "./routes/requirements.js";
 
 // Application Configurations
 const app = express();
@@ -31,8 +32,9 @@ app.use(
 );
 logger.info('Allowed origins-' + process.env.allow_cors);
 
-app.use('/api', apiRouter);
-app.use('/server', serverRoute);
+app.use("/api/agents", agentsRouter);
+app.use("/api/clients", clientsRouter);
+app.use("/api/requirements", requirementsRouter);
 
 logger.info('Routes are configured.');
 
