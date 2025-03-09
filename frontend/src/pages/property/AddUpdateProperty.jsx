@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Plus, Save } from "lucide-react";
-import TinyEditor from "../../components/TinyEditor";
-import OpenStreetMapComponent from "../../components/OpenStreetMapComponent";
+import { Save } from "lucide-react";
+import QuillEditor from "@/components/QuillEditor";
+import OpenStreetMapComponent from "@/components/OpenStreetMapComponent";
 
 export default function AddUpdateProperty() {
   const [property, setProperty] = useState({
@@ -90,13 +90,13 @@ export default function AddUpdateProperty() {
               className="w-full p-2 border rounded-md"
             />
           </div>
-          <div>
+          <div className="flex-1">
             <label className="block text-sm font-medium">Unit</label>
             <select
               name="measurementUnit"
               value={property.measurementUnit}
               onChange={handleChange}
-              className="p-2 border rounded-md"
+              className="w-full p-2 border rounded-md"
             >
               <option>Feet</option>
               <option>Acer</option>
@@ -106,7 +106,7 @@ export default function AddUpdateProperty() {
         </div>
         <div>
           <label className="block text-sm font-medium">Description</label>
-          <TinyEditor />
+          <QuillEditor />
         </div>
         <div>
           <label className="block text-sm font-medium">Map Location</label>
