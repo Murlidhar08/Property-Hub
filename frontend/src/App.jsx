@@ -14,6 +14,9 @@ import ClientsPage from "./pages/clients/ClientsPage";
 import PropertyPage from "./pages/property/PropertyPage";
 import Requirements from "./pages/requirements/Requirements";
 
+// Details Page
+import PropertyDetails from "./pages/property/PropertyDetails";
+
 // Add/Update Pages
 import AddUpdateClient from "./pages/clients/AddUpdateClient";
 import AddUpdateProperty from "./pages/property/AddUpdateProperty";
@@ -51,6 +54,9 @@ function App() {
           <Route path="/properties" element={<PropertyPage />} />
           <Route path="/requirements" element={<Requirements />} />
           <Route path="/agents" element={<AgentsPage />} />
+
+          {/* Details page */}
+          <Route path="/properties/:id" element={<PropertyDetails />} />
 
           {/* Add/Update Pages */}
           <Route path="/clients/add" element={<AddUpdateClient />} />
