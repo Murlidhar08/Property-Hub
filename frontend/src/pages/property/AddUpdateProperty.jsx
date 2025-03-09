@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Save } from "lucide-react";
 import QuillEditor from "@/components/QuillEditor";
-import OpenStreetMapComponent from "@/components/OpenStreetMapComponent";
+import LeafletMap from "@/components/LeafletMap";
 
 export default function AddUpdateProperty() {
   const [property, setProperty] = useState({
@@ -110,7 +110,7 @@ export default function AddUpdateProperty() {
         </div>
         <div>
           <label className="block text-sm font-medium">Map Location</label>
-          <OpenStreetMapComponent />
+          <LeafletMap />
         </div>
         <div>
           <label className="block text-sm font-medium">Comments</label>
