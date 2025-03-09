@@ -12,12 +12,12 @@ import ForgotPassword from "./pages/authentication/forgetPassword";
 import AdminPage from "./pages/admin/AdminPage";
 import ClientsPage from "./pages/clients/ClientsPage";
 import PropertyPage from "./pages/property/PropertyPage";
-import Requirements from './pages/requirements/Requirements';
+import Requirements from "./pages/requirements/Requirements";
 
 // Add/Update Pages
 import AddUpdateClient from "./pages/clients/AddUpdateClient";
 import AddUpdateProperty from "./pages/property/AddUpdateProperty";
-import AddRequirementPage from './pages/requirements/AddRequirementPage';
+import AddRequirementPage from "./pages/requirements/AddRequirementPage";
 
 // Error Pages
 import Unauthorized from "./pages/errors/Unauthorized";
@@ -26,7 +26,8 @@ import ServerError from "./pages/errors/ServerError";
 
 // Layout
 import NavLayout from "./layouts/NavLayout";
-import Dashboard from './pages/dashboard/Dashboard';
+import Dashboard from "./pages/dashboard/Dashboard";
+import AgentsPage from "./pages/agents/AgentsPage";
 
 function App() {
   return (
@@ -49,6 +50,7 @@ function App() {
           <Route path="/clients" element={<ClientsPage />} />
           <Route path="/properties" element={<PropertyPage />} />
           <Route path="/requirements" element={<Requirements />} />
+          <Route path="/agents" element={<AgentsPage />} />
 
           {/* Add/Update Pages */}
           <Route path="/clients/add" element={<AddUpdateClient />} />
@@ -56,7 +58,12 @@ function App() {
           <Route path="/properties/add" element={<AddUpdateProperty />} />
           <Route path="/properties/edit/:id" element={<AddUpdateProperty />} />
           <Route path="/requirements/add" element={<AddRequirementPage />} />
-          <Route path="/requirements/edit/:id" element={<AddRequirementPage />} />
+          <Route
+            path="/requirements/edit/:id"
+            element={<AddRequirementPage />}
+          />
+          <Route path="/agents/add" element={<AgentsPage />} />
+          <Route path="/agents/edit/:id" element={<AgentsPage />} />
         </Route>
 
         <Route path="*" element={<NotFound />} />
