@@ -1,5 +1,5 @@
-import express from "express";
-import { getAgents, getAgentById, addAgent, updateAgent, deleteAgent } from "../controllers/agentController.js";
+const express = require('express');
+const { getAgents, getAgentById, addAgent, updateAgent, deleteAgent } = require("../controller/agentController.js");
 
 const router = express.Router();
 
@@ -9,4 +9,4 @@ router.post("/", addAgent);
 router.put("/:id", updateAgent);
 router.delete("/:id", deleteAgent);
 
-export default router;
+module.exports = router;

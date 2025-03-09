@@ -1,24 +1,52 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import clientService from "../../services/clientService";
 
-export default function AddUpdateClient({ clientData = null, onSubmit }) {
+export default function AddUpdateClient({ clientData = null }) {
   const navigate = useNavigate();
   const [client, setClient] = useState({
-    name: clientData?.name || "",
-    contact: clientData?.contact || "",
-    email: clientData?.email || "",
-    address: clientData?.address || "",
-    occupation: clientData?.occupation || "",
+    name: "",
+    contact: "",
+    email: "",
+    address: "",
+    occupation: "",
   });
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (clientData) {
+      setClient({
+        name: clientData.name || "",
+        contact: clientData.contact || "",
+        email: clientData.email || "",
+        address: clientData.address || "",
+        occupation: clientData.occupation || "",
+      });
+    }
+  }, [clientData]);
 
   const handleChange = (e) => {
     setClient({ ...client, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit(client);
-    navigate("/clients");
+    setLoading(true);
+
+    try {
+      if (clientData?.id) {
+        // Update existing client
+        await clientService.updateClient(clientData.id, client);
+      } else {
+        // Add new client
+        await clientService.addClient(client);
+      }
+      navigate("/clients"); // Redirect to client list after success
+    } catch (error) {
+      console.error("Error saving client:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -91,15 +119,17 @@ export default function AddUpdateClient({ clientData = null, onSubmit }) {
             <button
               type="button"
               className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 text-sm"
-              onClick={() => setClient(clientData || {})}
+              onClick={() => setClient(clientData || { name: "", contact: "", email: "", address: "", occupation: "" })}
+              disabled={loading}
             >
               Reset
             </button>
             <button
               type="submit"
               className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 text-sm"
+              disabled={loading}
             >
-              {clientData ? "Update Client" : "Add Client"}
+              {loading ? "Saving..." : clientData ? "Update Client" : "Add Client"}
             </button>
           </div>
         </form>

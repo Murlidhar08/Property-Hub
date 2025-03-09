@@ -1,5 +1,5 @@
-import express from "express";
-import { getRequirements, getRequirementById, addRequirement, updateRequirement, deleteRequirement } from "../controllers/requirementController.js";
+const express = require("express");
+const { getRequirements, getRequirementById, addRequirement, updateRequirement, deleteRequirement } = require("../controller/requirementController.js");
 
 const router = express.Router();
 
@@ -9,4 +9,4 @@ router.post("/", addRequirement);
 router.put("/:id", updateRequirement);
 router.delete("/:id", deleteRequirement);
 
-export default router;
+module.exports = router;

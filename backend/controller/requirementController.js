@@ -1,4 +1,4 @@
-const db = require("../config/mySql");
+const db = require("../config/mySql.js");
 
 // Get all requirements
 exports.getRequirements = (req, res) => {

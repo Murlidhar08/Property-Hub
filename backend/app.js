@@ -9,9 +9,9 @@ const cors = require('cors');
 logger.info('Environment Mode: ' + process.env.NODE_ENV);
 
 // Routes
-import agentsRouter from "./routes/agents.js";
-import clientsRouter from "./routes/clients.js";
-import requirementsRouter from "./routes/requirements.js";
+const agentsRouter = require("./routes/agentRoutes.js");
+const clientsRouter = require("./routes/clientRoutes.js");
+const requirementsRouter = require("./routes/requirementRoutes.js");
 
 // Application Configurations
 const app = express();
