@@ -20,6 +20,7 @@ import PropertyDetails from "./pages/property/PropertyDetails";
 // Add/Update Pages
 import AddUpdateClient from "./pages/clients/AddUpdateClient";
 import AddUpdateProperty from "./pages/property/AddUpdateProperty";
+import AddUpdateAgent from "./pages/agents/AddUpdateAgent";
 import AddRequirementPage from "./pages/requirements/AddRequirementPage";
 
 // Error Pages
@@ -68,8 +69,8 @@ function App() {
             path="/requirements/edit/:id"
             element={<AddRequirementPage />}
           />
-          <Route path="/agents/add" element={<AddUpdateClient />} />
-          <Route path="/agents/edit/:id" element={<AddUpdateClient />} />
+          <Route path="/agents/add" element={<AddUpdateAgent />} />
+          <Route path="/agents/edit/:id" element={<AddUpdateAgent />} />
         </Route>
 
         <Route path="*" element={<NotFound />} />
