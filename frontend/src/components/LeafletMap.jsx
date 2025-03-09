@@ -49,7 +49,9 @@ const DraggableMarker = () => {
 
 const LeafletMap = () => {
   return (
-    <></>
+    <>
+      <h1>Map</h1>
+    </>
     // <MapContainer
     //   center={center}
     //   zoom={13}

@@ -7,7 +7,7 @@ export default function QuillEditor() {
 
   return (
     <ReactQuill
-      style={{ height: 200, marginBottom: 10 }}
+      style={{ height: 200, marginBottom: 60 }}
       theme="snow"
       value={value}
       onChange={setValue}
