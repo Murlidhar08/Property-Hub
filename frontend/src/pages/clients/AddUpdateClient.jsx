@@ -10,6 +10,7 @@ export default function AddUpdateClient({ clientData = null }) {
     email: "",
     address: "",
     occupation: "",
+    description: "", // New field added
   });
   const [loading, setLoading] = useState(false);
 
@@ -21,6 +22,7 @@ export default function AddUpdateClient({ clientData = null }) {
         email: clientData.email || "",
         address: clientData.address || "",
         occupation: clientData.occupation || "",
+        description: clientData.description || "", // Initialize description
       });
     }
   }, [clientData]);
@@ -115,11 +117,33 @@ export default function AddUpdateClient({ clientData = null }) {
             />
           </div>
 
+          {/* New Description Field */}
+          <div>
+            <label className="block font-medium">Description</label>
+            <textarea
+              name="description"
+              value={client.description}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border rounded-md text-sm"
+            />
+          </div>
+
           <div className="flex justify-end space-x-2">
             <button
               type="button"
               className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 text-sm"
-              onClick={() => setClient(clientData || { name: "", contact: "", email: "", address: "", occupation: "" })}
+              onClick={() =>
+                setClient(
+                  clientData || {
+                    name: "",
+                    contact: "",
+                    email: "",
+                    address: "",
+                    occupation: "",
+                    description: "",
+                  }
+                )
+              }
               disabled={loading}
             >
               Reset
@@ -129,7 +153,11 @@ export default function AddUpdateClient({ clientData = null }) {
               className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 text-sm"
               disabled={loading}
             >
-              {loading ? "Saving..." : clientData ? "Update Client" : "Add Client"}
+              {loading
+                ? "Saving..."
+                : clientData
+                ? "Update Client"
+                : "Add Client"}
             </button>
           </div>
         </form>
