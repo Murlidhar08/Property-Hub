@@ -1,7 +1,9 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
 
 // Styles
 import "./styles/App.css";
+import "react-toastify/dist/ReactToastify.css";
 
 // Authentication
 import Login from "./pages/authentication/Login";
@@ -36,6 +38,9 @@ import AgentsPage from "./pages/agents/AgentsPage";
 function App() {
   return (
     <Router>
+      {/* Toast notifications container */}
+      <ToastContainer position="top-right" autoClose={3000} />
+
       <Routes>
         {/* Authentication Routes */}
         <Route path="/login" element={<Login />} />

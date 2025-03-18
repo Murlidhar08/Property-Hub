@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 09, 2025 at 06:08 PM
+-- Generation Time: Mar 18, 2025 at 02:29 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -211,17 +211,73 @@ CREATE TABLE `requirements` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `role_type_master`
+--
+
+CREATE TABLE `role_type_master` (
+  `id` int(11) NOT NULL,
+  `name` varchar(50) NOT NULL,
+  `description` varchar(1000) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `role_type_master`
+--
+
+INSERT INTO `role_type_master` (`id`, `name`, `description`) VALUES
+(1, 'Admin', 'Full access to application'),
+(2, 'Agent', 'Access to add update detele basic feature'),
+(3, 'Client', 'Read Only view of the details');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `users`
 --
 
 CREATE TABLE `users` (
   `id` int(11) NOT NULL,
-  `google_id` varchar(255) NOT NULL,
-  `name` varchar(255) NOT NULL,
+  `firstName` varchar(255) NOT NULL,
+  `lastname` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
-  `role` enum('Admin','Agent','Client') NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `username` varchar(500) NOT NULL,
+  `password` varchar(500) NOT NULL,
+  `status` int(11) NOT NULL,
+  `role` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`id`, `firstName`, `lastname`, `email`, `username`, `password`, `status`, `role`, `created_at`, `updated_at`) VALUES
+(1, 'Mahesh', 'Chavda', 'Chavdamahesh2772@gmail.com', 'chavda2772', '111', 1, 1, '2025-03-18 00:38:45', '2025-03-18 01:09:40');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `userstatusmaster`
+--
+
+CREATE TABLE `userstatusmaster` (
+  `id` int(11) NOT NULL,
+  `name` varchar(50) NOT NULL,
+  `description` varchar(1000) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `userstatusmaster`
+--
+
+INSERT INTO `userstatusmaster` (`id`, `name`, `description`) VALUES
+(1, 'Verified', 'The user has been verified and has full access.'),
+(2, 'Unverified', 'The user has not completed the verification process.'),
+(3, 'Pending Approval', 'The user is awaiting approval from an administrator.'),
+(4, 'Suspended', 'The user account is temporarily disabled due to a violation or issue.'),
+(5, 'Deleted', 'The user account has been deleted and is no longer active.'),
+(6, 'Banned', 'The user has been permanently banned from the platform.');
 
 -- --------------------------------------------------------
 
@@ -286,12 +342,25 @@ ALTER TABLE `requirements`
   ADD KEY `client_id` (`client_id`);
 
 --
+-- Indexes for table `role_type_master`
+--
+ALTER TABLE `role_type_master`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `name` (`name`);
+
+--
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `google_id` (`google_id`),
   ADD UNIQUE KEY `email` (`email`);
+
+--
+-- Indexes for table `userstatusmaster`
+--
+ALTER TABLE `userstatusmaster`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `name` (`name`);
 
 --
 -- Indexes for table `user_access`
@@ -339,13 +408,25 @@ ALTER TABLE `property_media`
 -- AUTO_INCREMENT for table `requirements`
 --
 ALTER TABLE `requirements`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `role_type_master`
+--
+ALTER TABLE `role_type_master`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `userstatusmaster`
+--
+ALTER TABLE `userstatusmaster`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `user_access`
