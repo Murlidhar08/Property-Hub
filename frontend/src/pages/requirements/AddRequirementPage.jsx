@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import requirementService from "@/services/requirementService";
 
 export default function AddRequirementPage() {
   const navigate = useNavigate();
@@ -33,6 +34,7 @@ export default function AddRequirementPage() {
 
     // Simulate storing data
     console.log("Requirement Added:", formData);
+    requirementService.addRequirement(formData);
 
     // Redirect to Requirements Page
     navigate("/requirements");

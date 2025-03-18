@@ -1,6 +1,6 @@
 import API from "./api";
 
-const requirementService = {
+export default {
     getAllRequirements: async () => {
         const response = await API.get("/requirements");
         return response.data;
@@ -26,5 +26,3 @@ const requirementService = {
         return response.data;
     },
 };
-
-export default requirementService;
