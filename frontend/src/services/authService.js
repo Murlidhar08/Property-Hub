@@ -13,8 +13,8 @@ const authService = {
         });
         return response.data;
     },
-    login: async (token) => {
-        const response = await API.post("/auth/login", { token });
+    login: async ({ identifier, password }) => {
+        const response = await API.post("/auth/login", { identifier, password });
         return response.data;
     },
 

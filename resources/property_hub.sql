@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 19, 2025 at 09:22 AM
+-- Generation Time: Mar 19, 2025 at 10:01 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -86,37 +86,31 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_get_user_profile` (IN `p_user_i
     FROM users WHERE id = p_user_id;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_login_user` (IN `p_email` VARCHAR(255), IN `p_password` VARCHAR(500))   BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_login_user` (IN `p_identifier` VARCHAR(255), IN `p_password` VARCHAR(500))   BEGIN
     DECLARE user_count INT;
     DECLARE user_id INT;
     DECLARE db_password VARCHAR(500);
     DECLARE user_role INT;
     DECLARE user_status INT;
+    DECLARE user_email VARCHAR(255);
+    DECLARE user_username VARCHAR(255);
 
-    -- Check if user exists
-    SELECT COUNT(*), id, password, role_id, status 
-    INTO user_count, user_id, db_password, user_role, user_status
-    FROM users WHERE email = p_email;
+    -- Check if user exists with given email or username
+    SELECT COUNT(*), id, password, role_id, status, email, username
+    INTO user_count, user_id, db_password, user_role, user_status, user_email, user_username
+    FROM users 
+    WHERE email = p_identifier OR username = p_identifier;
 
+    -- If no user found
     IF user_count = 0 THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'User not found';
     END IF;
 
-    -- Check if the password matches
-    IF db_password <> p_password THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Invalid credentials';
-    END IF;
-
-    -- Check if the user is active
-    IF user_status <> 1 THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'User is not active';
-    END IF;
-
     -- Return user details
-    SELECT id, first_name, last_name, email, username, role_id, status FROM users WHERE id = user_id;
+    SELECT id, first_name, last_name, email, username, role_id, status 
+    FROM users 
+    WHERE id = user_id;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_oauth_login` (IN `p_email` VARCHAR(255), IN `p_firstName` VARCHAR(255), IN `p_lastName` VARCHAR(255), IN `p_provider` VARCHAR(50))   BEGIN

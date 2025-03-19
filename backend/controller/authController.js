@@ -1,5 +1,7 @@
 const db = require("../config/mySql");
 const enums = require("../config/enums");
+const jwt = require('jsonwebtoken');
+
 
 // Register a new user
 exports.register = (req, res) => {
@@ -22,18 +24,52 @@ exports.register = (req, res) => {
 
 // Login user
 exports.login = (req, res) => {
-    const { email, password } = req.body;
+    const { identifier, password } = req.body;
 
-    db.query("CALL usp_login_user(?, ?)", [email, password], (err, results) => {
-        if (err) return res.status(500).json({ error: err.message });
-
-        if (results[0].length === 0) {
-            return res.status(401).json({ error: "Invalid email or password" });
+    db.query("CALL usp_login_user(?, ?)", [identifier, password], (err, results) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
         }
 
-        res.json(results[0][0]); // Return user details
+        if (results[0].length === 0) {
+            return res.status(401).json({ error: "Invalid email/username or password" });
+        }
+
+        const user = results[0][0];
+
+        // Define the payload for the JWT
+        const payload = {
+            userId: user.user_id,
+            email: user.email,
+            username: user.username,
+            roleId: user.role_id
+        };
+
+        // Define the secret key and options
+        const secretKey = process.env.JWT_SECRET_KEY || 'your_secret_key';
+        const options = {
+            expiresIn: '1h' // Token expires in 1 hour
+        };
+
+        // Generate the JWT
+        const token = jwt.sign(payload, secretKey, options);
+
+        // Return the token and user details
+        res.json({
+            message: "Login successful",
+            token: token,
+            user: {
+                id: user.user_id,
+                firstName: user.first_name,
+                lastName: user.last_name,
+                email: user.email,
+                username: user.username,
+                roleId: user.role_id
+            }
+        });
     });
 };
+
 
 // Google/Facebook OAuth Login
 exports.oauthLogin = (req, res) => {

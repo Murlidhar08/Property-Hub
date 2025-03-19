@@ -2,14 +2,42 @@ import { useState } from "react";
 import { FaGoogle, FaFacebook } from "react-icons/fa";
 import { FiLogIn } from "react-icons/fi";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import authService from "@/services/authService"
 
 export default function Login() {
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState(""); // Can be email or username
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogin = async () => {
+    setLoading(true);
+    try {
+      const response = await authService.login({
+        identifier, // Send either email or username
+        password,
+      });
+
+      if (response.token) {
+        localStorage.setItem("token", response.token); // Store token
+        toast.success("Login successful! Redirecting...");
+        setTimeout(() => navigate("/"), 1500); // Redirect after success
+      } else {
+        toast.error("Invalid credentials. Please try again.");
+      }
+    } catch (err) {
+      toast.error(err.response?.error || "Login failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-blue-100 to-blue-300">
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
+
       <motion.div
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
@@ -26,17 +54,17 @@ export default function Login() {
             <FiLogIn className="text-gray-600 text-2xl" />
           </div>
         </motion.div>
-        <h2 className="text-xl font-semibold">Sign in with email</h2>
+        <h2 className="text-xl font-semibold">Sign in with email or username</h2>
         <p className="text-gray-500 text-sm mt-1 mb-4">
-          Make a new doc to bring your words, data, and teams together. For free
+          Enter your email or username to access your account.
         </p>
 
         <div className="space-y-3">
           <motion.input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            type="text"
+            placeholder="Email or Username"
+            value={identifier}
+            onChange={(e) => setIdentifier(e.target.value)}
             className="w-full px-4 py-2 border rounded-lg text-gray-700 focus:outline-none"
             whileFocus={{ scale: 1.05 }}
           />
@@ -57,11 +85,13 @@ export default function Login() {
             </Link>
           </div>
           <motion.button
-            className="w-full bg-black text-white py-2 rounded-lg font-medium hover:bg-gray-800"
+            className="w-full bg-black text-white py-2 rounded-lg font-medium hover:bg-gray-800 disabled:opacity-50"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
+            onClick={handleLogin}
+            disabled={loading}
           >
-            Sign In
+            {loading ? "Signing in..." : "Sign In"}
           </motion.button>
           <motion.button
             className="w-full py-2 rounded-lg font-medium hover:bg-gray-200"
