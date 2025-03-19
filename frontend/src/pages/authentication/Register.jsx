@@ -4,6 +4,7 @@ import { FiUserPlus } from "react-icons/fi";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import authService from "@/services/authService"
 
 export default function Register() {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   // Function to handle registration
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
 
     // Validate form inputs
@@ -33,12 +34,23 @@ export default function Register() {
     }
 
     // Simulate API request (Replace with actual API call)
-    console.log("User Registered:", { username, firstName, lastName, email });
+    console.log("User Registered:", { username, firstName, lastName, email, password });
 
-    toast.success("Registration successful! Redirecting...");
+    var res = await authService.register({
+      username,
+      firstName,
+      lastName,
+      email,
+      password,
+      provider: "local",
+      providerId: "local"
+    })
+
+    toast.success("Registration successful! Redirecting...", res);
+    console.log(res);
 
     // Redirect to login page after 2 seconds
-    setTimeout(() => navigate("/login"), 2000);
+    setTimeout(() => navigate("/login"), 4000);
   };
 
   return (

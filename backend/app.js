@@ -12,6 +12,7 @@ logger.info('Environment Mode: ' + process.env.NODE_ENV);
 const agentsRouter = require("./routes/agentRoutes.js");
 const clientsRouter = require("./routes/clientRoutes.js");
 const requirementsRouter = require("./routes/requirementRoutes.js");
+const authRouter = require("./routes/authRoutes.js");
 
 // Application Configurations
 const app = express();
@@ -32,6 +33,7 @@ app.use(
 );
 logger.info('Allowed origins-' + process.env.allow_cors);
 
+app.use("/api/auth", authRouter);
 app.use("/api/agents", agentsRouter);
 app.use("/api/clients", clientsRouter);
 app.use("/api/requirements", requirementsRouter);
