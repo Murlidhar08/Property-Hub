@@ -1,3 +1,5 @@
 export default {
-    "JWT_SECRET": "MySecret",
+    "JWT_OPTIONS": {
+        expiresIn: '1h' // Token expires in 1 hour
+    },
 }

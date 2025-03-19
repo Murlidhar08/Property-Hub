@@ -1,7 +1,6 @@
 const db = require("../config/mySql");
 const enums = require("../config/enums");
-const jwt = require('jsonwebtoken');
-
+const commonFunction = require("../config/commonFunction");
 
 // Register a new user
 exports.register = (req, res) => {
@@ -11,10 +10,11 @@ exports.register = (req, res) => {
     const finalProviderUid = enProviderId === 1 ? null : providerUid;
     const finalProfilePicture = enProviderId === 1 ? null : profilePicture;
     const finalRoleId = enProviderId === 1 && !roleId ? 6 : roleId; // Default roleId to 6 (Client) if provider is Local
+    const finalPassword = enProviderId === 1 ? null : profilePicture;
 
     db.query(
         "CALL usp_register_user(?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        [firstName, lastName, email, username, password, enProviderId, finalProviderUid, finalProfilePicture, finalRoleId],
+        [firstName, lastName, email, username, finalPassword, enProviderId, finalProviderUid, finalProfilePicture, finalRoleId],
         (err, results) => {
             if (err) return res.status(500).json({ error: err.message });
             res.status(201).json({ message: "User registered successfully", userId: results[0][0].user_id });
@@ -37,22 +37,13 @@ exports.login = (req, res) => {
 
         const user = results[0][0];
 
-        // Define the payload for the JWT
-        const payload = {
+        // Generate the JWT
+        const token = commonFunction.generateJwtToken({
             userId: user.user_id,
             email: user.email,
             username: user.username,
             roleId: user.role_id
-        };
-
-        // Define the secret key and options
-        const secretKey = process.env.JWT_SECRET_KEY || 'your_secret_key';
-        const options = {
-            expiresIn: '1h' // Token expires in 1 hour
-        };
-
-        // Generate the JWT
-        const token = jwt.sign(payload, secretKey, options);
+        });
 
         // Return the token and user details
         res.json({

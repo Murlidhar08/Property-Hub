@@ -1,5 +1,5 @@
 const bcrypt = require('bcrypt');
-const saltValue = 10;
+const saltValue = process.env.SALT_VALUE;;
 
 module.exports.generatePasswordHash = (password) => {
     return new Promise((resolve, reject) => {

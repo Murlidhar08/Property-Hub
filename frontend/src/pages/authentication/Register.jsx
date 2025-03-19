@@ -33,24 +33,26 @@ export default function Register() {
       return;
     }
 
-    // Simulate API request (Replace with actual API call)
-    console.log("User Registered:", { username, firstName, lastName, email, password });
+    try {
+      var res = await authService.register({
+        username,
+        firstName,
+        lastName,
+        email,
+        password,
+        provider: "local",
+        providerId: "local"
+      });
 
-    var res = await authService.register({
-      username,
-      firstName,
-      lastName,
-      email,
-      password,
-      provider: "local",
-      providerId: "local"
-    })
+      toast.success("Registration successful! Redirecting...");
+      console.log(res);
 
-    toast.success("Registration successful! Redirecting...", res);
-    console.log(res);
-
-    // Redirect to login page after 2 seconds
-    setTimeout(() => navigate("/login"), 4000);
+      // Redirect to login page after 2 seconds
+      setTimeout(() => navigate("/login"), 4000);
+    } catch (error) {
+      toast.error("Error in Registration user.");
+      console.log("Registration ERROR: ", error);
+    }
   };
 
   return (
