@@ -1,10 +1,36 @@
 import { useState } from "react";
 import { FiUnlock } from "react-icons/fi";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import authService from "@/services/authService"; // Adjust based on your project structure
 
 export default function ForgotPassword() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSendResetLink = async () => {
+    if (!email) {
+      toast.error("Please enter your email address.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await authService.resetPassword(email);
+      toast.success(response.message || "Reset link sent successfully!");
+
+      // Redirect to login page after 2 seconds
+      setTimeout(() => navigate("/login"), 2000);
+    } catch (error) {
+      toast.error(
+        error.response?.error || "Failed to send reset link. Try again!"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <motion.div
@@ -68,11 +94,16 @@ export default function ForgotPassword() {
             className="w-full px-4 py-2 border rounded-lg text-gray-700 focus:outline-none"
           />
           <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="w-full bg-black text-white py-2 rounded-lg font-medium hover:bg-gray-800"
+            whileHover={!loading ? { scale: 1.05 } : {}}
+            whileTap={!loading ? { scale: 0.95 } : {}}
+            onClick={handleSendResetLink}
+            disabled={loading}
+            className={`w-full py-2 rounded-lg font-medium ${loading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-black text-white hover:bg-gray-800"
+              }`}
           >
-            Send Reset Link
+            {loading ? "Sending..." : "Send Reset Link"}
           </motion.button>
         </motion.div>
         <div className="mt-4">

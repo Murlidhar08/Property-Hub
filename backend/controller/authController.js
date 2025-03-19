@@ -1,6 +1,8 @@
 const db = require("../config/mySql");
 const enums = require("../config/enums");
 const commonFunction = require("../config/commonFunction");
+const sendMail = require("../lib/nodemailer")
+const path = require("path");
 
 // Register a new user
 exports.register = (req, res) => {
@@ -91,4 +93,20 @@ exports.getProfile = (req, res) => {
 // Logout user
 exports.logout = (req, res) => {
     res.json({ message: "Logged out successfully" });
+};
+
+// Reset password
+exports.resetPassword = async (req, res) => {
+    const emailAddress = req.body.email;
+
+    // Email Validate
+    if (!emailAddress)
+        return res.status(400).json({ error: "Email address is required" });
+
+    // Send email
+    const filePath = path.join(__dirname, "../templates", "reset_password.html");
+    const template = commonFunction.getFileContent(filePath);
+    const mailInfo = await sendMail(emailAddress, "Reset Password", template);
+
+    res.json({ ...mailInfo });
 };
