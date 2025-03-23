@@ -64,7 +64,7 @@ export default function Sidebar() {
             key={name}
             className={clsx(
               "flex items-center gap-4 p-3 rounded-md cursor-pointer transition",
-              location.pathname.startsWith(path)
+              selected == name
                 ? "bg-white text-black"
                 : "hover:bg-gray-700"
             )}
@@ -82,8 +82,8 @@ export default function Sidebar() {
       </nav>
 
       {/* Bottom Section */}
-      {/* <div className="mt-auto">
-        <div
+      <div className="mt-auto">
+        {/* <div
           className={clsx(
             "flex items-center gap-4 p-3 rounded-md cursor-pointer transition",
             location.pathname === "/notifications"
@@ -101,7 +101,7 @@ export default function Sidebar() {
             )}
           />
           <span className={clsx(!isOpen && "hidden")}>Notifications</span>
-        </div>
+        </div> */}
         <div
           className={clsx(
             "flex items-center gap-4 p-3 rounded-md cursor-pointer transition",
@@ -119,7 +119,7 @@ export default function Sidebar() {
           />
           <span className={clsx(!isOpen && "hidden")}>Account</span>
         </div>
-      </div> */}
+      </div>
     </div>
   );
 }

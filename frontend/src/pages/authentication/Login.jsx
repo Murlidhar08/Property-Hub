@@ -9,11 +9,16 @@ import authService from "@/services/authService";
 // Components
 import GoogleLogin from "@/pages/authentication/GoogleLogin.jsx";
 
+// Redux
+import { useDispatch } from "react-redux";
+import { setUser, setToken } from "@/redux/slices/userSlice";
+
 export default function Login() {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleLogin = async () => {
     setLoading(true);
@@ -21,8 +26,15 @@ export default function Login() {
       const response = await authService.login({ identifier, password });
 
       if (response.token) {
+        // Set User details here
+        dispatch(setUser(response.user));
+
+        // set Token here
+        dispatch(setToken(response.token));
+
         localStorage.setItem("token", response.token);
         toast.success("Login successful! Redirecting...");
+
         setTimeout(() => navigate("/"), 1500);
       } else {
         toast.error("Invalid credentials. Please try again.");

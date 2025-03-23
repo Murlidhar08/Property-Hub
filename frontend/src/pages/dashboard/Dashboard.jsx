@@ -1,15 +1,10 @@
-import { useEffect, useState } from "react";
 import { Wallet, PieChart, Users, CreditCard } from "lucide-react";
 
-const Dashboard = () => {
-  const [email, setEmail] = useState("");
+// Redux
+import { useSelector } from "react-redux";
 
-  useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user-info"));
-    if (user) {
-      setEmail(user?.email);
-    }
-  }, []);
+const Dashboard = () => {
+  const user = useSelector((state) => state.user);
 
   const stats = [
     { icon: Wallet, value: "$143,624", label: "Your Bank Balance" },
@@ -26,7 +21,7 @@ const Dashboard = () => {
     <div className="p-6 bg-gray-100 min-h-screen w-full">
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-800">
-          Good morning, {email || "Guest"}!
+          Good morning, {user.email || "Guest"}!
         </h1>
       </div>
       <hr className="my-4" />
