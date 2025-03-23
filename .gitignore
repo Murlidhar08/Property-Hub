@@ -23,4 +23,9 @@ OnlyLocal
 *.njsproj
 *.sln
 *.sw?
-*.env
+
+# BACKEND
+backend/.env
+
+# FRONTEND
+frontend/.env
