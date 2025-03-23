@@ -9,6 +9,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Login from "./pages/authentication/Login";
 import Register from "./pages/authentication/Register";
 import ForgotPassword from "./pages/authentication/ForgetPassword";
+import PendingApproval from './pages/authentication/PendingApproval';
 
 // Main Pages
 import AdminPage from "./pages/admin/AdminPage";
@@ -80,6 +81,7 @@ function App() {
         </Route>
 
         {/* Public routes */}
+        <Route path="/pending-approval" element={<PendingApproval />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
         <Route path="/server-error" element={<ServerError />} />
         <Route path="*" element={<NotFound />} />
