@@ -1,6 +1,16 @@
+import { useEffect, useState } from "react";
 import { Wallet, PieChart, Users, CreditCard } from "lucide-react";
 
 const Dashboard = () => {
+  const [email, setEmail] = useState("");
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user-info"));
+    if (user) {
+      setEmail(user?.email);
+    }
+  }, []);
+
   const stats = [
     { icon: Wallet, value: "$143,624", label: "Your Bank Balance" },
     { icon: PieChart, value: "12", label: "Uncategorized Transactions" },
@@ -16,7 +26,7 @@ const Dashboard = () => {
     <div className="p-6 bg-gray-100 min-h-screen w-full">
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-800">
-          Good morning, Mahesh Chavda!
+          Good morning, {email || "Guest"}!
         </h1>
       </div>
       <hr className="my-4" />

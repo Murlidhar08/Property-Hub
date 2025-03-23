@@ -18,5 +18,8 @@ router.get("/profile", authController.getProfile);
 // Reset password
 router.post("/reset-password", authController.resetPassword);
 
+// Google OAuth Login
+router.get("/google", authController.googleAuth);
+
 module.exports = router;
 

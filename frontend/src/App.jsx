@@ -1,5 +1,6 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import { ToastContainer } from "react-toastify";
+import { useState } from 'react';
 
 // Styles
 import "./styles/App.css";
@@ -34,12 +35,23 @@ import ServerError from "./pages/errors/ServerError";
 import NavLayout from "./layouts/NavLayout";
 import Dashboard from "./pages/dashboard/Dashboard";
 import AgentsPage from "./pages/agents/AgentsPage";
+import RefrshHandler from "./utils/RefreshHandler";
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // eslint-disable-next-line react/prop-types
+  const PrivateRoute = ({ element }) => {
+    return isAuthenticated ? element : <Navigate to="/login" />
+  }
+
   return (
-    <Router>
+    <BrowserRouter>
       {/* Toast notifications container */}
       <ToastContainer position="top-right" autoClose={3000} />
+
+      {/* Refresh Handler */}
+      <RefrshHandler setIsAuthenticated={setIsAuthenticated} />
 
       <Routes>
         {/* Authentication Routes */}
@@ -53,8 +65,8 @@ function App() {
 
         {/* Protected Routes (With Navbar) */}
         <Route element={<NavLayout />}>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/" element={<Dashboard to="/login" />} />
+          <Route path='/dashboard' element={<PrivateRoute element={<Dashboard />} />} />
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/clients" element={<ClientsPage />} />
           <Route path="/properties" element={<PropertyPage />} />
@@ -80,7 +92,7 @@ function App() {
 
         <Route path="*" element={<NotFound />} />
       </Routes>
-    </Router>
+    </BrowserRouter>
   );
 }
 

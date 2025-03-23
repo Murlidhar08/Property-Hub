@@ -1,13 +1,16 @@
 import { useState } from "react";
-import { FaGoogle, FaFacebook } from "react-icons/fa";
+import { FaFacebook } from "react-icons/fa";
 import { FiLogIn } from "react-icons/fi";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
-import authService from "@/services/authService"
+import authService from "@/services/authService";
+
+// Components
+import GoogleLogin from "@/pages/authentication/GoogleLogin.jsx";
 
 export default function Login() {
-  const [identifier, setIdentifier] = useState(""); // Can be email or username
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -15,15 +18,12 @@ export default function Login() {
   const handleLogin = async () => {
     setLoading(true);
     try {
-      const response = await authService.login({
-        identifier, // Send either email or username
-        password,
-      });
+      const response = await authService.login({ identifier, password });
 
       if (response.token) {
-        localStorage.setItem("token", response.token); // Store token
+        localStorage.setItem("token", response.token);
         toast.success("Login successful! Redirecting...");
-        setTimeout(() => navigate("/"), 1500); // Redirect after success
+        setTimeout(() => navigate("/"), 1500);
       } else {
         toast.error("Invalid credentials. Please try again.");
       }
@@ -77,10 +77,7 @@ export default function Login() {
             whileFocus={{ scale: 1.05 }}
           />
           <div className="text-right text-sm text-blue-500 cursor-pointer">
-            <Link
-              to="/forgot-password"
-              className="text-blue-600 hover:underline"
-            >
+            <Link to="/forgot-password" className="text-blue-600 hover:underline">
               Forgot password?
             </Link>
           </div>
@@ -109,13 +106,10 @@ export default function Login() {
         </div>
 
         <div className="flex justify-center space-x-4">
-          <motion.button
-            className="p-3 bg-gray-200 rounded-full hover:bg-gray-300"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-          >
-            <FaGoogle className="text-red-500 text-xl" />
-          </motion.button>
+          {/* Google Login */}
+          <GoogleLogin />
+
+          {/* Facebook (Not Implemented Yet) */}
           <motion.button
             className="p-3 bg-gray-200 rounded-full hover:bg-gray-300"
             whileHover={{ scale: 1.1 }}

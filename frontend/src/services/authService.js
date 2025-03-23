@@ -32,6 +32,11 @@ const authService = {
         const response = await API.post("/auth/reset-password", { email });
         return response.data;
     },
+
+    googleAuth: async (code) => {
+        const response = await API.get("/auth/google?code=" + code);
+        return response.data;
+    },
 };
 
 export default authService;
