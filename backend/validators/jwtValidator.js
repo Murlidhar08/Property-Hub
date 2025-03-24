@@ -1,16 +1,15 @@
 const jwt = require('jsonwebtoken');
+const commonFunction = require('../config/commonFunction.js');
 
 // Middleware to verify JWT
 const verifyToken = (req, res, next) => {
     const token = req.headers['authorization'];
-
     if (!token) {
         return res.status(403).json({ error: "No token provided" });
     }
 
-    const secretKey = process.env.JWT_SECRET_KEY;
-
-    jwt.verify(token, secretKey, (err, decoded) => {
+    const jwtToken = token.split(' ')[1];
+    commonFunction.verifyJwtToken(jwtToken, (err, decoded) => {
         if (err) {
             return res.status(500).json({ error: "Failed to authenticate token" });
         }

@@ -68,7 +68,7 @@ exports.login = (req, res) => {
 
 // Get user profile
 exports.getProfile = (req, res) => {
-    const userId = req.user.id;
+    const userId = req.user.userId;
 
     db.query("CALL usp_get_user_profile(?)", [userId], (err, results) => {
         if (err) return res.status(500).json({ error: err.message });
@@ -108,12 +108,14 @@ exports.googleAuth = async (req, res, next) => {
         const userRes = await axios.get(
             `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${googleRes.tokens.access_token}`
         );
-        const { email, name, picture } = userRes.data;
+        const { id, given_name, family_name, email, name, picture } = userRes.data;
         // console.log(userRes);
         let user = await authService.getUserByEmail(email);
 
         if (!user) {
             // Add User
+            const addUser = { providerId: 2, providerUid: id, firstName: given_name, lastName: family_name, email, profilePicture: picture };
+            user = await authService.googleOauthLogin(addUser);
         }
 
         const token = commonFunction.generateJwtToken({

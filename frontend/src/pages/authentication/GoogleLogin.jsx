@@ -5,14 +5,24 @@ import { useNavigate } from 'react-router-dom';
 import { FaGoogle } from "react-icons/fa";
 import { motion } from "framer-motion";
 
+// Redux
+import { useDispatch } from "react-redux";
+import { setUser, setToken } from "@/redux/slices/userSlice";
+
 const GoolgeLogin = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const responseGoogle = async (authResult) => {
         try {
             if (authResult["code"]) {
                 const result = await authService.googleAuth(authResult.code);
-                const obj = { ...result.user, token: result.token };
-                localStorage.setItem('user-info', JSON.stringify(obj));
+
+                // Set User details here
+                dispatch(setUser(result.user));
+
+                // set Token here
+                dispatch(setToken(result.token));
+
                 navigate('/dashboard');
             } else {
                 console.log(authResult);

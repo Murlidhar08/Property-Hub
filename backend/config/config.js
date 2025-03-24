@@ -1,5 +1,5 @@
 export default {
     "JWT_OPTIONS": {
-        expiresIn: '1h' // Token expires in 1 hour
+        expiresIn: '10h' // Token expires in 1 hour
     },
 }

@@ -16,9 +16,11 @@ const userSlice = createSlice({
             return { ...state, ...action.payload, isAuthenticated: true };
         },
         setToken: (state, action) => {
+            localStorage.setItem("token", action.payload);
             return { ...state, token: action.payload };
         },
         logout: () => {
+            localStorage.removeItem("token");
             return { ...initialState };
         },
     },

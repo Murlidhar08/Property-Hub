@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 
 // Styles
@@ -9,7 +9,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Login from "./pages/authentication/Login";
 import Register from "./pages/authentication/Register";
 import ForgotPassword from "./pages/authentication/ForgetPassword";
-import PendingApproval from './pages/authentication/PendingApproval';
+import PendingApproval from "./pages/authentication/PendingApproval";
 
 // Main Pages
 import AdminPage from "./pages/admin/AdminPage";
@@ -37,11 +37,15 @@ import NavLayout from "./layouts/NavLayout";
 import PublicLayout from "@/layouts/PublicLayout";
 import Dashboard from "./pages/dashboard/Dashboard";
 import AgentsPage from "./pages/agents/AgentsPage";
-import ProtectedLayout from "@/layouts/ProtectedLayout"; // Import Protected Layout
+import ProtectedLayout from "@/layouts/ProtectedLayout";
+import AuthInitializer from "@/layouts/AuthInitializer";
 
 function App() {
   return (
     <BrowserRouter>
+      {/* Initialize Auth Check inside Router */}
+      <AuthInitializer />
+
       {/* Toast notifications container */}
       <ToastContainer position="top-right" autoClose={3000} />
 

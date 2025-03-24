@@ -1,5 +1,6 @@
 const express = require("express");
 const authController = require("../controller/authController.js");
+const validator = require("../validators/jwtValidator.js");
 
 const router = express.Router();
 
@@ -13,7 +14,7 @@ router.post("/login", authController.login);
 router.post("/logout", authController.logout);
 
 // Get user profile
-router.get("/profile", authController.getProfile);
+router.get("/profile", validator, authController.getProfile);
 
 // Reset password
 router.post("/reset-password", authController.resetPassword);
