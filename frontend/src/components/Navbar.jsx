@@ -1,22 +1,22 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
-  Home,
+  LayoutDashboard,
+  Fence,
   Users,
-  Workflow,
-  PenBoxIcon,
+  GraduationCap,
   // Bell,
-  User,
+  CircleUserRound,
   AlbumIcon,
 } from "lucide-react";
 import clsx from "clsx";
 
 const menuItems = [
-  { name: "Dashboard", icon: Home, path: "/dashboard" },
-  { name: "Properties", icon: Workflow, path: "/properties" },
+  { name: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
+  { name: "Properties", icon: Fence, path: "/properties" },
   { name: "Requirements", icon: AlbumIcon, path: "/requirements" },
   { name: "Clients", icon: Users, path: "/clients" },
-  { name: "Agents", icon: PenBoxIcon, path: "/agents" },
+  { name: "Agents", icon: GraduationCap, path: "/agents" },
   // { name: "Settings", icon: Settings, path: "/settings" },
 ];
 
@@ -111,7 +111,7 @@ export default function Sidebar() {
           )}
           onClick={() => navigate("/account")}
         >
-          <User
+          <CircleUserRound
             className={clsx(
               "h-5 w-5",
               location.pathname === "/account" ? "text-black" : "text-white"

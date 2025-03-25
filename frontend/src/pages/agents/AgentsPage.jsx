@@ -1,42 +1,37 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, Grid, List } from "lucide-react";
 import { Link } from "react-router-dom";
-
-const agents = [
-  {
-    name: "John Doe",
-    contact: "(302) 555-0123",
-    address: "123 Main St, Springfield",
-    area: "Downtown",
-    image: "/images/agent.png",
-  },
-  {
-    name: "Alice Johnson",
-    contact: "(629) 555-0456",
-    address: "456 Elm St, Riverside",
-    area: "Uptown",
-    image: "/images/agent.png",
-  },
-  {
-    name: "Robert Smith",
-    contact: "(480) 555-0789",
-    address: "789 Oak St, Lakeside",
-    area: "Suburb",
-    image: "/images/agent.png",
-  },
-  {
-    name: "Emma Brown",
-    contact: "(405) 555-0112",
-    address: "321 Pine St, Hillside",
-    area: "Countryside",
-    image: "/images/agent.png",
-  },
-];
+import agentService from '../../services/agentService';
 
 export default function AgentsPage() {
+  const [agents, setAgents] = useState([]);
   const [search, setSearch] = useState("");
   const [view, setView] = useState("grid");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
+  // Fetch agents from backend
+  useEffect(() => {
+    const fetchAgents = async () => {
+      try {
+        const data = await agentService.getAllAgents();
+
+        if (data.success) {
+          setAgents(data.agents);
+        } else {
+          throw new Error(data.message || "Failed to fetch agents.");
+        }
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAgents();
+  }, []);
+
+  // Filter agents based on search query
   const filteredAgents = agents.filter((agent) =>
     agent.name.toLowerCase().includes(search.toLowerCase())
   );
@@ -60,7 +55,6 @@ export default function AgentsPage() {
         <div className="relative w-full max-w-sm">
           <input
             type="text"
-            name="Search Agents"
             placeholder="Search Agents"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -69,18 +63,16 @@ export default function AgentsPage() {
         </div>
         <div className="flex items-center">
           <button
-            className={`p-2 rounded-md ${
-              view === "grid" ? "bg-purple-500 text-white" : "bg-gray-200"
-            }`}
+            className={`p-2 rounded-md ${view === "grid" ? "bg-purple-500 text-white" : "bg-gray-200"
+              }`}
             onClick={() => setView("grid")}
             title="Grid View"
           >
             <Grid size={20} />
           </button>
           <button
-            className={`p-2 rounded-md ${
-              view === "list" ? "bg-purple-500 text-white" : "bg-gray-200"
-            }`}
+            className={`p-2 rounded-md ${view === "list" ? "bg-purple-500 text-white" : "bg-gray-200"
+              }`}
             onClick={() => setView("list")}
             title="List View"
           >
@@ -91,8 +83,12 @@ export default function AgentsPage() {
 
       <hr className="my-4" />
 
-      {/* Agents List */}
-      {filteredAgents.length > 0 ? (
+      {/* Loading & Error Handling */}
+      {loading ? (
+        <p className="text-center text-gray-500 mt-6">Loading agents...</p>
+      ) : error ? (
+        <p className="text-center text-red-500 mt-6">{error}</p>
+      ) : filteredAgents.length > 0 ? (
         <div
           className={
             view === "grid"
@@ -100,11 +96,11 @@ export default function AgentsPage() {
               : "space-y-4"
           }
         >
-          {filteredAgents.map((agent, index) => (
-            <Link key={index} to={`/agents/${index}`} className="block">
+          {filteredAgents.map((agent) => (
+            <Link key={agent.id} to={`/agents/${agent.id}`} className="block">
               <div className="bg-white p-4 rounded-lg border hover:shadow-lg transition flex items-center space-x-4">
                 <img
-                  src={agent.image}
+                  src={agent.image || "/images/agent.png"}
                   alt={agent.name}
                   className="w-16 h-16 rounded-full object-cover border"
                 />

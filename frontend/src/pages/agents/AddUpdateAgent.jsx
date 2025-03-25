@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
+import agentService from "../../services/agentService";
 
 export default function AddUpdateAgentPage() {
   const navigate = useNavigate();
   const { id } = useParams(); // Get agent ID if updating
   const isEditing = Boolean(id);
 
-  const [formData, setFormData] = useState({
+  const [agentDetails, setAgentDetails] = useState({
     name: "",
     contact: "",
     address: "",
@@ -16,26 +18,33 @@ export default function AddUpdateAgentPage() {
   });
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setAgentDetails({ ...agentDetails, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (
-      !formData.name ||
-      !formData.contact ||
-      !formData.address ||
-      !formData.area
-    ) {
-      alert("All fields except Image & Description are required!");
+    if (!agentDetails.name || !agentDetails.contact || !agentDetails.address || !agentDetails.area) {
+      toast.error("All fields except Image & Description are required!");
       return;
     }
-    console.log(isEditing ? "Agent Updated:" : "New Agent Added:", formData);
-    navigate("/agents");
+
+    try {
+      if (isEditing) {
+        await agentService.updateAgent(id, agentDetails);
+        toast.success("Agent updated successfully!");
+      } else {
+        await agentService.addAgent(agentDetails);
+        toast.success("Agent added successfully!");
+      }
+
+      navigate("/agents");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Something went wrong!");
+    }
   };
 
   const handleReset = () => {
-    setFormData({
+    setAgentDetails({
       name: "",
       contact: "",
       address: "",
@@ -59,7 +68,7 @@ export default function AddUpdateAgentPage() {
             <input
               type="text"
               name="name"
-              value={formData.name}
+              value={agentDetails.name}
               onChange={handleChange}
               className="w-full px-3 py-2 border rounded-md text-sm"
               required
@@ -68,13 +77,11 @@ export default function AddUpdateAgentPage() {
 
           {/* Contact Number */}
           <div>
-            <label className="block text-sm font-medium mb-1">
-              Contact Number
-            </label>
+            <label className="block text-sm font-medium mb-1">Contact Number</label>
             <input
               type="text"
               name="contact"
-              value={formData.contact}
+              value={agentDetails.contact}
               onChange={handleChange}
               className="w-full px-3 py-2 border rounded-md text-sm"
               required
@@ -87,7 +94,7 @@ export default function AddUpdateAgentPage() {
             <input
               type="text"
               name="address"
-              value={formData.address}
+              value={agentDetails.address}
               onChange={handleChange}
               className="w-full px-3 py-2 border rounded-md text-sm"
               required
@@ -100,7 +107,7 @@ export default function AddUpdateAgentPage() {
             <input
               type="text"
               name="area"
-              value={formData.area}
+              value={agentDetails.area}
               onChange={handleChange}
               className="w-full px-3 py-2 border rounded-md text-sm"
               required
@@ -109,13 +116,11 @@ export default function AddUpdateAgentPage() {
 
           {/* Profile Image URL */}
           <div>
-            <label className="block text-sm font-medium mb-1">
-              Profile Image URL (Optional)
-            </label>
+            <label className="block text-sm font-medium mb-1">Profile Image URL (Optional)</label>
             <input
               type="text"
               name="image"
-              value={formData.image}
+              value={agentDetails.image}
               onChange={handleChange}
               className="w-full px-3 py-2 border rounded-md text-sm"
             />
@@ -123,12 +128,10 @@ export default function AddUpdateAgentPage() {
 
           {/* Description Field */}
           <div>
-            <label className="block text-sm font-medium mb-1">
-              Description (Optional)
-            </label>
+            <label className="block text-sm font-medium mb-1">Description (Optional)</label>
             <textarea
               name="description"
-              value={formData.description}
+              value={agentDetails.description}
               onChange={handleChange}
               className="w-full px-3 py-2 border rounded-md text-sm h-24 resize-none"
             />

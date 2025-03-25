@@ -1,32 +1,29 @@
-import { Wallet, PieChart, Users, CreditCard } from "lucide-react";
+import { Fence, AlbumIcon, Users, GraduationCap } from "lucide-react";
 
 // Redux
 import { useSelector } from "react-redux";
+import commonFunction from '@/utils/commonFunction.js';
 
 const Dashboard = () => {
   const user = useSelector((state) => state.user);
 
-  const stats = [
-    { icon: Wallet, value: "$143,624", label: "Your Bank Balance" },
-    { icon: PieChart, value: "12", label: "Uncategorized Transactions" },
-    { icon: Users, value: "7", label: "Employees Working Today" },
-    {
-      icon: CreditCard,
-      value: "$3,287.49",
-      label: "This Week's Card Spending",
-    },
+  const cards = [
+    { icon: Fence, value: "5", label: "Total Properties" },
+    { icon: AlbumIcon, value: "12", label: "Total Requirements" },
+    { icon: Users, value: "7", label: "Total Clients" },
+    { icon: GraduationCap, value: "3", label: "Total Agents" },
   ];
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen w-full">
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-800">
-          Good morning, {user.email || "Guest"}!
+          {commonFunction.getGreeting()}, {user.firstName || "Guest"} {user.lastName}
         </h1>
       </div>
       <hr className="my-4" />
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-        {stats.map(({ icon: Icon, value, label }, index) => (
+        {cards.map(({ icon: Icon, value, label }, index) => (
           <div
             key={index}
             className="bg-white shadow-sm rounded-xl p-6 flex flex-col items-center text-center transition hover:shadow-lg"

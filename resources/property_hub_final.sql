@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 25, 2025 at 06:23 PM
+-- Generation Time: Mar 25, 2025 at 10:44 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -25,20 +25,41 @@ DELIMITER $$
 --
 -- Procedures
 --
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_google_auth_login` (
-  IN `p_providerUid` VARCHAR(255), 
-  IN `p_firstName` VARCHAR(255), 
-  IN `p_lastName` VARCHAR(255), 
-  IN `p_email` VARCHAR(255), 
-  IN `p_profilePicture` VARCHAR(500)
-)   
-BEGIN
-	  DECLARE varRole INT;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_agent_add` (IN `p_name` VARCHAR(255), IN `p_contact` VARCHAR(20), IN `p_address` VARCHAR(500), IN `p_area` VARCHAR(255), IN `p_image` VARCHAR(255), IN `p_description` TEXT)   BEGIN
+    INSERT INTO agents (name, contact, address, area, image, description)
+    VALUES (p_name, p_contact, p_address, p_area, p_image, p_description);
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_agent_delete` (IN `p_id` INT)   BEGIN
+    DELETE FROM agents WHERE id = p_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_agent_get_all` ()   BEGIN
+    SELECT * FROM agents ORDER BY createdAt DESC;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_agent_get_by_id` (IN `p_id` INT)   BEGIN
+    SELECT * FROM agents WHERE id = p_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_agent_update` (IN `p_id` INT, IN `p_name` VARCHAR(255), IN `p_contact` VARCHAR(20), IN `p_address` VARCHAR(500), IN `p_area` VARCHAR(255), IN `p_image` VARCHAR(255), IN `p_description` TEXT)   BEGIN
+    UPDATE agents
+    SET name = p_name,
+        contact = p_contact,
+        address = p_address,
+        area = p_area,
+        image = p_image,
+        description = p_description
+    WHERE id = p_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_google_auth_login` (IN `p_providerUid` VARCHAR(255), IN `p_firstName` VARCHAR(255), IN `p_lastName` VARCHAR(255), IN `p_email` VARCHAR(255), IN `p_profilePicture` VARCHAR(500))   BEGIN
+	DECLARE varRole INT;
     DECLARE varStatus INT;
     DECLARE varProviderTypeId INT;
 
-	  -- Get  provider Type ID
-	  SET varProviderTypeId = fn_get_masters_id_by_name('Google');
+	-- Get  provider Type ID
+	SET varProviderTypeId = fn_get_masters_id_by_name('Google');
 
     -- Check if the user exists based on providerUid (Google UID)
     IF EXISTS (SELECT 1 FROM userinfo WHERE email = p_email) THEN
@@ -52,9 +73,9 @@ BEGIN
             profilePicture = p_profilePicture
         WHERE email = p_email;
     ELSE
-		    -- Get role and status, and provider ID
-		    SET varRole = fn_get_masters_id_by_name('Client');
-		    SET varStatus = fn_get_masters_id_by_name('PendingApproval');
+		-- Get role and status, and provider ID
+		SET varRole = fn_get_masters_id_by_name('Client');
+		SET varStatus = fn_get_masters_id_by_name('PendingApproval');
     
         -- Insert new Google user with default values
         INSERT INTO userinfo (providerTypeId, providerUid, firstName, lastName, email, profilePicture, roleId, status) 
@@ -174,6 +195,23 @@ DELIMITER ;
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `agents`
+--
+
+CREATE TABLE `agents` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `contact` varchar(20) NOT NULL,
+  `address` varchar(500) NOT NULL,
+  `area` varchar(255) NOT NULL,
+  `image` varchar(255) DEFAULT NULL,
+  `description` text DEFAULT NULL,
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `masters`
 --
 
@@ -255,6 +293,12 @@ CREATE TABLE `userinfo` (
 --
 
 --
+-- Indexes for table `agents`
+--
+ALTER TABLE `agents`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `masters`
 --
 ALTER TABLE `masters`
@@ -281,6 +325,12 @@ ALTER TABLE `userinfo`
 --
 -- AUTO_INCREMENT for dumped tables
 --
+
+--
+-- AUTO_INCREMENT for table `agents`
+--
+ALTER TABLE `agents`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `masters`
