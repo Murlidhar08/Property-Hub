@@ -18,7 +18,7 @@ export default function ForgotPassword() {
 
     try {
       setLoading(true);
-      const response = await authService.resetPassword(email);
+      const response = await authService.forgetPassword(email);
       toast.success(response.message || "Reset link sent successfully!");
 
       // Redirect to login page after 2 seconds

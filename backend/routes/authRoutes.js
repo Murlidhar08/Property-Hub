@@ -16,12 +16,11 @@ router.get("/profile", validator, authController.getProfile);
 // Google OAuth Login
 router.post("/googleLogin", authController.googleLogin);
 
-// Logout user
-// router.post("/logout", authController.logout);
+// Forget password
+router.post("/forget-password", authController.forgetPassword);
 
 // Reset password
-// router.post("/reset-password", authController.resetPassword);
-
+router.post("/reset-password", authController.resetPassword);
 
 module.exports = router;
 

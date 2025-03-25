@@ -1,11 +1,11 @@
-const db = require("../config/mySql");
-const enums = require("../config/enums");
-const commonFunction = require("../config/commonFunction");
-const sendMail = require("../lib/nodemailer")
-const { oauth2Client } = require('../lib/googleClient');
-const path = require("path");
-const authService = require('../services/authService');
 const axios = require('axios');
+const path = require("path");
+
+const { oauth2Client } = require('../lib/googleClient');
+const sendMail = require("../lib/nodemailer")
+const commonFunction = require("../config/commonFunction");
+const authService = require('../services/authService');
+const config = require('../config/config')
 
 // Login user
 exports.login = async (req, res) => {
@@ -145,23 +145,74 @@ exports.googleLogin = async (req, res, next) => {
     }
 };
 
-// Logout user
-exports.logout = (req, res) => {
-    res.json({ message: "Logged out successfully" });
+// Forget password
+exports.forgetPassword = async (req, res) => {
+    try {
+        const emailAddress = req.body.email;
+
+        // Email Validate
+        if (!emailAddress)
+            return res.status(400).json({ error: "Email address is required" });
+
+        // Validate email
+        if (!commonFunction.isEmail(emailAddress)) {
+            return res.status(400).json({ error: "Invalid Email" });
+        }
+
+        // Fetch user details
+        let user = await authService.loginUser(emailAddress);
+        if (!user) {
+            return res.status(500).json({
+                success: false,
+                message: 'Invalid Email'
+            });
+        }
+
+        // Send email
+        const filePath = path.join(__dirname, "../templates", "reset_password.html");
+        let template = commonFunction.getFileContent(filePath);
+
+        // User details
+        let userPayload = { email: user.email }
+        let token = commonFunction.generateJwtToken(userPayload, config.JWT_RESET_PASSWORD)
+        let resetUrl = `${process.env.base_url}/reset-password?token=${token}`
+
+        // Update template details
+        template = template
+            .replaceAll('[[user]]', user.firstName)
+            .replaceAll('[[email]]', process.env.EMAILFROM)
+            .replaceAll('[[url]]', resetUrl)
+
+        // send mail
+        const mailInfo = await sendMail(emailAddress, "Reset Password", template);
+
+        res.json({
+            success: true,
+            message: 'Reset email sended.'
+        });
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: err.sqlMessage || err.message
+        });
+    }
 };
 
 // Reset password
 exports.resetPassword = async (req, res) => {
-    const emailAddress = req.body.email;
+    try {
+        let { token, password } = req.body;
+        let { email } = await commonFunction.verifyJwtToken(token);
+        let status = await authService.updatePassword(email, password);
 
-    // Email Validate
-    if (!emailAddress)
-        return res.status(400).json({ error: "Email address is required" });
-
-    // Send email
-    const filePath = path.join(__dirname, "../templates", "reset_password.html");
-    const template = commonFunction.getFileContent(filePath);
-    const mailInfo = await sendMail(emailAddress, "Reset Password", template);
-
-    res.json({ ...mailInfo });
+        return res.json({
+            success: status,
+            message: status ? 'Password updated successfully.' : 'Failed to updated password.'
+        });
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: err.message
+        });
+    }
 };

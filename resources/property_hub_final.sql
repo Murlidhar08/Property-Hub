@@ -123,6 +123,13 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_register_user` (IN `p_firstName
     SELECT LAST_INSERT_ID() AS userId;
 END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_update_password` (IN `p_email` VARCHAR(255), IN `p_password` VARCHAR(255))   BEGIN
+    -- Update password
+    UPDATE userinfo 
+    SET password = p_password 
+    WHERE email = p_email;
+END$$
+
 --
 -- Functions
 --

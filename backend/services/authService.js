@@ -39,3 +39,17 @@ exports.googleAuthLogin = async (user) => {
             });
     });
 };
+
+// Update user password
+exports.updatePassword = async (email, password) => {
+    return new Promise((resolve, reject) => {
+        db.query("CALL usp_update_password(?, ?)",
+            [email, password],
+            (err, results) => {
+                if (err) return reject(err);
+
+                resolve(!!results.affectedRows);
+            }
+        );
+    });
+}

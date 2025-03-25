@@ -22,8 +22,12 @@ const authService = {
         return true;
     },
 
-    resetPassword: async (email) => {
-        return await API.post("/auth/reset-password", { email });
+    forgetPassword: async (email) => {
+        return await API.post("/auth/forget-password", { email });
+    },
+
+    resetPassword: async (payload) => {
+        return await API.post("/auth/reset-password", payload);
     },
 };
 

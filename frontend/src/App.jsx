@@ -39,6 +39,7 @@ import Dashboard from "./pages/dashboard/Dashboard";
 import AgentsPage from "./pages/agents/AgentsPage";
 import ProtectedLayout from "@/layouts/ProtectedLayout";
 import AuthInitializer from "@/layouts/AuthInitializer";
+import ResetPassword from './pages/authentication/ResetPassword';
 
 function App() {
   return (
@@ -55,6 +56,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path='/reset-password' element={<ResetPassword />} />
         </Route>
 
         {/* Protected Routes */}
