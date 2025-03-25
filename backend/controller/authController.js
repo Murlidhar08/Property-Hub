@@ -175,7 +175,7 @@ exports.forgetPassword = async (req, res) => {
         // User details
         let userPayload = { email: user.email }
         let token = commonFunction.generateJwtToken(userPayload, config.JWT_RESET_PASSWORD)
-        let resetUrl = `${process.env.base_url}/reset-password?token=${token}`
+        let resetUrl = `${process.env.BASE_URL}/reset-password?token=${token}`
 
         // Update template details
         template = template

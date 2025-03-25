@@ -28,10 +28,10 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(
   cors({
-    origin: process.env.allow_cors?.split(','),
+    origin: process.env.ALLOW_CORS?.split(','),
   })
 );
-logger.info('Allowed origins-' + process.env.allow_cors);
+logger.info('Allowed origins-' + process.env.ALLOW_CORS);
 
 app.use("/api/auth", authRouter);
 app.use("/api/agents", agentsRouter);

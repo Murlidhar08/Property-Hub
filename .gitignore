@@ -30,3 +30,4 @@ backend/.env
 # FRONTEND
 frontend/.env
 frontend/dev-dist
+frontend/dist
