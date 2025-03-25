@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 25, 2025 at 04:14 PM
+-- Generation Time: Mar 25, 2025 at 06:23 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -25,6 +25,49 @@ DELIMITER $$
 --
 -- Procedures
 --
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_google_auth_login` (
+  IN `p_providerUid` VARCHAR(255), 
+  IN `p_firstName` VARCHAR(255), 
+  IN `p_lastName` VARCHAR(255), 
+  IN `p_email` VARCHAR(255), 
+  IN `p_profilePicture` VARCHAR(500)
+)   
+BEGIN
+	  DECLARE varRole INT;
+    DECLARE varStatus INT;
+    DECLARE varProviderTypeId INT;
+
+	  -- Get  provider Type ID
+	  SET varProviderTypeId = fn_get_masters_id_by_name('Google');
+
+    -- Check if the user exists based on providerUid (Google UID)
+    IF EXISTS (SELECT 1 FROM userinfo WHERE email = p_email) THEN
+        -- Update existing Google user
+        UPDATE userinfo 
+        SET 
+            firstName = p_firstName,
+            lastName = p_lastName,
+            providerTypeId = varProviderTypeId,
+            providerUid = p_providerUid,
+            profilePicture = p_profilePicture
+        WHERE email = p_email;
+    ELSE
+		    -- Get role and status, and provider ID
+		    SET varRole = fn_get_masters_id_by_name('Client');
+		    SET varStatus = fn_get_masters_id_by_name('PendingApproval');
+    
+        -- Insert new Google user with default values
+        INSERT INTO userinfo (providerTypeId, providerUid, firstName, lastName, email, profilePicture, roleId, status) 
+        VALUES (varProviderTypeId, p_providerUid, p_firstName, p_lastName, p_email, p_profilePicture, varRole, varStatus);
+    END IF;
+
+    -- Return updated or newly inserted user details
+    SELECT userId, firstName, lastName, email, username, roleId, status, profilePicture
+    FROM userinfo 
+    WHERE email = p_email;
+
+END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_login_user` (IN `p_identifier` VARCHAR(255))   BEGIN
     DECLARE varUserCount INT;
     DECLARE varUserId INT;
@@ -199,27 +242,6 @@ CREATE TABLE `userinfo` (
   `updatedAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `userinfo`
---
-
-INSERT INTO `userinfo` (`userId`, `firstName`, `lastName`, `email`, `username`, `password`, `providerTypeId`, `providerUid`, `profilePicture`, `roleId`, `status`, `createdAt`, `updatedAt`) VALUES
-(1, 'Chavda', 'Mahesh', 'Chavdamahesh2772@gmail.com', 'Chavda2772', '1111', 1, NULL, NULL, 4, 7, '2025-03-25 11:19:34', '2025-03-25 11:55:08'),
-(6, 'test', 'testLast', 'test@aa.com', 'test1', '111', 1, NULL, NULL, 6, 9, '2025-03-25 13:18:13', '2025-03-25 13:18:13'),
-(7, 'aa', 'bb', 'aa@gmail.com', 'ab1', '11', 1, NULL, NULL, 6, 9, '2025-03-25 13:32:12', '2025-03-25 13:32:12'),
-(8, 'as', 'ss', 'aa@aa.com', 'aa11', '11', 1, NULL, NULL, 6, 9, '2025-03-25 13:33:10', '2025-03-25 13:33:10'),
-(9, 'qweQWE', 'qe', 'jj@gmail.com', 'ff11', '11', 1, NULL, NULL, 6, 9, '2025-03-25 13:36:17', '2025-03-25 13:36:17'),
-(10, 'asfd', 'asdf', 'chavdamahsesh2772@gmail.com', 'ab1s', '111', 1, NULL, NULL, 6, 9, '2025-03-25 14:15:31', '2025-03-25 14:15:31'),
-(11, 'sd', 'ds', 'asf@asdf.com', 'dd11', '111', 1, NULL, NULL, 6, 9, '2025-03-25 14:15:59', '2025-03-25 14:15:59'),
-(12, 'ffd', 'sdf', 'asfd@asdf.com', 'jj11', '11', 1, NULL, NULL, 6, 9, '2025-03-25 14:18:01', '2025-03-25 14:18:01'),
-(13, 'fd', 'asd', 'sdf@er.com', 'ff', '11', 1, NULL, NULL, 6, 9, '2025-03-25 14:18:54', '2025-03-25 14:18:54'),
-(14, 'ss', 'ss', 'dd@ss.com', 'ss1', '11', 1, NULL, NULL, 6, 9, '2025-03-25 14:35:49', '2025-03-25 14:35:49'),
-(15, 'dd', 'dd', 'df@asdf.com', 'ss1d', '11', 1, NULL, NULL, 6, 9, '2025-03-25 14:37:09', '2025-03-25 14:37:09'),
-(16, 'sdf', 'asdf', 'asdf@d.com', 'ssfd1', '11', 1, NULL, NULL, 6, 9, '2025-03-25 14:37:34', '2025-03-25 14:37:34'),
-(17, 'dd', 'dd', 'asd@sd.com', 'ff@adf.com', '11', 1, NULL, NULL, 6, 9, '2025-03-25 14:38:21', '2025-03-25 14:38:21'),
-(18, 'dd', 'dd', 'asf@asf.com', 'ff1', '11', 1, NULL, NULL, 6, 9, '2025-03-25 14:41:19', '2025-03-25 14:41:19'),
-(19, 'ss', 'sff', '11@asd.com', '1', '11', 1, NULL, NULL, 6, 9, '2025-03-25 15:13:06', '2025-03-25 15:13:06'),
-(20, 'ss', 'sff', '11s@asd.com', '11', '11', 1, NULL, NULL, 6, 9, '2025-03-25 15:14:13', '2025-03-25 15:14:13');
 
 --
 -- Indexes for dumped tables
@@ -269,7 +291,7 @@ ALTER TABLE `mastertypes`
 -- AUTO_INCREMENT for table `userinfo`
 --
 ALTER TABLE `userinfo`
-  MODIFY `userId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `userId` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- Constraints for dumped tables
