@@ -80,6 +80,25 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_client_update` (IN `p_id` INT, 
     WHERE id = p_id;
 END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_get_user_by_email` (IN `p_email` VARCHAR(255))   BEGIN
+    SELECT 
+        id, 
+        first_name, 
+        last_name, 
+        email, 
+        username, 
+        role_id, 
+        status, 
+        provider_id, 
+        provider_uid, 
+        profile_picture, 
+        created_at, 
+        updated_at
+    FROM users 
+    WHERE email = p_email 
+    LIMIT 1;
+END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_get_user_profile` (IN `p_user_id` INT)   BEGIN
     -- Retrieve user profile details
     SELECT id, first_name, last_name, email, username, provider_id, profile_picture, role_id, status, created_at, updated_at
@@ -104,7 +123,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_login_user` (IN `p_identifier` 
     -- If no user found
     IF user_count = 0 THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'User not found';
+        SET MESSAGE_TEXT = 'invalidCreadential';
     END IF;
 
     -- Return user details
@@ -113,19 +132,41 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_login_user` (IN `p_identifier` 
     WHERE id = user_id;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_oauth_login` (IN `p_email` VARCHAR(255), IN `p_firstName` VARCHAR(255), IN `p_lastName` VARCHAR(255), IN `p_provider` VARCHAR(50))   BEGIN
-    DECLARE user_exists INT;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_oauth_login` (IN `p_provider_id` INT, IN `p_provider_uid` VARCHAR(255), IN `p_first_name` VARCHAR(255), IN `p_last_name` VARCHAR(255), IN `p_email` VARCHAR(255), IN `p_profile_picture` VARCHAR(500))   BEGIN
+    DECLARE user_id INT;
     
-    -- Check if user exists
-    SELECT COUNT(*) INTO user_exists FROM users WHERE email = p_email;
+    -- Check if user exists based on provider and provider UID
+    SELECT id INTO user_id 
+    FROM users 
+    WHERE provider_id = p_provider_id AND provider_uid = p_provider_uid;
     
-    IF user_exists = 0 THEN
-        INSERT INTO users (firstName, lastName, email, username, password, role, status, created_at, updated_at)
-        VALUES (p_firstName, p_lastName, p_email, p_email, '', 3, 1, NOW(), NOW()); -- Default role = Client
+    IF user_id IS NULL THEN
+        -- Check if user exists based on email (for users logging in with a different provider)
+        SELECT id INTO user_id FROM users WHERE email = p_email;
+
+        IF user_id IS NULL THEN
+            -- Insert new user
+            INSERT INTO users (first_name, last_name, email, username, password, provider_id, provider_uid, profile_picture, role_id, status)
+            VALUES (p_first_name, p_last_name, p_email, p_email, '', p_provider_id, p_provider_uid, p_profile_picture, 
+            (SELECT id FROM masters where name = 'Client' limit 1) , 
+            (SELECT id FROM masters where name = 'Pending Approval' limit 1));
+
+            -- Get new user ID
+            SET user_id = LAST_INSERT_ID();
+        ELSE
+            -- If email exists but provider is different, update provider info
+            UPDATE users
+            SET provider_id = p_provider_id, 
+				provider_uid = p_provider_uid, 
+                profile_picture = p_profile_picture
+            WHERE id = user_id;
     END IF;
     
     -- Return user details
-    SELECT id, firstName, lastName, email, username, role, status FROM users WHERE email = p_email;
+    SELECT id, first_name, last_name, email, username, role_id, status, provider_id, profile_picture 
+    FROM users 
+    WHERE id = user_id;
+    
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_register_user` (IN `p_first_name` VARCHAR(255), IN `p_last_name` VARCHAR(255), IN `p_email` VARCHAR(255), IN `p_username` VARCHAR(255), IN `p_password` VARCHAR(500), IN `p_provider_id` INT, IN `p_provider_uid` VARCHAR(255), IN `p_profile_picture` VARCHAR(500), IN `p_role_id` INT)   BEGIN
