@@ -1,4 +1,5 @@
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const API = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api",
@@ -15,5 +16,18 @@ API.interceptors.request.use((config) => {
     }
     return config;
 });
+
+// Request Interceptor for Post API
+API.interceptors.response.use(
+    (response) => {
+        return response.data;
+    },
+    (error) => {
+        if (error.response?.data?.message)
+            toast.error(error.response?.data?.message);
+
+        return Promise.reject(error.response || error);
+    }
+);
 
 export default API;

@@ -1,22 +1,12 @@
 import API from "./api";
 
 const authService = {
-    register: async ({ firstName, lastName, username, email, password, provider, providerId }) => {
-        const response = await API.post("/auth/register", {
-            firstName,
-            lastName,
-            username,
-            email,
-            password,
-            provider,     // e.g., "local", "google", "facebook"
-            providerId,   // Only applicable for OAuth providers
-        });
-        return response.data;
+    login: async ({ identifier, password }) => {
+        return await API.post("/auth/login", { identifier, password });
     },
 
-    login: async ({ identifier, password }) => {
-        const response = await API.post("/auth/login", { identifier, password });
-        return response.data;
+    register: async (data) => {
+        return await API.post("/auth/register", data);
     },
 
     logout: async () => {
@@ -25,18 +15,15 @@ const authService = {
     },
 
     getProfile: async () => {
-        const response = await API.get("/auth/profile");
-        return response.data;
+        return await API.get("/auth/profile");
     },
 
     resetPassword: async (email) => {
-        const response = await API.post("/auth/reset-password", { email });
-        return response.data;
+        return await API.post("/auth/reset-password", { email });
     },
 
     googleAuth: async (code) => {
-        const response = await API.get("/auth/google?code=" + code);
-        return response.data;
+        return await API.get("/auth/google?code=" + code);
     },
 };
 

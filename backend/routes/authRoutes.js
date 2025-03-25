@@ -11,16 +11,16 @@ router.post("/login", authController.login);
 router.post("/register", authController.register);
 
 // Logout user
-router.post("/logout", authController.logout);
+// router.post("/logout", authController.logout);
 
 // Reset password
-router.post("/reset-password", authController.resetPassword);
+// router.post("/reset-password", authController.resetPassword);
 
 // Google OAuth Login
-router.get("/google", authController.googleAuth);
+// router.get("/google", authController.googleAuth);
 
 // Get user profile
-router.get("/profile", validator, authController.getProfile);
+// router.get("/profile", validator, authController.getProfile);
 
 module.exports = router;
 

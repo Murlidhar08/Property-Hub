@@ -1,17 +1,20 @@
+// Packages
 import { useState } from "react";
 import { FaFacebook } from "react-icons/fa";
 import { FiLogIn } from "react-icons/fi";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
-import authService from "@/services/authService";
+import { useDispatch } from "react-redux";
 
 // Components
 import GoogleLogin from "@/pages/authentication/GoogleLogin.jsx";
 
-// Redux
-import { useDispatch } from "react-redux";
+// Store
 import { setUser, setToken } from "@/redux/slices/userSlice";
+
+// Services
+import authService from "@/services/authService";
 
 export default function Login() {
   const [identifier, setIdentifier] = useState("");
@@ -23,9 +26,20 @@ export default function Login() {
   const handleLogin = async () => {
     setLoading(true);
     try {
+      // UserName or Email validation
+      if (!identifier) {
+        toast.error("Email or Username is required.");
+        return;
+      }
+
+      if (!password) {
+        toast.error("Password is required.");
+        return;
+      }
+
       const response = await authService.login({ identifier, password });
 
-      if (response.token) {
+      if (response.success) {
         // Set User details here
         dispatch(setUser(response.user));
 
@@ -33,14 +47,14 @@ export default function Login() {
         dispatch(setToken(response.token));
 
         localStorage.setItem("token", response.token);
-        toast.success("Login successful! Redirecting...");
+        toast.error("Login successful! Redirecting...");
 
-        setTimeout(() => navigate("/"), 1500);
+        navigate("/");
       } else {
         toast.error("Invalid credentials. Please try again.");
       }
     } catch (err) {
-      toast.error(err.response?.error || "Login failed. Please try again.");
+      console.log(err)
     } finally {
       setLoading(false);
     }

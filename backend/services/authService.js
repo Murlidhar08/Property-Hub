@@ -1,13 +1,26 @@
 const db = require("../config/mySql");
 
 // Login User
-exports.loginUser = async (identifier, password) => {
+exports.loginUser = async (identifier) => {
     return new Promise((resolve, reject) => {
-        db.query("CALL usp_login_user(?, ?)", [identifier, password], (err, results) => {
-            if (err) return reject(err.message);
+        db.query("CALL usp_login_user(?)", [identifier], (err, results) => {
+            if (err) return reject(err);
 
             resolve(results[0][0]);
         });
+    });
+}
+
+// Register User
+exports.registerUser = async ({ firstName, lastName, username, email, finalPassword }) => {
+    return new Promise((resolve, reject) => {
+        db.query("CALL usp_register_user(?, ?, ?, ?, ?);",
+            [firstName, lastName, username, email, finalPassword],
+            (err, results) => {
+                if (err) return reject(err);
+
+                resolve(results[0][0]['userId']);
+            });
     });
 }
 

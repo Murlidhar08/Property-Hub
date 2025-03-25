@@ -1,12 +1,15 @@
+// Packages
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App";
-import "@/assets/styles/main.css";
 import { GoogleOAuthProvider } from "@react-oauth/google";
-
-// store
 import { Provider } from "react-redux";
+
+// Style
+import "@/assets/styles/main.css";
+
+// Store
 import store from "./redux/store";
+import App from "./App";
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 

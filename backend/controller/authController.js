@@ -14,51 +14,66 @@ exports.login = async (req, res) => {
     try {
         let user = await authService.loginUser(identifier, password);
 
-        // Generate the JWT
-        const token = commonFunction.generateJwtToken({
-            userId: user.user_id,
+        // Verify Password
+        if (password != user.password)
+            return res.status(401).json({
+                success: false,
+                message: "Invalid credentials. Please Try Again."
+            });
+
+        let userDetails = {
+            userId: user.userId,
             email: user.email,
             username: user.username,
-            roleId: user.role_id
-        });
+            roleId: user.roleId,
+            status: user.status
+        };
+
+        // Generate the JWT
+        const token = commonFunction.generateJwtToken(userDetails);
 
         // Return the token and user details
         res.json({
+            success: true,
             message: "Login successful",
             token: token,
             user: {
-                id: user.user_id,
-                firstName: user.first_name,
-                lastName: user.last_name,
-                email: user.email,
-                username: user.username,
-                roleId: user.role_id
+                ...userDetails,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                profilePicture: user.profilePicture
             }
         });
-
-    } catch (error) {
-        return res.status(500).json({ error: err.message });
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: err.sqlMessage || err.message
+        });
     }
 };
 
 // Register a new user
-exports.register = (req, res) => {
-    const { firstName, lastName, email, username, password, providerId, providerUid, profilePicture, roleId } = req.body;
+exports.register = async (req, res) => {
+    const { firstName, lastName, email, username, password } = req.body;
 
-    const enProviderId = enums.providerType[providerId];
-    const finalProviderUid = enProviderId === 1 ? null : providerUid;
-    const finalProfilePicture = enProviderId === 1 ? null : profilePicture;
-    const finalRoleId = enProviderId === 1 && !roleId ? 6 : roleId; // Default roleId to 6 (Client) if provider is Local
-    const finalPassword = enProviderId === 1 ? null : profilePicture;
+    try {
+        // Encrypt password 
+        let finalPassword = password;
 
-    db.query(
-        "CALL usp_register_user(?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        [firstName, lastName, email, username, finalPassword, enProviderId, finalProviderUid, finalProfilePicture, finalRoleId],
-        (err, results) => {
-            if (err) return res.status(500).json({ error: err.message });
-            res.status(201).json({ message: "User registered successfully", userId: results[0][0].user_id });
-        }
-    );
+        // Add user to database
+        let userId = await authService.registerUser({ firstName, lastName, username, email, finalPassword });
+
+        res.status(201).json({
+            success: true,
+            message: "User Registered successfully.",
+            userId: userId
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.sqlMessage
+        })
+    }
 };
 
 // Get user profile

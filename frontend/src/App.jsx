@@ -84,7 +84,7 @@ function App() {
           </Route>
         </Route>
 
-        {/* Public routes */}
+        {/* error routes */}
         <Route path="/pending-approval" element={<PendingApproval />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
         <Route path="/server-error" element={<ServerError />} />

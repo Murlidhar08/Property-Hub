@@ -36,7 +36,7 @@ const AuthInitializer = () => {
             }
         };
 
-        initializeAuth();
+        // initializeAuth();
     }, []); // 🚀 Runs ONLY ONCE when the app loads
 
     return null; // No UI, only logic

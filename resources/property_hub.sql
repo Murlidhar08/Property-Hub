@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 19, 2025 at 10:01 AM
+-- Generation Time: Mar 25, 2025 at 12:02 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -139,7 +139,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_oauth_login` (IN `p_provider_id
     SELECT id INTO user_id 
     FROM users 
     WHERE provider_id = p_provider_id AND provider_uid = p_provider_uid;
-    
+
     IF user_id IS NULL THEN
         -- Check if user exists based on email (for users logging in with a different provider)
         SELECT id INTO user_id FROM users WHERE email = p_email;
@@ -160,8 +160,9 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_oauth_login` (IN `p_provider_id
 				provider_uid = p_provider_uid, 
                 profile_picture = p_profile_picture
             WHERE id = user_id;
+        END IF;
     END IF;
-    
+
     -- Return user details
     SELECT id, first_name, last_name, email, username, role_id, status, provider_id, profile_picture 
     FROM users 

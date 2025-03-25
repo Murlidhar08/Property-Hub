@@ -13,7 +13,7 @@ const AccountPage = () => {
     };
 
     // Placeholder profile image if none is provided
-    const profileImage = user['profile_picture'] || "/images/user.png";
+    const profileImage = user['profilePicture'] || "/images/user.png";
 
     return (
         <div className="p-6 bg-gray-100 min-h-screen w-full flex justify-center">
@@ -25,7 +25,7 @@ const AccountPage = () => {
                         alt="Profile"
                         className="w-24 h-24 rounded-full border-2 border-purple-600 shadow-md"
                     />
-                    <h2 className="text-2xl font-bold text-gray-800 mt-4">{user.first_name} {user.last_name}</h2>
+                    <h2 className="text-2xl font-bold text-gray-800 mt-4">{user.firstName} {user.lastName}</h2>
                     <p className="text-gray-500">@{user.username}</p>
                 </div>
 
@@ -34,12 +34,12 @@ const AccountPage = () => {
                 <div className="space-y-4">
                     <div className="flex justify-between">
                         <span className="font-semibold text-gray-700">First Name:</span>
-                        <span className="text-gray-900">{user.first_name}</span>
+                        <span className="text-gray-900">{user.firstName}</span>
                     </div>
 
                     <div className="flex justify-between">
                         <span className="font-semibold text-gray-700">Last Name:</span>
-                        <span className="text-gray-900">{user.last_name}</span>
+                        <span className="text-gray-900">{user.lastName}</span>
                     </div>
 
                     <div className="flex justify-between">
@@ -49,7 +49,7 @@ const AccountPage = () => {
 
                     <div className="flex justify-between">
                         <span className="font-semibold text-gray-700">Role ID:</span>
-                        <span className="text-gray-900">{user.role_id}</span>
+                        <span className="text-gray-900">{user.roleId}</span>
                     </div>
                 </div>
 
