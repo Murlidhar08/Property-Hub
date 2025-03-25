@@ -1,9 +1,13 @@
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
-import * as path from 'path';
 import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      '@': '/src',
+    },
+  },
   server: {
     port: 4000
   },
@@ -95,11 +99,6 @@ export default defineConfig({
       },
     }),
   ],
-  resolve: {
-    alias: [
-      { find: '@', replacement: path.resolve(path.dirname(), 'src') },
-    ],
-  },
   optimizeDeps: {
     exclude: ['lucide-react'],
   },
