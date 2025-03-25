@@ -13,14 +13,15 @@ router.post("/register", authController.register);
 // Get user profile
 router.get("/profile", validator, authController.getProfile);
 
+// Google OAuth Login
+router.post("/googleLogin", authController.googleLogin);
+
 // Logout user
 // router.post("/logout", authController.logout);
 
 // Reset password
 // router.post("/reset-password", authController.resetPassword);
 
-// Google OAuth Login
-// router.get("/google", authController.googleAuth);
 
 module.exports = router;
 

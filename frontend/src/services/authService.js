@@ -9,21 +9,21 @@ const authService = {
         return await API.post("/auth/register", data);
     },
 
+    getProfile: async () => {
+        return await API.get("/auth/profile");
+    },
+
+    googleLogin: async (code) => {
+        return await API.post("/auth/googleLogin", { code });
+    },
+
     logout: async () => {
         localStorage.removeItem("token");
         return true;
     },
 
-    getProfile: async () => {
-        return await API.get("/auth/profile");
-    },
-
     resetPassword: async (email) => {
         return await API.post("/auth/reset-password", { email });
-    },
-
-    googleAuth: async (code) => {
-        return await API.get("/auth/google?code=" + code);
     },
 };
 

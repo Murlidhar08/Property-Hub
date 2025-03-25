@@ -102,6 +102,49 @@ exports.getProfile = async (req, res) => {
     }
 };
 
+// Google authentication
+exports.googleLogin = async (req, res, next) => {
+    const { code } = req.body;
+
+    try {
+        const googleRes = await oauth2Client.getToken(code);
+        oauth2Client.setCredentials(googleRes.tokens);
+        const userRes = await axios.get(
+            `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${googleRes.tokens.access_token}`
+        );
+        const { id, given_name, family_name, email, picture } = userRes.data;
+
+        const addUser = {
+            providerUid: id,
+            firstName: given_name,
+            lastName: family_name,
+            email,
+            profilePicture: picture
+        };
+
+        // Add or Update user details
+        let user = await authService.googleAuthLogin(addUser);
+
+        const token = commonFunction.generateJwtToken({
+            userId: user.userId,
+            email: user.email,
+            username: user.username,
+            roleId: user.roleId,
+            status: user.status
+        });
+
+        res.status(200).json({
+            success: true,
+            token,
+            user,
+        });
+    } catch (err) {
+        res.status(500).json({
+            message: "Internal Server Error"
+        })
+    }
+};
+
 // Logout user
 exports.logout = (req, res) => {
     res.json({ message: "Logged out successfully" });
@@ -121,43 +164,4 @@ exports.resetPassword = async (req, res) => {
     const mailInfo = await sendMail(emailAddress, "Reset Password", template);
 
     res.json({ ...mailInfo });
-};
-
-// Google authentication
-exports.googleAuth = async (req, res, next) => {
-    const code = req.query.code;
-
-    try {
-        const googleRes = await oauth2Client.getToken(code);
-        oauth2Client.setCredentials(googleRes.tokens);
-        const userRes = await axios.get(
-            `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${googleRes.tokens.access_token}`
-        );
-        const { id, given_name, family_name, email, name, picture } = userRes.data;
-        // console.log(userRes);
-        let user = await authService.getUserByEmail(email);
-
-        if (!user) {
-            // Add User
-            const addUser = { providerId: 2, providerUid: id, firstName: given_name, lastName: family_name, email, profilePicture: picture };
-            user = await authService.googleOauthLogin(addUser);
-        }
-
-        const token = commonFunction.generateJwtToken({
-            userId: user.id,
-            email: user.email,
-            username: user.username,
-            roleId: user.role_id
-        });
-
-        res.status(200).json({
-            message: 'success',
-            token,
-            user,
-        });
-    } catch (err) {
-        res.status(500).json({
-            message: "Internal Server Error"
-        })
-    }
 };

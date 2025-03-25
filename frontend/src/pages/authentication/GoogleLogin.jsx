@@ -15,7 +15,7 @@ const GoolgeLogin = () => {
     const responseGoogle = async (authResult) => {
         try {
             if (authResult["code"]) {
-                const result = await authService.googleAuth(authResult.code);
+                const result = await authService.googleLogin(authResult.code);
 
                 // Set User details here
                 dispatch(setUser(result.user));
