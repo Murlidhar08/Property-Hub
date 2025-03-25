@@ -43,7 +43,7 @@ import AuthInitializer from "@/layouts/AuthInitializer";
 function App() {
   return (
     <BrowserRouter>
-      {/* Initialize Auth Check inside Router */}
+      {/* fetching user details if loged In*/}
       <AuthInitializer />
 
       {/* Toast notifications container */}

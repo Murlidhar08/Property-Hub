@@ -12,7 +12,7 @@ exports.login = async (req, res) => {
     const { identifier, password } = req.body;
 
     try {
-        let user = await authService.loginUser(identifier, password);
+        let user = await authService.loginUser(identifier);
 
         // Verify Password
         if (password != user.password)
@@ -77,14 +77,29 @@ exports.register = async (req, res) => {
 };
 
 // Get user profile
-exports.getProfile = (req, res) => {
-    const userId = req.user.userId;
-
-    db.query("CALL usp_get_user_profile(?)", [userId], (err, results) => {
-        if (err) return res.status(500).json({ error: err.message });
-
-        res.json(results[0][0]); // Return user profile
-    });
+exports.getProfile = async (req, res) => {
+    const email = req.user.email;
+    try {
+        let user = await authService.loginUser(email);
+        return res.json({
+            success: true,
+            user: {
+                userId: user.userId,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+                username: user.username,
+                roleId: user.roleId,
+                status: user.status,
+                profilePicture: user.profilePicture
+            }
+        });
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: err.sqlMessage || err.message
+        });
+    }
 };
 
 // Logout user

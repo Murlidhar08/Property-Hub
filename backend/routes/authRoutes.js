@@ -10,6 +10,9 @@ router.post("/login", authController.login);
 // Register a new user (Email & Password or OAuth)
 router.post("/register", authController.register);
 
+// Get user profile
+router.get("/profile", validator, authController.getProfile);
+
 // Logout user
 // router.post("/logout", authController.logout);
 
@@ -18,9 +21,6 @@ router.post("/register", authController.register);
 
 // Google OAuth Login
 // router.get("/google", authController.googleAuth);
-
-// Get user profile
-// router.get("/profile", validator, authController.getProfile);
 
 module.exports = router;
 
