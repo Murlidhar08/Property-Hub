@@ -7,40 +7,12 @@ const path = require("path");
 const authService = require('../services/authService');
 const axios = require('axios');
 
-// Register a new user
-exports.register = (req, res) => {
-    const { firstName, lastName, email, username, password, providerId, providerUid, profilePicture, roleId } = req.body;
-
-    const enProviderId = enums.providerType[providerId];
-    const finalProviderUid = enProviderId === 1 ? null : providerUid;
-    const finalProfilePicture = enProviderId === 1 ? null : profilePicture;
-    const finalRoleId = enProviderId === 1 && !roleId ? 6 : roleId; // Default roleId to 6 (Client) if provider is Local
-    const finalPassword = enProviderId === 1 ? null : profilePicture;
-
-    db.query(
-        "CALL usp_register_user(?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        [firstName, lastName, email, username, finalPassword, enProviderId, finalProviderUid, finalProfilePicture, finalRoleId],
-        (err, results) => {
-            if (err) return res.status(500).json({ error: err.message });
-            res.status(201).json({ message: "User registered successfully", userId: results[0][0].user_id });
-        }
-    );
-};
-
 // Login user
-exports.login = (req, res) => {
+exports.login = async (req, res) => {
     const { identifier, password } = req.body;
 
-    db.query("CALL usp_login_user(?, ?)", [identifier, password], (err, results) => {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
-
-        if (results[0].length === 0) {
-            return res.status(401).json({ error: "Invalid email/username or password" });
-        }
-
-        const user = results[0][0];
+    try {
+        let user = await authService.loginUser(identifier, password);
 
         // Generate the JWT
         const token = commonFunction.generateJwtToken({
@@ -63,7 +35,30 @@ exports.login = (req, res) => {
                 roleId: user.role_id
             }
         });
-    });
+
+    } catch (error) {
+        return res.status(500).json({ error: err.message });
+    }
+};
+
+// Register a new user
+exports.register = (req, res) => {
+    const { firstName, lastName, email, username, password, providerId, providerUid, profilePicture, roleId } = req.body;
+
+    const enProviderId = enums.providerType[providerId];
+    const finalProviderUid = enProviderId === 1 ? null : providerUid;
+    const finalProfilePicture = enProviderId === 1 ? null : profilePicture;
+    const finalRoleId = enProviderId === 1 && !roleId ? 6 : roleId; // Default roleId to 6 (Client) if provider is Local
+    const finalPassword = enProviderId === 1 ? null : profilePicture;
+
+    db.query(
+        "CALL usp_register_user(?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        [firstName, lastName, email, username, finalPassword, enProviderId, finalProviderUid, finalProfilePicture, finalRoleId],
+        (err, results) => {
+            if (err) return res.status(500).json({ error: err.message });
+            res.status(201).json({ message: "User registered successfully", userId: results[0][0].user_id });
+        }
+    );
 };
 
 // Get user profile

@@ -4,6 +4,11 @@ const providerType = {
     'facebook': 3
 };
 
+const errorCode = {
+    invalidCreadential: 'Invalid credential'
+}
+
 module.exports = {
-    providerType
+    providerType,
+    errorCode
 }

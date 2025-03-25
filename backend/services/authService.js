@@ -1,5 +1,16 @@
 const db = require("../config/mySql");
 
+// Login User
+exports.loginUser = async (identifier, password) => {
+    return new Promise((resolve, reject) => {
+        db.query("CALL usp_login_user(?, ?)", [identifier, password], (err, results) => {
+            if (err) return reject(err.message);
+
+            resolve(results[0][0]);
+        });
+    });
+}
+
 exports.getUserByEmail = async (email) => {
     return new Promise((resolve, reject) => {
         db.query("CALL usp_get_user_by_email(?)", [email], (err, results) => {
