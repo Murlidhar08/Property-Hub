@@ -158,7 +158,7 @@ export default function Register() {
         </form>
 
         {/* Divider */}
-        <div className="my-4 text-gray-400 flex items-center">
+        <div className="my-4 text-gray-400 flex items-center" style={{ display: 'none' }}>
           <hr className="flex-grow border-gray-300" />
           <span className="mx-2 text-sm">Or sign up with</span>
           <hr className="flex-grow border-gray-300" />
@@ -170,6 +170,7 @@ export default function Register() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
           className="flex justify-center space-x-4"
+          style={{ display: 'none' }}
         >
           {/* Google Sign-Up */}
           <button className="p-3 bg-gray-200 rounded-full hover:bg-gray-300">
@@ -180,7 +181,7 @@ export default function Register() {
             <FaFacebook className="text-blue-600 text-xl" />
           </button>
         </motion.div>
-      </motion.div>
-    </div>
+      </motion.div >
+    </div >
   );
 }

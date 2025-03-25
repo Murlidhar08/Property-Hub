@@ -140,6 +140,7 @@ export default function Login() {
             className="p-3 bg-gray-200 rounded-full hover:bg-gray-300"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
+            style={{ display: 'none' }}
           >
             <FaFacebook className="text-blue-600 text-xl" />
           </motion.button>
