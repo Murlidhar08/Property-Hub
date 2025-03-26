@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 26, 2025 at 02:06 PM
+-- Generation Time: Mar 26, 2025 at 08:38 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -99,6 +99,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_google_auth_login` (IN `p_provi
             firstName = p_firstName,
             lastName = p_lastName,
             providerTypeId = varProviderTypeId,
+            isVerified = 1,
             providerUid = p_providerUid,
             profilePicture = p_profilePicture
         WHERE email = p_email;
@@ -108,12 +109,12 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_google_auth_login` (IN `p_provi
 		SET varStatus = fn_get_masters_id_by_name('PendingApproval');
     
         -- Insert new Google user with default values
-        INSERT INTO userinfo (providerTypeId, providerUid, firstName, lastName, email, profilePicture, roleId, status) 
-        VALUES (varProviderTypeId, p_providerUid, p_firstName, p_lastName, p_email, p_profilePicture, varRole, varStatus);
+        INSERT INTO userinfo (providerTypeId, isVerified, providerUid, firstName, lastName, email, profilePicture, roleId, status) 
+        VALUES (varProviderTypeId, 1, p_providerUid, p_firstName, p_lastName, p_email, p_profilePicture, varRole, varStatus);
     END IF;
 
     -- Return updated or newly inserted user details
-    SELECT userId, firstName, lastName, email, username, roleId, status, profilePicture
+    SELECT userId, firstName, lastName, email, username, roleId, status, profilePicture, isVerified
     FROM userinfo 
     WHERE email = p_email;
 
@@ -136,9 +137,13 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_login_user` (IN `p_identifier` 
     END IF;
 
     -- Return user details
-    SELECT userId, firstName, lastName, email, username, password, roleId, status, profilePicture
+    SELECT userId, firstName, lastName, email, username, password, roleId, status, profilePicture, isVerified
     FROM userinfo 
     WHERE userId = varUserId;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_masters_getId_by_name` (IN `p_name` VARCHAR(255))   BEGIN
+	SELECT fn_get_masters_id_by_name(p_name) as id;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_register_user` (IN `p_firstName` VARCHAR(100), IN `p_lastName` VARCHAR(100), IN `p_username` VARCHAR(100), IN `p_email` VARCHAR(255), IN `p_password` VARCHAR(255))   BEGIN
@@ -178,6 +183,12 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_update_password` (IN `p_email` 
     -- Update password
     UPDATE userinfo 
     SET password = p_password 
+    WHERE email = p_email;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_verify_user` (IN `p_email` VARCHAR(255))   BEGIN
+	UPDATE userInfo
+    SET isVerified = 1
     WHERE email = p_email;
 END$$
 
@@ -319,6 +330,7 @@ CREATE TABLE `userinfo` (
   `username` varchar(255) DEFAULT NULL,
   `password` varchar(500) DEFAULT NULL,
   `providerTypeId` int(11) NOT NULL,
+  `isVerified` int(1) DEFAULT 0,
   `providerUid` varchar(255) DEFAULT NULL,
   `profilePicture` varchar(500) DEFAULT NULL,
   `roleId` int(11) NOT NULL,
@@ -418,7 +430,7 @@ DELIMITER $$
 --
 -- Events
 --
-CREATE DEFINER=`root`@`localhost` EVENT `delete_expired_tokens` ON SCHEDULE EVERY 1 DAY STARTS '2025-03-26 18:32:13' ON COMPLETION NOT PRESERVE ENABLE DO CALL usp_expiredToken_delete()$$
+CREATE DEFINER=`root`@`localhost` EVENT `delete_expired_tokens` ON SCHEDULE EVERY 1 DAY STARTS '2025-03-26 18:41:29' ON COMPLETION NOT PRESERVE ENABLE DO CALL usp_expiredToken_delete()$$
 
 DELIMITER ;
 COMMIT;

@@ -10,7 +10,8 @@ const PendingApproval = () => {
             />
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Pending Approval</h1>
             <p className="text-lg text-gray-600">
-                Your account is awaiting admin approval. You will be notified once your access is granted.
+                Your account is awaiting admin approval. <br />
+                You will be notified once your access is granted.
             </p>
             <Link
                 to="/login"

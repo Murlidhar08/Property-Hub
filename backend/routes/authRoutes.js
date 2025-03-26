@@ -25,5 +25,11 @@ router.post("/forget-password", authController.forgetPassword);
 // Reset password
 router.post("/reset-password", authController.resetPassword);
 
+// Send verification link
+router.post("/resend-verification", validator, authController.resendVerification);
+
+// Verify user account
+router.post("/verify-account", validator, authController.verifyAccount);
+
 module.exports = router;
 

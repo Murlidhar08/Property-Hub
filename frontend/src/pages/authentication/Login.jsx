@@ -39,6 +39,10 @@ export default function Login() {
 
       const response = await authService.login({ identifier, password });
 
+      // Set token
+      if (response.token)
+        localStorage.setItem("token", response.token);
+
       if (response.success) {
         // Set User details here
         dispatch(setUser(response.user));
@@ -46,11 +50,16 @@ export default function Login() {
         // set Token here
         dispatch(setToken(response.token));
 
-        localStorage.setItem("token", response.token);
         toast.error("Login successful! Redirecting...");
-
         navigate("/");
-      } else {
+      }
+      else if (response.message == 'pendingVerification') {
+        navigate("/pending-verification");
+      }
+      // else if (response.message == 'pendingApproval') {
+      //   navigate("/pending-approval");
+      // }
+      else {
         toast.error("Invalid credentials. Please try again.");
       }
     } catch (err) {

@@ -4,5 +4,8 @@ module.exports = {
     },
     "JWT_RESET_PASSWORD": {
         expiresIn: '1h' // Token expires in 1 hour
+    },
+    "JWT_VERIFY_EMAIL": {
+        expiresIn: '1h' // Token expires in 1 hour
     }
 }

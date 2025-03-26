@@ -6,6 +6,8 @@ const sendMail = require("../lib/nodemailer")
 const commonFunction = require("../config/commonFunction");
 const authService = require('../services/authService');
 const config = require('../config/config')
+const encryptionUtil = require('../config/encryptionUtil');
+const applicationService = require('../services/applicationService')
 
 // Login user
 exports.login = async (req, res) => {
@@ -15,7 +17,8 @@ exports.login = async (req, res) => {
         let user = await authService.loginUser(identifier);
 
         // Verify Password
-        if (password != user.password)
+        let isMatched = await encryptionUtil.comparePassword(password, user.password)
+        if (!isMatched)
             return res.status(401).json({
                 success: false,
                 message: "Invalid credentials. Please Try Again."
@@ -24,13 +27,31 @@ exports.login = async (req, res) => {
         let userDetails = {
             userId: user.userId,
             email: user.email,
-            username: user.username,
             roleId: user.roleId,
             status: user.status
         };
 
         // Generate the JWT
         const token = commonFunction.generateJwtToken(userDetails);
+
+        // Validate email verification
+        if (!user.isVerified) {
+            return res.json({
+                success: false,
+                message: 'pendingVerification',
+                token: token
+            });
+        }
+
+        // PENDING: Validate for Approval
+        // let val = await applicationService.getMastersIdByName('pendingApproval');
+        // if (user.status == val) {
+        //     return res.json({
+        //         success: false,
+        //         message: 'pendingApproval',
+        //         token: token
+        //     });
+        // }
 
         // Return the token and user details
         res.json({
@@ -39,6 +60,7 @@ exports.login = async (req, res) => {
             token: token,
             user: {
                 ...userDetails,
+                username: user.username,
                 firstName: user.firstName,
                 lastName: user.lastName,
                 profilePicture: user.profilePicture
@@ -82,7 +104,7 @@ exports.register = async (req, res) => {
 
     try {
         // Encrypt password 
-        let finalPassword = password;
+        let finalPassword = await encryptionUtil.generatePasswordHash(password);
 
         // Add user to database
         let userId = await authService.registerUser({ firstName, lastName, username, email, finalPassword });
@@ -228,16 +250,100 @@ exports.resetPassword = async (req, res) => {
     try {
         let { token, password } = req.body;
         let { email } = await commonFunction.verifyJwtToken(token);
-        let status = await authService.updatePassword(email, password);
+
+        // Encrypt password
+        let finalPassword = await encryptionUtil.generatePasswordHash(password);
+
+        // Update password
+        await authService.updatePassword(email, finalPassword);
+
+        // Force expire token
+        let tokenHash = commonFunction.generateHash(token);
+        let tokenExpireTimestamp = await commonFunction.tokenExpireTimestamp(token);
+        await authService.addExpireToken(tokenHash, tokenExpireTimestamp);
 
         return res.json({
-            success: status,
-            message: status ? 'Password updated successfully.' : 'Failed to updated password.'
+            success: true,
+            message: 'Password updated successfully.'
         });
     } catch (err) {
         return res.status(500).json({
             success: false,
             message: err.message
+        });
+    }
+};
+
+// Resend verification email
+exports.resendVerification = async (req, res) => {
+    try {
+        const emailAddress = req.user.email;
+
+        // Email Validate
+        if (!emailAddress)
+            return res.status(400).json({ error: "Email address is required" });
+
+        // Validate email
+        if (!commonFunction.isEmail(emailAddress)) {
+            return res.status(400).json({ error: "Invalid Email" });
+        }
+
+        // Send email
+        const filePath = path.join(__dirname, "../templates", "verify_email.html");
+        let template = commonFunction.getFileContent(filePath);
+
+        // User details
+        let userPayload = { email: emailAddress }
+        let token = commonFunction.generateJwtToken(userPayload, config.JWT_VERIFY_EMAIL)
+        let verifyUrl = `${process.env.BASE_URL}/verify-email?token=${token}`
+
+        // Update template details
+        template = template.replaceAll('[[url]]', verifyUrl)
+
+        // send mail
+        const mailInfo = await sendMail(emailAddress, "Verify Account", template);
+
+        res.json({
+            success: true,
+            message: 'Reset email sended.'
+        });
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: err.sqlMessage || err.message
+        });
+    }
+};
+
+// Send verify user email
+exports.verifyAccount = async (req, res) => {
+    try {
+        const emailAddress = req.user.email;
+        const token = req.token;
+
+        // Email Validate
+        if (!emailAddress)
+            return res.status(400).json({ error: "Email address is required" });
+
+        // Validate email
+        if (!commonFunction.isEmail(emailAddress)) {
+            return res.status(400).json({ error: "Invalid Email" });
+        }
+
+        // Update verification 
+        await authService.updateVerifyStatus(emailAddress);
+
+        // Force expire token
+        await commonFunction.forceExpireToken(token);
+
+        res.json({
+            success: true,
+            message: 'Account verified'
+        });
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: err.sqlMessage || err.message
         });
     }
 };

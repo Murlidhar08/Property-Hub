@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const fs = require("fs");
 const validator = require('validator');
 const crypto = require('crypto');
+const authService = require('../services/authService');
 
 // Generate the JWT TOKEN
 module.exports.generateJwtToken = (payload, options = config.JWT_OPTIONS) => {
@@ -42,5 +43,23 @@ module.exports.tokenExpireTimestamp = async (token) => {
         return decoded.exp || null; // Convert to milliseconds
     } catch (err) {
         return null;
+    }
+};
+
+// Get token expire timestamp by calling verifyJwtToken
+module.exports.forceExpireToken = async (token) => {
+    try {
+        const decoded = await module.exports.verifyJwtToken(token);
+
+        // Force expire token
+        let tokenHash = await module.exports.generateHash(token);
+        let tokenExpireTimestamp = decoded.exp;
+
+        // Add token to Expired list
+        await authService.addExpireToken(tokenHash, tokenExpireTimestamp);
+
+        return true;
+    } catch (err) {
+        return err;
     }
 };

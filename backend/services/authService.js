@@ -84,3 +84,18 @@ exports.isTokenExpired = async (tokenHash) => {
         );
     });
 }
+
+// Update verification 
+exports.updateVerifyStatus = async (email) => {
+    return new Promise((resolve, reject) => {
+        db.query('CALL usp_verify_user(?)',
+            [email],
+            (err, results) => {
+                if (err)
+                    return reject(err);
+
+                return resolve(!!results.affectedRows)
+            }
+        );
+    });
+}

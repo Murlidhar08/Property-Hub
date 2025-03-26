@@ -40,6 +40,8 @@ import AgentsPage from "./pages/agents/AgentsPage";
 import ProtectedLayout from "@/layouts/ProtectedLayout";
 import AuthInitializer from "@/layouts/AuthInitializer";
 import ResetPassword from './pages/authentication/ResetPassword';
+import PendingVerification from './pages/authentication/PendingVerification';
+import UserVerified from './pages/authentication/UserVerified';
 
 function App() {
   return (
@@ -88,6 +90,8 @@ function App() {
 
         {/* error routes */}
         <Route path="/pending-approval" element={<PendingApproval />} />
+        <Route path="/pending-verification" element={<PendingVerification />} />
+        <Route path="/verify-email" element={<UserVerified />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
         <Route path="/server-error" element={<ServerError />} />
         <Route path="*" element={<NotFound />} />

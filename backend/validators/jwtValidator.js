@@ -4,12 +4,18 @@ const authService = require('../services/authService.js')
 // Middleware to verify JWT
 const verifyToken = async (req, res, next) => {
     const authorization = req.headers['authorization'];
-    if (!authorization)
-        return res.status(403).json({ error: "No token provided" });
 
     try {
         // Verify Token
-        const token = authorization.split(' ')[1];
+        let token = authorization?.split(' ')[1];
+
+        // Verify body token
+        if (!token && req.body?.token)
+            token = req.body?.token;
+
+        if (!token)
+            return res.status(403).json({ error: "No token provided" });
+
         let decoded = await commonFunction.verifyJwtToken(token);
         let tokenHash = await commonFunction.generateHash(token);
 

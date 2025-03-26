@@ -28,6 +28,14 @@ const authService = {
     resetPassword: async (payload) => {
         return await API.post("/auth/reset-password", payload);
     },
+
+    resendVerification: async () => {
+        return await API.post("/auth/resend-verification");
+    },
+
+    verifyAccount: async (payload) => {
+        return await API.post("/auth/verify-account", payload);
+    },
 };
 
 export default authService;
