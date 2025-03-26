@@ -53,3 +53,34 @@ exports.updatePassword = async (email, password) => {
         );
     });
 }
+
+// TOKEN
+// Add Expire Token
+exports.addExpireToken = async (tokenHash, expiresAt) => {
+    return new Promise((resolve, reject) => {
+        db.query('CALL usp_expiredToken_add(?, ?)',
+            [tokenHash, expiresAt],
+            (err, results) => {
+                if (err)
+                    return reject(err)
+
+                return resolve(results[0]);
+            }
+        );
+    });
+}
+
+// verify expire token
+exports.isTokenExpired = async (tokenHash) => {
+    return new Promise((resolve, reject) => {
+        db.query('CALL usp_expiredToken_verify(?)',
+            [tokenHash],
+            (err, results) => {
+                if (err)
+                    return reject(err);
+
+                return resolve(!!results[0][0]['isExpired'])
+            }
+        );
+    });
+}

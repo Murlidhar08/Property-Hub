@@ -23,8 +23,13 @@ API.interceptors.response.use(
         return response.data;
     },
     (error) => {
-        if (error.response?.data?.message)
-            toast.error(error.response?.data?.message);
+        let message = error.response?.data?.message;
+        if (message)
+            toast.error(message);
+
+        // Clear Token
+        if (message == 'Invalid token' || message == 'Token expired')
+            localStorage.removeItem("token");
 
         return Promise.reject(error.response || error);
     }

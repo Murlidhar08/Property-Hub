@@ -52,6 +52,30 @@ exports.login = async (req, res) => {
     }
 };
 
+// Logout User
+exports.logout = async (req, res) => {
+    try {
+        let token = req.token;
+
+        // Generate token hash
+        let tokenHash = commonFunction.generateHash(token);
+        let tokenExpireTimestamp = await commonFunction.tokenExpireTimestamp(token);
+
+        // Add token to Expired list
+        await authService.addExpireToken(tokenHash, tokenExpireTimestamp);
+
+        return res.json({
+            success: true,
+            message: 'Successfully loged out.'
+        });
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: err.message
+        });
+    }
+};
+
 // Register a new user
 exports.register = async (req, res) => {
     const { firstName, lastName, email, username, password } = req.body;

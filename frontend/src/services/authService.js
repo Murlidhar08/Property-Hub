@@ -18,8 +18,7 @@ const authService = {
     },
 
     logout: async () => {
-        localStorage.removeItem("token");
-        return true;
+        return await API.post("/auth/logout");
     },
 
     forgetPassword: async (email) => {

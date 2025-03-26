@@ -1,13 +1,16 @@
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { logout } from "@/redux/slices/userSlice";
+import authService from '../../services/authService';
 
 const AccountPage = () => {
     const user = useSelector((state) => state.user);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const handleLogout = () => {
+    // Logout
+    const handleLogout = async () => {
+        await authService.logout();
         dispatch(logout()); // Clear user state
         navigate("/login"); // Redirect to login page
     };

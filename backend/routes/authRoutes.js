@@ -7,6 +7,9 @@ const router = express.Router();
 // Login with email/password or OAuth token
 router.post("/login", authController.login);
 
+// Logout user
+router.post("/logout", validator, authController.logout);
+
 // Register a new user (Email & Password or OAuth)
 router.post("/register", authController.register);
 
