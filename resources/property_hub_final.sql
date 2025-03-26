@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 25, 2025 at 10:44 PM
+-- Generation Time: Mar 26, 2025 at 12:03 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -51,6 +51,25 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_agent_update` (IN `p_id` INT, I
         image = p_image,
         description = p_description
     WHERE id = p_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_expiredToken_add` (IN `p_token_hash` CHAR(64), IN `p_expires_at` TIMESTAMP)   BEGIN
+    INSERT IGNORE INTO expiredtokens (tokenHash, expiresAt) 
+    VALUES (p_token_hash, p_expires_at);
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_expiredToken_verify` (IN `p_token_hash` CHAR(64))   BEGIN
+    DECLARE token_count INT;
+
+    -- Check if token hash exists
+    SELECT COUNT(*) 
+    INTO token_count 
+    FROM expiredtokens 
+    WHERE tokenHash = p_token_hash
+    LIMIT 1;
+
+    -- Set output parameter (TRUE if exists, FALSE otherwise)
+    SELECT token_count > 0 as isExpired;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_google_auth_login` (IN `p_providerUid` VARCHAR(255), IN `p_firstName` VARCHAR(255), IN `p_lastName` VARCHAR(255), IN `p_email` VARCHAR(255), IN `p_profilePicture` VARCHAR(500))   BEGIN
@@ -209,6 +228,17 @@ CREATE TABLE `agents` (
   `createdAt` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Table structure for table `expiredtokens`
+--
+
+CREATE TABLE `expiredtokens` (
+  `id` int(11) NOT NULL,
+  `tokenHash` char(64) NOT NULL,
+  `expiresAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
 -- --------------------------------------------------------
 
 --
@@ -299,6 +329,13 @@ ALTER TABLE `agents`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `expiredtokens`
+--
+ALTER TABLE `expiredtokens`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `tokenHash` (`tokenHash`);
+
+--
 -- Indexes for table `masters`
 --
 ALTER TABLE `masters`
@@ -333,6 +370,12 @@ ALTER TABLE `agents`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `expiredtokens`
+--
+ALTER TABLE `expiredtokens`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `masters`
 --
 ALTER TABLE `masters`
@@ -360,6 +403,14 @@ ALTER TABLE `userinfo`
 ALTER TABLE `userinfo`
   ADD CONSTRAINT `fk_users_provider` FOREIGN KEY (`providerTypeId`) REFERENCES `masters` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_users_role` FOREIGN KEY (`roleId`) REFERENCES `masters` (`id`) ON DELETE CASCADE;
+
+DELIMITER $$
+--
+-- Events
+--
+CREATE DEFINER=`root`@`localhost` EVENT `delete_expired_tokens` ON SCHEDULE EVERY 1 DAY STARTS '2025-03-26 14:46:53' ON COMPLETION NOT PRESERVE ENABLE DO DELETE FROM expiredtokens WHERE expiresAt < NOW()$$
+
+DELIMITER ;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
