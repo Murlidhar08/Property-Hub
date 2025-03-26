@@ -105,6 +105,7 @@ exports.getProfile = async (req, res) => {
     const email = req.user.email;
     try {
         let user = await authService.loginUser(email);
+
         return res.json({
             success: true,
             user: {

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 26, 2025 at 12:03 PM
+-- Generation Time: Mar 26, 2025 at 02:06 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -53,9 +53,20 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_agent_update` (IN `p_id` INT, I
     WHERE id = p_id;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_expiredToken_add` (IN `p_token_hash` CHAR(64), IN `p_expires_at` TIMESTAMP)   BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_expiredToken_add` (IN `p_token_hash` CHAR(64), IN `p_expires_at` INT(11))   BEGIN
     INSERT IGNORE INTO expiredtokens (tokenHash, expiresAt) 
     VALUES (p_token_hash, p_expires_at);
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_expiredToken_delete` ()   BEGIN
+    -- Disable safe update mode
+    SET SQL_SAFE_UPDATES = 0;
+    
+    -- Delete expired tokens
+    DELETE FROM expiredtokens WHERE FROM_UNIXTIME(expiresAt) < NOW();
+    
+    -- Re-enable safe update mode
+    SET SQL_SAFE_UPDATES = 1;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_expiredToken_verify` (IN `p_token_hash` CHAR(64))   BEGIN
@@ -235,9 +246,8 @@ CREATE TABLE `agents` (
 CREATE TABLE `expiredtokens` (
   `id` int(11) NOT NULL,
   `tokenHash` char(64) NOT NULL,
-  `expiresAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `expiresAt` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
 
 -- --------------------------------------------------------
 
@@ -408,7 +418,7 @@ DELIMITER $$
 --
 -- Events
 --
-CREATE DEFINER=`root`@`localhost` EVENT `delete_expired_tokens` ON SCHEDULE EVERY 1 DAY STARTS '2025-03-26 14:46:53' ON COMPLETION NOT PRESERVE ENABLE DO DELETE FROM expiredtokens WHERE expiresAt < NOW()$$
+CREATE DEFINER=`root`@`localhost` EVENT `delete_expired_tokens` ON SCHEDULE EVERY 1 DAY STARTS '2025-03-26 18:32:13' ON COMPLETION NOT PRESERVE ENABLE DO CALL usp_expiredToken_delete()$$
 
 DELIMITER ;
 COMMIT;

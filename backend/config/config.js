@@ -1,4 +1,4 @@
-export default {
+module.exports = {
     "JWT_OPTIONS": {
         expiresIn: '10h' // Token expires in 10 hour
     },

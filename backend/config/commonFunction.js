@@ -38,9 +38,9 @@ module.exports.generateHash = (obj) => {
 // Get token expire timestamp by calling verifyJwtToken
 module.exports.tokenExpireTimestamp = async (token) => {
     try {
-        const decoded = await module.exports.verifyJwtToken(token); // Calling function inside function
-        return decoded.iat ? decoded.iat * 1000 : null; // Convert to milliseconds
+        const decoded = await module.exports.verifyJwtToken(token);
+        return decoded.exp || null; // Convert to milliseconds
     } catch (err) {
-        return null; // Invalid token
+        return null;
     }
 };
