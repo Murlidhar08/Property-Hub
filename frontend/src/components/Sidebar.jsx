@@ -39,7 +39,7 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
             )}
             onClick={() => navigate(path)}
           >
-            <Icon className="h-5 w-5 text-white" />
+            <Icon className={clsx("h-5 w-5", location.pathname.startsWith(path) ? "text-black" : "text-white")} />
             <span className={clsx(!isOpen && "hidden")}>{name}</span>
           </div>
         ))}
