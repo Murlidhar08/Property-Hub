@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import agentService from "../../services/agentService";
@@ -7,7 +7,6 @@ export default function AddUpdateAgentPage() {
   const navigate = useNavigate();
   const { id } = useParams(); // Get agent ID if updating
   const isEditing = Boolean(id);
-
   const [agentDetails, setAgentDetails] = useState({
     name: "",
     contact: "",
@@ -16,6 +15,19 @@ export default function AddUpdateAgentPage() {
     image: "",
     description: "",
   });
+
+  // Fetching agents
+  useEffect(() => {
+    if (!isEditing) return;
+
+    agentService.getAgentById(id)
+      .then(data => {
+        setAgentDetails(data.agent);
+      })
+      .catch(err => {
+        console.error(err)
+      })
+  }, []);
 
   const handleChange = (e) => {
     setAgentDetails({ ...agentDetails, [e.target.name]: e.target.value });

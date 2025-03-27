@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Plus, Grid, List } from "lucide-react";
 import { Link } from "react-router-dom";
-import agentService from '../../services/agentService';
+import agentService from '@/services/agentService';
 
 export default function AgentsPage() {
   const [agents, setAgents] = useState([]);
@@ -10,25 +10,19 @@ export default function AgentsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch agents from backend
+  // Fetching agents
   useEffect(() => {
-    const fetchAgents = async () => {
-      try {
-        const data = await agentService.getAllAgents();
-
-        if (data.success) {
-          setAgents(data.agents);
-        } else {
-          throw new Error(data.message || "Failed to fetch agents.");
-        }
-      } catch (err) {
+    agentService.getAllAgents()
+      .then(data => {
+        if (data.success) { setAgents(data.agents); }
+        else { throw new Error(data.message || "Failed to fetch agents."); }
+      })
+      .catch(err => {
         setError(err.message);
-      } finally {
+      })
+      .finally(() => {
         setLoading(false);
-      }
-    };
-
-    fetchAgents();
+      })
   }, []);
 
   // Filter agents based on search query

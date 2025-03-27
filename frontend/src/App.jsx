@@ -68,24 +68,30 @@ function App() {
             <Route path="/" element={<Navigate to="/dashboard" />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/admin" element={<AdminPage />} />
-            <Route path="/clients" element={<ClientsPage />} />
-            <Route path="/properties" element={<PropertyPage />} />
-            <Route path="/requirements" element={<Requirements />} />
-            <Route path="/agents" element={<AgentsPage />} />
             <Route path="/account" element={<AccountPage />} />
 
             {/* Details page */}
             <Route path="/properties/:id" element={<PropertyDetails />} />
 
-            {/* Add/Update Pages */}
+            {/* Client */}
+            <Route path="/clients" element={<ClientsPage />} />
             <Route path="/clients/add" element={<AddUpdateClient />} />
             <Route path="/clients/edit/:id" element={<AddUpdateClient />} />
+
+            {/* Properties */}
+            <Route path="/properties" element={<PropertyPage />} />
             <Route path="/properties/add" element={<AddUpdateProperty />} />
             <Route path="/properties/edit/:id" element={<AddUpdateProperty />} />
+
+            {/* Requirements */}
+            <Route path="/requirements" element={<Requirements />} />
             <Route path="/requirements/add" element={<AddRequirementPage />} />
             <Route path="/requirements/edit/:id" element={<AddRequirementPage />} />
+
+            {/* Agents */}
+            <Route path="/agents" element={<AgentsPage />} />
             <Route path="/agents/add" element={<AddUpdateAgent />} />
-            <Route path="/agents/edit/:id" element={<AddUpdateAgent />} />
+            <Route path="/agents/:id" element={<AddUpdateAgent />} />
           </Route>
         </Route>
 

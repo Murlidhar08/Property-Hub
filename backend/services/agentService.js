@@ -34,7 +34,7 @@ exports.getAgentById = async (id) => {
             (err, results) => {
                 if (err) return reject(err);
 
-                resolve(results[0]);
+                resolve(results[0][0]);
             }
         );
     });
