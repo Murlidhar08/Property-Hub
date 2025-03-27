@@ -57,16 +57,16 @@ export default function AgentDetailsPage() {
                     </div>
                 </div>
 
-                <div className="mt-6 border-t pt-4 space-y-3 flex-grow">
-                    <div>
-                        <h4 className="font-semibold">Email</h4>
-                        <p className="text-blue-600 underline">{agent?.email}</p>
-                    </div>
+                <div className="mt-6 border-t pt-4 space-y-4 flex-grow">
                     <div>
                         <h4 className="font-semibold">Phone Number</h4>
                         <a href={`tel:${agent?.contact}`} className="text-blue-600 underline">
                             {agent?.contact}
                         </a>
+                    </div>
+                    <div>
+                        <h4 className="font-semibold">Area</h4>
+                        <p className="text-gray-700">{agent?.area}</p>
                     </div>
                     <div>
                         <h4 className="font-semibold">Address</h4>
