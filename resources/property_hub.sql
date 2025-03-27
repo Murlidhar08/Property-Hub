@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 25, 2025 at 12:02 PM
+-- Generation Time: Mar 27, 2025 at 09:26 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -25,208 +25,194 @@ DELIMITER $$
 --
 -- Procedures
 --
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_agent_add` (IN `p_name` VARCHAR(255), IN `p_contact` VARCHAR(20), IN `p_email` VARCHAR(255), IN `p_address` TEXT, IN `p_area` VARCHAR(255), IN `p_image` VARCHAR(255))   BEGIN
-    INSERT INTO agents (name, contact, email, address, area, image, created_at)
-    VALUES (p_name, p_contact, p_email, p_address, p_area, p_image, NOW());
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_agent_add` (IN `p_name` VARCHAR(255), IN `p_contact` VARCHAR(20), IN `p_address` VARCHAR(500), IN `p_area` VARCHAR(255), IN `p_image` VARCHAR(255), IN `p_description` TEXT)   BEGIN
+    INSERT INTO agents (name, contact, address, area, image, description)
+    VALUES (p_name, p_contact, p_address, p_area, p_image, p_description);
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_agent_delete` (IN `p_id` INT)   BEGIN
     DELETE FROM agents WHERE id = p_id;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_agent_select` (IN `p_id` INT)   BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_agent_get_all` ()   BEGIN
+    SELECT * FROM agents ORDER BY createdAt DESC;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_agent_get_by_id` (IN `p_id` INT)   BEGIN
     SELECT * FROM agents WHERE id = p_id;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_agent_select_all` ()   BEGIN
-    SELECT * FROM agents;
-END$$
-
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_agent_update` (IN `p_id` INT, IN `p_name` VARCHAR(255), IN `p_contact` VARCHAR(20), IN `p_email` VARCHAR(255), IN `p_address` TEXT, IN `p_area` VARCHAR(255), IN `p_image` VARCHAR(255))   BEGIN
-    UPDATE agents 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_agent_update` (IN `p_id` INT, IN `p_name` VARCHAR(255), IN `p_contact` VARCHAR(20), IN `p_address` VARCHAR(500), IN `p_area` VARCHAR(255), IN `p_image` VARCHAR(255), IN `p_description` TEXT)   BEGIN
+    UPDATE agents
     SET name = p_name,
         contact = p_contact,
-        email = p_email,
         address = p_address,
         area = p_area,
-        image = p_image
+        image = p_image,
+        description = p_description
     WHERE id = p_id;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_client_add` (IN `p_name` VARCHAR(255), IN `p_contact` VARCHAR(20), IN `p_email` VARCHAR(255), IN `p_address` TEXT, IN `p_occupation` VARCHAR(255))   BEGIN
-    INSERT INTO clients (name, contact, email, address, occupation, created_at)
-    VALUES (p_name, p_contact, p_email, p_address, p_occupation, NOW());
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_expiredToken_add` (IN `p_token_hash` CHAR(64), IN `p_expires_at` INT(11))   BEGIN
+    INSERT IGNORE INTO expiredtokens (tokenHash, expiresAt) 
+    VALUES (p_token_hash, p_expires_at);
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_client_delete` (IN `p_id` INT)   BEGIN
-    DELETE FROM clients WHERE id = p_id;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_expiredToken_delete` ()   BEGIN
+    -- Disable safe update mode
+    SET SQL_SAFE_UPDATES = 0;
+    
+    -- Delete expired tokens
+    DELETE FROM expiredtokens WHERE FROM_UNIXTIME(expiresAt) < NOW();
+    
+    -- Re-enable safe update mode
+    SET SQL_SAFE_UPDATES = 1;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_client_select` (IN `p_id` INT)   BEGIN
-    SELECT * FROM clients WHERE id = p_id;
-END$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_expiredToken_verify` (IN `p_token_hash` CHAR(64))   BEGIN
+    DECLARE token_count INT;
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_client_select_all` ()   BEGIN
-    SELECT * FROM clients;
-END$$
-
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_client_update` (IN `p_id` INT, IN `p_name` VARCHAR(255), IN `p_contact` VARCHAR(20), IN `p_email` VARCHAR(255), IN `p_address` TEXT, IN `p_occupation` VARCHAR(255))   BEGIN
-    UPDATE clients 
-    SET name = p_name,
-        contact = p_contact,
-        email = p_email,
-        address = p_address,
-        occupation = p_occupation
-    WHERE id = p_id;
-END$$
-
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_get_user_by_email` (IN `p_email` VARCHAR(255))   BEGIN
-    SELECT 
-        id, 
-        first_name, 
-        last_name, 
-        email, 
-        username, 
-        role_id, 
-        status, 
-        provider_id, 
-        provider_uid, 
-        profile_picture, 
-        created_at, 
-        updated_at
-    FROM users 
-    WHERE email = p_email 
+    -- Check if token hash exists
+    SELECT COUNT(*) 
+    INTO token_count 
+    FROM expiredtokens 
+    WHERE tokenHash = p_token_hash
     LIMIT 1;
+
+    -- Set output parameter (TRUE if exists, FALSE otherwise)
+    SELECT token_count > 0 as isExpired;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_get_user_profile` (IN `p_user_id` INT)   BEGIN
-    -- Retrieve user profile details
-    SELECT id, first_name, last_name, email, username, provider_id, profile_picture, role_id, status, created_at, updated_at
-    FROM users WHERE id = p_user_id;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_google_auth_login` (IN `p_providerUid` VARCHAR(255), IN `p_firstName` VARCHAR(255), IN `p_lastName` VARCHAR(255), IN `p_email` VARCHAR(255), IN `p_profilePicture` VARCHAR(500))   BEGIN
+	DECLARE varRole INT;
+    DECLARE varStatus INT;
+    DECLARE varProviderTypeId INT;
+
+	-- Get  provider Type ID
+	SET varProviderTypeId = fn_get_masters_id_by_name('Google');
+
+    -- Check if the user exists based on providerUid (Google UID)
+    IF EXISTS (SELECT 1 FROM userinfo WHERE email = p_email) THEN
+        -- Update existing Google user
+        UPDATE userinfo 
+        SET 
+            firstName = p_firstName,
+            lastName = p_lastName,
+            providerTypeId = varProviderTypeId,
+            isVerified = 1,
+            providerUid = p_providerUid,
+            profilePicture = p_profilePicture
+        WHERE email = p_email;
+    ELSE
+		-- Get role and status, and provider ID
+		SET varRole = fn_get_masters_id_by_name('Client');
+		SET varStatus = fn_get_masters_id_by_name('PendingApproval');
+    
+        -- Insert new Google user with default values
+        INSERT INTO userinfo (providerTypeId, isVerified, providerUid, firstName, lastName, email, profilePicture, roleId, status) 
+        VALUES (varProviderTypeId, 1, p_providerUid, p_firstName, p_lastName, p_email, p_profilePicture, varRole, varStatus);
+    END IF;
+
+    -- Return updated or newly inserted user details
+    SELECT userId, firstName, lastName, email, username, roleId, status, profilePicture, isVerified
+    FROM userinfo 
+    WHERE email = p_email;
+
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_login_user` (IN `p_identifier` VARCHAR(255), IN `p_password` VARCHAR(500))   BEGIN
-    DECLARE user_count INT;
-    DECLARE user_id INT;
-    DECLARE db_password VARCHAR(500);
-    DECLARE user_role INT;
-    DECLARE user_status INT;
-    DECLARE user_email VARCHAR(255);
-    DECLARE user_username VARCHAR(255);
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_login_user` (IN `p_identifier` VARCHAR(255))   BEGIN
+    DECLARE varUserCount INT;
+    DECLARE varUserId INT;
 
     -- Check if user exists with given email or username
-    SELECT COUNT(*), id, password, role_id, status, email, username
-    INTO user_count, user_id, db_password, user_role, user_status, user_email, user_username
-    FROM users 
+    SELECT COUNT(*), userId
+    INTO varUserCount, varUserId
+    FROM userinfo 
     WHERE email = p_identifier OR username = p_identifier;
 
     -- If no user found
-    IF user_count = 0 THEN
+    IF varUserCount = 0 THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'invalidCreadential';
+        SET MESSAGE_TEXT = 'Invalid email address';
     END IF;
 
     -- Return user details
-    SELECT id, first_name, last_name, email, username, role_id, status 
-    FROM users 
-    WHERE id = user_id;
+    SELECT userId, firstName, lastName, email, username, password, roleId, status, profilePicture, isVerified
+    FROM userinfo 
+    WHERE userId = varUserId;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_oauth_login` (IN `p_provider_id` INT, IN `p_provider_uid` VARCHAR(255), IN `p_first_name` VARCHAR(255), IN `p_last_name` VARCHAR(255), IN `p_email` VARCHAR(255), IN `p_profile_picture` VARCHAR(500))   BEGIN
-    DECLARE user_id INT;
-    
-    -- Check if user exists based on provider and provider UID
-    SELECT id INTO user_id 
-    FROM users 
-    WHERE provider_id = p_provider_id AND provider_uid = p_provider_uid;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_masters_getId_by_name` (IN `p_name` VARCHAR(255))   BEGIN
+	SELECT fn_get_masters_id_by_name(p_name) as id;
+END$$
 
-    IF user_id IS NULL THEN
-        -- Check if user exists based on email (for users logging in with a different provider)
-        SELECT id INTO user_id FROM users WHERE email = p_email;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_register_user` (IN `p_firstName` VARCHAR(100), IN `p_lastName` VARCHAR(100), IN `p_username` VARCHAR(100), IN `p_email` VARCHAR(255), IN `p_password` VARCHAR(255))   BEGIN
+    DECLARE varUserId INT;
+    DECLARE varRole INT;
+    DECLARE varStatus INT;
+    DECLARE varProviderTypeId INT;
 
-        IF user_id IS NULL THEN
-            -- Insert new user
-            INSERT INTO users (first_name, last_name, email, username, password, provider_id, provider_uid, profile_picture, role_id, status)
-            VALUES (p_first_name, p_last_name, p_email, p_email, '', p_provider_id, p_provider_uid, p_profile_picture, 
-            (SELECT id FROM masters where name = 'Client' limit 1) , 
-            (SELECT id FROM masters where name = 'Pending Approval' limit 1));
-
-            -- Get new user ID
-            SET user_id = LAST_INSERT_ID();
-        ELSE
-            -- If email exists but provider is different, update provider info
-            UPDATE users
-            SET provider_id = p_provider_id, 
-				provider_uid = p_provider_uid, 
-                profile_picture = p_profile_picture
-            WHERE id = user_id;
-        END IF;
+    -- Check if username already exists
+    SELECT userId INTO varUserId FROM userinfo WHERE username = p_username LIMIT 1;
+    IF varUserId IS NOT NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Username already exists. Please choose a different one.';
     END IF;
 
-    -- Return user details
-    SELECT id, first_name, last_name, email, username, role_id, status, provider_id, profile_picture 
-    FROM users 
-    WHERE id = user_id;
-    
-END$$
-
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_register_user` (IN `p_first_name` VARCHAR(255), IN `p_last_name` VARCHAR(255), IN `p_email` VARCHAR(255), IN `p_username` VARCHAR(255), IN `p_password` VARCHAR(500), IN `p_provider_id` INT, IN `p_provider_uid` VARCHAR(255), IN `p_profile_picture` VARCHAR(500), IN `p_role_id` INT)   BEGIN
-    DECLARE v_role_id INT;
-
-    -- If provider is Local (1), set provider_uid and profile_picture to NULL
-    IF p_provider_id = 1 THEN
-        SET p_provider_uid = NULL;
-        SET p_profile_picture = NULL;
-
-        -- Assign default role (Client role ID = 6) if role_id is NULL
-        IF p_role_id IS NULL THEN
-            SET v_role_id = 6;
-        ELSE
-            SET v_role_id = p_role_id;
-        END IF;
-    ELSE
-        SET v_role_id = p_role_id;
+    -- Check if email already exists
+    SELECT userId INTO varUserId FROM userinfo WHERE email = p_email LIMIT 1;
+    IF varUserId IS NOT NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Email is already registered. Try to sign in.';
     END IF;
 
-    -- Insert user into the table
-    INSERT INTO users (first_name, last_name, email, username, password, provider_id, provider_uid, profile_picture, role_id, status)
-    VALUES (p_first_name, p_last_name, p_email, p_username, p_password, p_provider_id, p_provider_uid, p_profile_picture, v_role_id, 1);
-    
-    -- Return last inserted ID
-    SELECT LAST_INSERT_ID() AS user_id;
+    -- Get role, status, and provider ID
+    SET varRole = fn_get_masters_id_by_name('Client');
+    SET varStatus = fn_get_masters_id_by_name('PendingApproval');
+    SET varProviderTypeId = fn_get_masters_id_by_name('Local');
+
+    -- Insert new user with providerId
+    INSERT INTO userinfo (firstName, lastName, email, username, password, roleId, status, providerTypeId)
+    VALUES (p_firstName, p_lastName, p_email, p_username, p_password, varRole, varStatus, varProviderTypeId);
+
+    -- Return the new user ID
+    SELECT LAST_INSERT_ID() AS userId;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_req_add` (IN `p_client_id` INT, IN `p_type` ENUM('Residential','Commercial','Land','Other'), IN `p_location` VARCHAR(255), IN `p_measurement` FLOAT, IN `p_unit` VARCHAR(50), IN `p_price_range` VARCHAR(50))   BEGIN
-    INSERT INTO requirements (client_id, type, location, measurement, unit, price_range, created_at)
-    VALUES (p_client_id, p_type, p_location, p_measurement, p_unit, p_price_range, NOW());
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_update_password` (IN `p_email` VARCHAR(255), IN `p_password` VARCHAR(255))   BEGIN
+    -- Update password
+    UPDATE userinfo 
+    SET password = p_password 
+    WHERE email = p_email;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_req_delete` (IN `p_id` INT)   BEGIN
-    DELETE FROM requirements WHERE id = p_id;
-END$$
-
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_req_select` (IN `p_id` INT)   BEGIN
-    SELECT * FROM requirements WHERE id = p_id;
-END$$
-
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_req_select_all` ()   BEGIN
-    SELECT * FROM requirements;
-END$$
-
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_req_update` (IN `p_id` INT, IN `p_client_id` INT, IN `p_type` ENUM('Residential','Commercial','Land','Other'), IN `p_location` VARCHAR(255), IN `p_measurement` FLOAT, IN `p_unit` VARCHAR(50), IN `p_price_range` VARCHAR(50))   BEGIN
-    UPDATE requirements 
-    SET client_id = p_client_id,
-        type = p_type,
-        location = p_location,
-        measurement = p_measurement,
-        unit = p_unit,
-        price_range = p_price_range
-    WHERE id = p_id;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_verify_user` (IN `p_email` VARCHAR(255))   BEGIN
+	UPDATE userInfo
+    SET isVerified = 1
+    WHERE email = p_email;
 END$$
 
 --
 -- Functions
 --
+CREATE DEFINER=`root`@`localhost` FUNCTION `fn_get_masters_id_by_name` (`p_Name` VARCHAR(255)) RETURNS INT(11)  BEGIN
+	DECLARE v_id INT;
+
+    -- Fetch the ID based on the provided value
+    SELECT id INTO v_id FROM masters WHERE name = p_Name LIMIT 1;
+
+    RETURN v_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` FUNCTION `fn_get_masters_name_by_id` (`p_id` INT) RETURNS VARCHAR(255) CHARSET utf8mb4 COLLATE utf8mb4_general_ci  BEGIN
+	DECLARE v_name VARCHAR(255);
+
+    -- Fetch the ID based on the provided value
+    SELECT name INTO v_name FROM masters WHERE id = p_id LIMIT 1;
+
+    RETURN v_name;
+END$$
+
 CREATE DEFINER=`root`@`localhost` FUNCTION `fn_get_typename_by_id` (`p_id` INT(11)) RETURNS VARCHAR(255) CHARSET utf8mb4 COLLATE utf8mb4_general_ci DETERMINISTIC BEGIN
     DECLARE v_name varchar(255);
 
@@ -236,11 +222,11 @@ CREATE DEFINER=`root`@`localhost` FUNCTION `fn_get_typename_by_id` (`p_id` INT(1
     RETURN v_name;
 END$$
 
-CREATE DEFINER=`root`@`localhost` FUNCTION `fn_get_type_id` (`p_value` VARCHAR(255)) RETURNS INT(11) DETERMINISTIC BEGIN
+CREATE DEFINER=`root`@`localhost` FUNCTION `fn_get_type_id_by_name` (`p_value` VARCHAR(255)) RETURNS INT(11) DETERMINISTIC BEGIN
     DECLARE v_id INT;
 
     -- Fetch the ID based on the provided value
-    SELECT id INTO v_id FROM master_types WHERE name = p_value LIMIT 1;
+    SELECT id INTO v_id FROM mastertypes WHERE name = p_value LIMIT 1;
 
     RETURN v_id;
 END$$
@@ -257,27 +243,21 @@ CREATE TABLE `agents` (
   `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `contact` varchar(20) NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `address` text DEFAULT NULL,
-  `area` varchar(255) DEFAULT NULL,
+  `address` varchar(500) NOT NULL,
+  `area` varchar(255) NOT NULL,
   `image` varchar(255) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `description` text DEFAULT NULL,
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- --------------------------------------------------------
-
 --
--- Table structure for table `clients`
+-- Table structure for table `expiredtokens`
 --
 
-CREATE TABLE `clients` (
+CREATE TABLE `expiredtokens` (
   `id` int(11) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `contact` varchar(20) NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `address` text DEFAULT NULL,
-  `occupation` varchar(255) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `tokenHash` char(64) NOT NULL,
+  `expiresAt` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -290,137 +270,73 @@ CREATE TABLE `masters` (
   `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `description` text DEFAULT NULL,
-  `master_type_id` int(11) NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `masterTypeId` int(11) NOT NULL,
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `masters`
 --
 
-INSERT INTO `masters` (`id`, `name`, `description`, `master_type_id`, `created_at`, `updated_at`) VALUES
-(1, 'Local', 'Standard email/password authentication', 2, '2025-03-18 08:06:09', '2025-03-18 08:06:09'),
-(2, 'Google', 'OAuth authentication via Google', 2, '2025-03-18 08:06:09', '2025-03-18 08:06:09'),
-(3, 'Facebook', 'OAuth authentication via Facebook', 2, '2025-03-18 08:06:09', '2025-03-18 08:06:09'),
-(4, 'Admin', 'Full access to application', 1, '2025-03-18 08:13:18', '2025-03-18 08:13:18'),
-(5, 'Agent', 'Access to add, update, delete basic features', 1, '2025-03-18 08:13:18', '2025-03-18 08:13:18'),
-(6, 'Client', 'Read-only view of the details', 1, '2025-03-18 08:13:18', '2025-03-18 08:13:18'),
-(7, 'Verified', 'The user has been verified and has full access.', 3, '2025-03-18 14:16:28', '2025-03-18 14:16:28'),
-(8, 'Unverified', 'The user has not completed the verification process.', 3, '2025-03-18 14:16:28', '2025-03-18 14:16:28'),
-(9, 'Pending Approval', 'The user is awaiting approval from an administrator.', 3, '2025-03-18 14:16:28', '2025-03-18 14:16:28'),
-(10, 'Suspended', 'The user account is temporarily disabled due to a violation or issue.', 3, '2025-03-18 14:16:28', '2025-03-18 14:16:28'),
-(11, 'Deleted', 'The user account has been deleted and is no longer active.', 3, '2025-03-18 14:16:28', '2025-03-18 14:16:28'),
-(12, 'Banned', 'The user has been permanently banned from the platform.', 3, '2025-03-18 14:16:28', '2025-03-18 14:16:28');
+INSERT INTO `masters` (`id`, `name`, `description`, `masterTypeId`, `createdAt`, `updatedAt`) VALUES
+(1, 'Local', 'Standard email/password authentication', 1, '2025-03-25 11:16:39', '2025-03-25 11:16:39'),
+(2, 'Google', 'OAuth authentication via Google', 1, '2025-03-25 11:16:39', '2025-03-25 11:16:39'),
+(3, 'Facebook', 'OAuth authentication via Facebook', 1, '2025-03-25 11:16:39', '2025-03-25 11:16:39'),
+(4, 'Admin', 'Full access to application', 2, '2025-03-25 11:16:39', '2025-03-25 11:16:39'),
+(5, 'Agent', 'Access to add, update, delete basic features', 2, '2025-03-25 11:16:39', '2025-03-25 11:16:39'),
+(6, 'Client', 'Read-only view of the details', 2, '2025-03-25 11:16:39', '2025-03-25 11:16:39'),
+(7, 'Verified', 'The user has been verified and has full access.', 3, '2025-03-25 11:16:39', '2025-03-25 11:16:39'),
+(8, 'Unverified', 'The user has not completed the verification process.', 3, '2025-03-25 11:16:39', '2025-03-25 11:16:39'),
+(9, 'PendingApproval', 'The user is awaiting approval from an administrator.', 3, '2025-03-25 11:16:39', '2025-03-25 12:26:10'),
+(10, 'Suspended', 'The user account is temporarily disabled due to a violation or issue.', 3, '2025-03-25 11:16:39', '2025-03-25 11:16:39'),
+(11, 'Deleted', 'The user account has been deleted and is no longer active.', 3, '2025-03-25 11:16:39', '2025-03-25 11:16:39'),
+(12, 'Banned', 'The user has been permanently banned from the platform.', 3, '2025-03-25 11:16:39', '2025-03-25 11:16:39');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `master_types`
+-- Table structure for table `mastertypes`
 --
 
-CREATE TABLE `master_types` (
+CREATE TABLE `mastertypes` (
   `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `description` text DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `master_types`
+-- Dumping data for table `mastertypes`
 --
 
-INSERT INTO `master_types` (`id`, `name`, `description`, `created_at`, `updated_at`) VALUES
-(1, 'Role', 'Defines user roles in the application', '2025-03-18 08:05:47', '2025-03-18 08:05:47'),
-(2, 'Authentication Provider', 'Defines third-party login providers', '2025-03-18 08:05:47', '2025-03-18 08:05:47'),
-(3, 'User Status', 'Defines different statuses for user accounts', '2025-03-18 14:15:11', '2025-03-18 14:15:11');
+INSERT INTO `mastertypes` (`id`, `name`, `description`, `createdAt`, `updatedAt`) VALUES
+(1, 'AuthenticationProvider', 'Defines third-party login providers', '2025-03-25 11:16:39', '2025-03-25 11:16:39'),
+(2, 'Role', 'Defines user roles in the application', '2025-03-25 11:16:39', '2025-03-25 11:16:39'),
+(3, 'UserStatus', 'Defines different statuses for user accounts', '2025-03-25 11:16:39', '2025-03-25 11:16:39');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `properties`
+-- Table structure for table `userinfo`
 --
 
-CREATE TABLE `properties` (
-  `id` int(11) NOT NULL,
-  `title` varchar(255) NOT NULL,
-  `location` varchar(255) NOT NULL,
-  `measurement` float NOT NULL,
-  `unit` varchar(50) NOT NULL,
-  `type` enum('Residential','Commercial','Land','Other') NOT NULL,
-  `address` text NOT NULL,
-  `price` decimal(15,2) NOT NULL,
-  `description` text DEFAULT NULL,
-  `added_by` int(11) NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `property_audit`
---
-
-CREATE TABLE `property_audit` (
-  `id` int(11) NOT NULL,
-  `property_id` int(11) NOT NULL,
-  `action` enum('Created','Updated','Deleted') NOT NULL,
-  `performed_by` int(11) NOT NULL,
-  `timestamp` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `property_media`
---
-
-CREATE TABLE `property_media` (
-  `id` int(11) NOT NULL,
-  `property_id` int(11) NOT NULL,
-  `file_path` varchar(255) NOT NULL,
-  `file_type` enum('Image','Video') NOT NULL,
-  `uploaded_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `requirements`
---
-
-CREATE TABLE `requirements` (
-  `id` int(11) NOT NULL,
-  `client_id` int(11) NOT NULL,
-  `type` enum('Residential','Commercial','Land','Other') NOT NULL,
-  `location` varchar(255) NOT NULL,
-  `measurement` float NOT NULL,
-  `unit` varchar(50) NOT NULL,
-  `price_range` varchar(50) NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `users`
---
-
-CREATE TABLE `users` (
-  `id` int(11) NOT NULL,
-  `first_name` varchar(255) NOT NULL,
-  `last_name` varchar(255) NOT NULL,
+CREATE TABLE `userinfo` (
+  `userId` int(11) NOT NULL,
+  `firstName` varchar(255) NOT NULL,
+  `lastName` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
   `username` varchar(255) DEFAULT NULL,
   `password` varchar(500) DEFAULT NULL,
-  `provider_id` int(11) NOT NULL,
-  `provider_uid` varchar(255) DEFAULT NULL,
-  `profile_picture` varchar(500) DEFAULT NULL,
-  `role_id` int(11) NOT NULL,
+  `providerTypeId` int(11) NOT NULL,
+  `isVerified` int(1) DEFAULT 0,
+  `providerUid` varchar(255) DEFAULT NULL,
+  `profilePicture` varchar(500) DEFAULT NULL,
+  `roleId` int(11) NOT NULL,
   `status` int(11) NOT NULL DEFAULT 1,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
@@ -432,68 +348,38 @@ CREATE TABLE `users` (
 -- Indexes for table `agents`
 --
 ALTER TABLE `agents`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `email` (`email`);
+  ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `clients`
+-- Indexes for table `expiredtokens`
 --
-ALTER TABLE `clients`
+ALTER TABLE `expiredtokens`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `email` (`email`);
+  ADD UNIQUE KEY `tokenHash` (`tokenHash`);
 
 --
 -- Indexes for table `masters`
 --
 ALTER TABLE `masters`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `name` (`name`),
-  ADD KEY `master_type_id` (`master_type_id`);
+  ADD UNIQUE KEY `name` (`name`);
 
 --
--- Indexes for table `master_types`
+-- Indexes for table `mastertypes`
 --
-ALTER TABLE `master_types`
+ALTER TABLE `mastertypes`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `name` (`name`);
 
 --
--- Indexes for table `properties`
+-- Indexes for table `userinfo`
 --
-ALTER TABLE `properties`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `added_by` (`added_by`);
-
---
--- Indexes for table `property_audit`
---
-ALTER TABLE `property_audit`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `property_id` (`property_id`);
-
---
--- Indexes for table `property_media`
---
-ALTER TABLE `property_media`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `property_id` (`property_id`);
-
---
--- Indexes for table `requirements`
---
-ALTER TABLE `requirements`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `client_id` (`client_id`);
-
---
--- Indexes for table `users`
---
-ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`),
+ALTER TABLE `userinfo`
+  ADD PRIMARY KEY (`userId`),
   ADD UNIQUE KEY `email` (`email`),
   ADD UNIQUE KEY `username` (`username`),
-  ADD UNIQUE KEY `provider_uid_unique` (`provider_id`,`provider_uid`),
-  ADD KEY `fk_users_role` (`role_id`);
+  ADD UNIQUE KEY `provider_uid_unique` (`providerTypeId`,`providerUid`),
+  ADD KEY `users_ibfk_1` (`roleId`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -506,9 +392,9 @@ ALTER TABLE `agents`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `clients`
+-- AUTO_INCREMENT for table `expiredtokens`
 --
-ALTER TABLE `clients`
+ALTER TABLE `expiredtokens`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -518,83 +404,35 @@ ALTER TABLE `masters`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
--- AUTO_INCREMENT for table `master_types`
+-- AUTO_INCREMENT for table `mastertypes`
 --
-ALTER TABLE `master_types`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+ALTER TABLE `mastertypes`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
--- AUTO_INCREMENT for table `properties`
+-- AUTO_INCREMENT for table `userinfo`
 --
-ALTER TABLE `properties`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `property_audit`
---
-ALTER TABLE `property_audit`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `property_media`
---
-ALTER TABLE `property_media`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `requirements`
---
-ALTER TABLE `requirements`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
--- AUTO_INCREMENT for table `users`
---
-ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `userinfo`
+  MODIFY `userId` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- Constraints for dumped tables
 --
 
 --
--- Constraints for table `masters`
+-- Constraints for table `userinfo`
 --
-ALTER TABLE `masters`
-  ADD CONSTRAINT `masters_ibfk_1` FOREIGN KEY (`master_type_id`) REFERENCES `master_types` (`id`) ON DELETE CASCADE;
+ALTER TABLE `userinfo`
+  ADD CONSTRAINT `fk_users_provider` FOREIGN KEY (`providerTypeId`) REFERENCES `masters` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_users_role` FOREIGN KEY (`roleId`) REFERENCES `masters` (`id`) ON DELETE CASCADE;
 
+DELIMITER $$
 --
--- Constraints for table `properties`
+-- Events
 --
-ALTER TABLE `properties`
-  ADD CONSTRAINT `properties_ibfk_1` FOREIGN KEY (`added_by`) REFERENCES `agents` (`id`) ON DELETE CASCADE;
+CREATE DEFINER=`root`@`localhost` EVENT `delete_expired_tokens` ON SCHEDULE EVERY 1 DAY STARTS '2025-03-26 18:41:29' ON COMPLETION NOT PRESERVE ENABLE DO CALL usp_expiredToken_delete()$$
 
---
--- Constraints for table `property_audit`
---
-ALTER TABLE `property_audit`
-  ADD CONSTRAINT `property_audit_ibfk_1` FOREIGN KEY (`property_id`) REFERENCES `properties` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `property_media`
---
-ALTER TABLE `property_media`
-  ADD CONSTRAINT `property_media_ibfk_1` FOREIGN KEY (`property_id`) REFERENCES `properties` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `requirements`
---
-ALTER TABLE `requirements`
-  ADD CONSTRAINT `requirements_ibfk_1` FOREIGN KEY (`client_id`) REFERENCES `clients` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `users`
---
-ALTER TABLE `users`
-  ADD CONSTRAINT `fk_users_provider` FOREIGN KEY (`provider_id`) REFERENCES `masters` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `fk_users_role` FOREIGN KEY (`role_id`) REFERENCES `masters` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `users_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `masters` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `users_ibfk_2` FOREIGN KEY (`provider_id`) REFERENCES `masters` (`id`) ON DELETE CASCADE;
+DELIMITER ;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
