@@ -43,6 +43,7 @@ import AuthInitializer from "@/layouts/AuthInitializer";
 import ResetPassword from './pages/authentication/ResetPassword';
 import PendingVerification from './pages/authentication/PendingVerification';
 import UserVerified from './pages/authentication/UserVerified';
+import AgentDisplayPage from './pages/agents/AgentDisplayPage';
 
 function App() {
   return (
@@ -90,8 +91,9 @@ function App() {
 
             {/* Agents */}
             <Route path="/agents" element={<AgentsPage />} />
+            <Route path="/agents/:id" element={<AgentDisplayPage />} />
             <Route path="/agents/add" element={<AddUpdateAgent />} />
-            <Route path="/agents/:id" element={<AddUpdateAgent />} />
+            <Route path="/agents/edit/:id" element={<AddUpdateAgent />} />
           </Route>
         </Route>
 
