@@ -10,9 +10,14 @@ const AccountPage = () => {
 
     // Logout
     const handleLogout = async () => {
-        await authService.logout();
-        dispatch(logout()); // Clear user state
-        navigate("/login"); // Redirect to login page
+        try {
+            await authService.logout();
+        }
+        catch (err) { /* empty */ }
+        finally {
+            dispatch(logout());
+            navigate("/login"); // Redirect to login page
+        }
     };
 
     // Placeholder profile image if none is provided

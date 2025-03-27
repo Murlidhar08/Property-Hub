@@ -7,7 +7,6 @@ const commonFunction = require("../config/commonFunction");
 const authService = require('../services/authService');
 const config = require('../config/config')
 const encryptionUtil = require('../config/encryptionUtil');
-const applicationService = require('../services/applicationService')
 
 // Login user
 exports.login = async (req, res) => {
@@ -77,14 +76,8 @@ exports.login = async (req, res) => {
 // Logout User
 exports.logout = async (req, res) => {
     try {
-        let token = req.token;
-
-        // Generate token hash
-        let tokenHash = commonFunction.generateHash(token);
-        let tokenExpireTimestamp = await commonFunction.tokenExpireTimestamp(token);
-
         // Add token to Expired list
-        await authService.addExpireToken(tokenHash, tokenExpireTimestamp);
+        await commonFunction.forceExpireToken(req.token);
 
         return res.json({
             success: true,
@@ -107,12 +100,14 @@ exports.register = async (req, res) => {
         let finalPassword = await encryptionUtil.generatePasswordHash(password);
 
         // Add user to database
-        let userId = await authService.registerUser({ firstName, lastName, username, email, finalPassword });
+        await authService.registerUser({ firstName, lastName, username, email, finalPassword });
+
+        // Send account verification mail
+        await sendAccountVerificationMail(emailAddress);
 
         res.status(201).json({
             success: true,
             message: "User Registered successfully.",
-            userId: userId
         });
     } catch (error) {
         res.status(500).json({
@@ -295,20 +290,8 @@ exports.resendVerification = async (req, res) => {
             return res.status(400).json({ error: "Invalid Email" });
         }
 
-        // Send email
-        const filePath = path.join(__dirname, "../templates", "verify_email.html");
-        let template = commonFunction.getFileContent(filePath);
-
-        // User details
-        let userPayload = { email: emailAddress }
-        let token = commonFunction.generateJwtToken(userPayload, config.JWT_VERIFY_EMAIL)
-        let verifyUrl = `${process.env.BASE_URL}/verify-email?token=${token}`
-
-        // Update template details
-        template = template.replaceAll('[[url]]', verifyUrl)
-
         // send mail
-        const mailInfo = await sendMail(emailAddress, "Verify Account", template);
+        await sendAccountVerificationMail(emailAddress);
 
         res.json({
             success: true,
@@ -359,3 +342,23 @@ exports.verifyAccount = async (req, res) => {
 exports.verifyToken = async (req, res) => {
     res.json({ success: true });
 };
+
+// *****************
+// HELPER FUNCTIONS
+// *****************
+// send Account verification mail
+const sendAccountVerificationMail = async (emailAddress) => {
+    const filePath = path.join(__dirname, "../templates", "verify_email.html");
+    let template = commonFunction.getFileContent(filePath);
+
+    // User details
+    let userPayload = { email: emailAddress }
+    let token = commonFunction.generateJwtToken(userPayload, config.JWT_VERIFY_EMAIL)
+    let verifyUrl = `${process.env.BASE_URL}/verify-email?token=${token}`
+
+    // Update template details
+    template = template.replaceAll('[[url]]', verifyUrl)
+
+    // send mail
+    return await sendMail(emailAddress, "Verify Account", template);
+}

@@ -7,17 +7,17 @@ const router = express.Router();
 // Login with email/password or OAuth token
 router.post("/login", authController.login);
 
+// Google OAuth Login
+router.post("/googleLogin", authController.googleLogin);
+
+// Register a new user with Email & Password
+router.post("/register", authController.register);
+
 // Logout user
 router.post("/logout", validator, authController.logout);
 
-// Register a new user (Email & Password or OAuth)
-router.post("/register", authController.register);
-
 // Get user profile
 router.get("/profile", validator, authController.getProfile);
-
-// Google OAuth Login
-router.post("/googleLogin", authController.googleLogin);
 
 // Forget password
 router.post("/forget-password", authController.forgetPassword);
@@ -28,7 +28,7 @@ router.post("/reset-password", validator, authController.resetPassword);
 // Send verification link
 router.post("/resend-verification", validator, authController.resendVerification);
 
-// Verify user account
+// Request to verify user account by validating header token
 router.post("/verify-account", validator, authController.verifyAccount);
 
 // Verify user account
