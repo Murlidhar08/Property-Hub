@@ -103,7 +103,7 @@ exports.register = async (req, res) => {
         await authService.registerUser({ firstName, lastName, username, email, finalPassword });
 
         // Send account verification mail
-        await sendAccountVerificationMail(emailAddress);
+        await sendAccountVerificationMail(email);
 
         res.status(201).json({
             success: true,

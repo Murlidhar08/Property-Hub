@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 26, 2025 at 08:38 PM
+-- Generation Time: Mar 27, 2025 at 09:26 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -133,7 +133,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_login_user` (IN `p_identifier` 
     -- If no user found
     IF varUserCount = 0 THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Invalid Credential. Please Try Again.';
+        SET MESSAGE_TEXT = 'Invalid email address';
     END IF;
 
     -- Return user details
