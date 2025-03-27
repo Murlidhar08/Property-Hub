@@ -1,52 +1,32 @@
-import { useState } from "react";
-import { Plus, Grid, List } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Plus, Grid, List, MapPin, Phone, User } from "lucide-react";
 import { Link } from "react-router-dom";
-
-const clients = [
-  {
-    name: "Linnie Richardson",
-    role: "Account Manager",
-    email: "binhan628@gmail.com",
-    area: "Downtown",
-    phone: "(302) 555-0107",
-    image: "/images/user.png",
-  },
-  {
-    name: "Miguel Daniels",
-    role: "Salon Owner",
-    email: "tienlapspktnd@gmail.com",
-    area: "Downtown",
-    phone: "(629) 555-0129",
-    image: "/images/user.png",
-  },
-  {
-    name: "Rose Walker",
-    role: "Account Manager",
-    email: "nvt.isst.nute@gmail.com",
-    area: "Downtown",
-    phone: "(480) 555-0103",
-    image: "/images/user.png",
-  },
-  {
-    name: "Edwin Frank",
-    role: "Account Manager",
-    area: "Downtown",
-    email: "manhhatk08@gmail.com",
-    phone: "(405) 555-0128",
-    image: "/images/user.png",
-  },
-];
+import clientService from '../../services/clientService';
 
 export default function ClientsPage() {
   const [search, setSearch] = useState("");
-  const [view, setView] = useState("grid");
+  const [clients, setClients] = useState([]);
+  const [view, setView] = useState("list");
 
-  const filteredClients = clients.filter((client) =>
+  // Fetch clients
+  useEffect(() => {
+    clientService.getAllClients()
+      .then(response => {
+        if (response.success) {
+          setClients(response.clients);
+        } else {
+          throw new Error(response.message || "Failed to fetch clients.");
+        }
+      })
+      .catch(error => console.error("Error fetching clients:", error));
+  }, []);
+
+  const filteredClients = clients.filter(client =>
     client.name.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen w-full">
+    <div className="p-6 bg-gray-50 min-h-screen w-full">
       {/* Header */}
       <div className="flex flex-wrap justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Clients</h1>
@@ -64,7 +44,6 @@ export default function ClientsPage() {
         <div className="relative w-full max-w-sm">
           <input
             type="text"
-            name="Search Clients"
             placeholder="Search Clients"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -73,22 +52,18 @@ export default function ClientsPage() {
         </div>
         <div className="flex items-center">
           <button
-            className={`p-2 rounded-md ${
-              view === "grid" ? "bg-purple-500 text-white" : "bg-gray-200"
-            }`}
-            onClick={() => setView("grid")}
-            title="Grid View"
-          >
-            <Grid size={20} />
-          </button>
-          <button
-            className={`p-2 rounded-md ${
-              view === "list" ? "bg-purple-500 text-white" : "bg-gray-200"
-            }`}
+            className={`p-2 rounded-l-md ${view === "list" ? "bg-purple-500 text-white" : "bg-gray-200"}`}
             onClick={() => setView("list")}
             title="List View"
           >
             <List size={20} />
+          </button>
+          <button
+            className={`p-2 rounded-r-md ${view === "grid" ? "bg-purple-500 text-white" : "bg-gray-200"}`}
+            onClick={() => setView("grid")}
+            title="Grid View"
+          >
+            <Grid size={20} />
           </button>
         </div>
       </div>
@@ -104,29 +79,30 @@ export default function ClientsPage() {
               : "space-y-4"
           }
         >
-          {filteredClients.map((client, index) => (
-            <Link key={index} to={`/clients/${index}`} className="block">
-              <div className="bg-white p-4 rounded-lg border hover:shadow-lg transition flex items-center space-x-4">
+          {filteredClients.map((client) => (
+            <Link key={client.id} to={`/clients/${client.id}`} className="block">
+              <div className="bg-white p-4 rounded-xl border shadow-sm hover:shadow-md transition flex items-center space-x-4 hover:bg-gray-100">
+                {/* Client Image */}
                 <img
-                  src={client.image}
+                  src={client.image || "/images/user.png"}
                   alt={client.name}
-                  className="w-16 h-16 rounded-full object-cover border"
+                  className="w-20 h-20 rounded-full object-cover border shadow"
                 />
-                <div>
-                  <h2 className="text-lg font-semibold">{client.name}</h2>
-                  <p className="text-sm text-gray-500">📍 {client.role}</p>
-                  <p className="text-sm mt-2">📞 {client.phone}</p>
-                  <p className="text-sm">🏠 {client.area}</p>
+
+                {/* Client Details */}
+                <div className="flex-1 min-w-0">
+                  <p className="text-lg font-semibold text-gray-800 truncate w-full">{client.name || "Unknown"}</p>
+                  <p className="flex items-center space-x-2 text-gray-600">
+                    <User size={16} /> <span className='truncate w-full'>{client.occupation || "Not Specified"}</span>
+                  </p>
+                  <p className="flex items-center space-x-2 text-gray-600">
+                    <MapPin size={16} /> <span className='truncate w-full'>{client.address || "Address Not Provided"}</span>
+                  </p>
+                  <p className="flex items-center space-x-2 text-gray-600">
+                    <Phone size={16} /> <span className='truncate w-full'>{client.contact || "No Contact"}</span>
+                  </p>
                 </div>
               </div>
-
-              {/* Sample */}
-              {/* <div className="bg-white p-4 rounded-lg border hover:shadow-lg transition">
-                <h2 className="text-lg font-semibold"></h2>
-                <p className="text-sm text-gray-500"></p>
-                <p className="text-sm mt-2">📧 {client.email}</p>
-                <p className="text-sm">📞 </p>
-              </div> */}
             </Link>
           ))}
         </div>

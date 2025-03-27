@@ -2,28 +2,23 @@ import API from "./api";
 
 const clientService = {
     getAllClients: async () => {
-        const response = await API.get("/clients");
-        return response.data;
+        return await API.get("/clients");
     },
 
     getClientById: async (id) => {
-        const response = await API.get(`/clients/${id}`);
-        return response.data;
+        return await API.get(`/clients/${id}`);
     },
 
     addClient: async (clientData) => {
-        const response = await API.post("/clients", clientData);
-        return response.data;
+        return await API.post("/clients", clientData);
     },
 
     updateClient: async (id, clientData) => {
-        const response = await API.put(`/clients/${id}`, clientData);
-        return response.data;
+        return await API.put(`/clients/${id}`, clientData);
     },
 
     deleteClient: async (id) => {
-        const response = await API.delete(`/clients/${id}`);
-        return response.data;
+        return await API.delete(`/clients/${id}`);
     },
 };
 
