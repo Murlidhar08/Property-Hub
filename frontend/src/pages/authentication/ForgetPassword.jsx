@@ -3,6 +3,7 @@ import { FiUnlock } from "react-icons/fi";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import authService from "@/services/authService"; // Adjust based on your project structure
 
 export default function ForgotPassword() {
@@ -24,9 +25,7 @@ export default function ForgotPassword() {
       // Redirect to login page after 2 seconds
       setTimeout(() => navigate("/login"), 2000);
     } catch (error) {
-      toast.error(
-        error.response?.error || "Failed to send reset link. Try again!"
-      );
+      console.log(error)
     } finally {
       setLoading(false);
     }
@@ -39,6 +38,8 @@ export default function ForgotPassword() {
       transition={{ duration: 0.6 }}
       className="flex items-center justify-center min-h-screen bg-gradient-to-b from-blue-100 to-blue-300"
     >
+      {/* Toast notifications container */}
+      <ToastContainer position="top-right" autoClose={3000} />
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}

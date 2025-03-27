@@ -128,6 +128,15 @@ exports.getProfile = async (req, res) => {
     try {
         let user = await authService.loginUser(email);
 
+        // Validate email verification
+        if (!user.isVerified) {
+            return res.json({
+                success: false,
+                message: 'pendingVerification',
+                token: req.token
+            });
+        }
+
         return res.json({
             success: true,
             user: {

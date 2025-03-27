@@ -21,14 +21,16 @@ const AuthInitializer = () => {
             }
             try {
                 // TODO PENDING: Prevent 2 API calls
-                const { user } = await authService.getProfile();
+                const res = await authService.getProfile();
 
-                if (user) {
-                    dispatch(setUser(user)); // Store user in Redux
-                    dispatch(setToken(token)); // Store token in Redux
-                } else {
-                    navigate("/login"); // Redirect to login
+                if (res.user) {
+                    dispatch(setUser(res.user));
+                    dispatch(setToken(token));
                 }
+                else if (res.message == 'pendingVerification')
+                    navigate("/pending-verification");
+                else
+                    navigate("/login");
             } catch (error) {
                 navigate("/login"); // Redirect to login if token is invalid
             } finally {
