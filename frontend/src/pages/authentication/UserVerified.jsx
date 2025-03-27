@@ -24,6 +24,10 @@ const UserVerified = () => {
                 if (data.success) {
                     toast.success("Email verified successfully!");
                     setLoading(false);
+                    localStorage.setItem('token', data.token);
+
+                    // Hard refresh and navigate to dashboard
+                    window.location.href = '/';
                 }
                 else navigate('/token-expired')
             })

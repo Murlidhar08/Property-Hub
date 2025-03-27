@@ -23,15 +23,8 @@ exports.login = async (req, res) => {
                 message: "Invalid credentials. Please Try Again."
             });
 
-        let userDetails = {
-            userId: user.userId,
-            email: user.email,
-            roleId: user.roleId,
-            status: user.status
-        };
-
         // Generate the JWT
-        const token = commonFunction.generateJwtToken(userDetails);
+        const token = generateUserToken(user);
 
         // Validate email verification
         if (!user.isVerified) {
@@ -58,7 +51,10 @@ exports.login = async (req, res) => {
             message: "Login successful",
             token: token,
             user: {
-                ...userDetails,
+                userId: user.userId,
+                email: user.email,
+                roleId: user.roleId,
+                status: user.status,
                 username: user.username,
                 firstName: user.firstName,
                 lastName: user.lastName,
@@ -175,14 +171,7 @@ exports.googleLogin = async (req, res, next) => {
 
         // Add or Update user details
         let user = await authService.googleAuthLogin(addUser);
-
-        const token = commonFunction.generateJwtToken({
-            userId: user.userId,
-            email: user.email,
-            username: user.username,
-            roleId: user.roleId,
-            status: user.status
-        });
+        const token = generateUserToken(user);
 
         res.status(200).json({
             success: true,
@@ -308,27 +297,32 @@ exports.resendVerification = async (req, res) => {
 // Send verify user email
 exports.verifyAccount = async (req, res) => {
     try {
-        const emailAddress = req.user.email;
-        const token = req.token;
+        const email = req.user.email;
+        const verifyToken = req.token;
 
         // Email Validate
-        if (!emailAddress)
+        if (!email)
             return res.status(400).json({ error: "Email address is required" });
 
         // Validate email
-        if (!commonFunction.isEmail(emailAddress)) {
+        if (!commonFunction.isEmail(email)) {
             return res.status(400).json({ error: "Invalid Email" });
         }
 
         // Update verification 
-        await authService.updateVerifyStatus(emailAddress);
+        await authService.updateVerifyStatus(email);
 
         // Force expire token
-        await commonFunction.forceExpireToken(token);
+        await commonFunction.forceExpireToken(verifyToken);
+
+        // Fetch user details
+        let user = await authService.loginUser(email);
+        let token = generateUserToken(user);
 
         res.json({
             success: true,
-            message: 'Account verified'
+            message: 'Account verified',
+            token
         });
     } catch (err) {
         return res.status(500).json({
@@ -361,4 +355,15 @@ const sendAccountVerificationMail = async (emailAddress) => {
 
     // send mail
     return await sendMail(emailAddress, "Verify Account", template);
+}
+
+// Generate user token
+const generateUserToken = (user) => {
+    return commonFunction.generateJwtToken({
+        userId: user.userId,
+        email: user.email,
+        roleId: user.roleId,
+        username: user.username,
+        status: user.status
+    });
 }
