@@ -44,6 +44,7 @@ import ResetPassword from './pages/authentication/ResetPassword';
 import PendingVerification from './pages/authentication/PendingVerification';
 import UserVerified from './pages/authentication/UserVerified';
 import AgentDisplayPage from './pages/agents/AgentDisplayPage';
+import ClientDisplayPage from './pages/clients/ClientDisplayPage';
 
 function App() {
   return (
@@ -76,6 +77,7 @@ function App() {
 
             {/* Client */}
             <Route path="/clients" element={<ClientsPage />} />
+            <Route path="/clients/:id" element={<ClientDisplayPage />} />
             <Route path="/clients/add" element={<AddUpdateClient />} />
             <Route path="/clients/edit/:id" element={<AddUpdateClient />} />
 

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 27, 2025 at 09:26 AM
+-- Generation Time: Mar 27, 2025 at 07:29 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -26,8 +26,8 @@ DELIMITER $$
 -- Procedures
 --
 CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_agent_add` (IN `p_name` VARCHAR(255), IN `p_contact` VARCHAR(20), IN `p_address` VARCHAR(500), IN `p_area` VARCHAR(255), IN `p_image` VARCHAR(255), IN `p_description` TEXT)   BEGIN
-    INSERT INTO agents (name, contact, address, area, image, description)
-    VALUES (p_name, p_contact, p_address, p_area, p_image, p_description);
+    INSERT INTO agents (name, contact, address, area, description)
+    VALUES (p_name, p_contact, p_address, p_area, p_description);
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_agent_delete` (IN `p_id` INT)   BEGIN
@@ -49,6 +49,33 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_agent_update` (IN `p_id` INT, I
         address = p_address,
         area = p_area,
         image = p_image,
+        description = p_description
+    WHERE id = p_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_client_add` (IN `p_name` VARCHAR(255), IN `p_contact` VARCHAR(20), IN `p_address` TEXT, IN `p_occupation` VARCHAR(255), IN `p_description` TEXT)   BEGIN
+    INSERT INTO clients (name, contact, address, occupation, description)
+    VALUES (p_name, p_contact, p_address, p_occupation, p_description);
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_client_delete` (IN `p_id` INT)   BEGIN
+    DELETE FROM clients WHERE id = p_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_client_get_all` ()   BEGIN
+    SELECT * FROM clients ORDER BY createdAt DESC;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_client_get_by_id` (IN `p_id` INT)   BEGIN
+    SELECT * FROM clients WHERE id = p_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_client_update` (IN `p_id` INT, IN `p_name` VARCHAR(255), IN `p_contact` VARCHAR(20), IN `p_address` TEXT, IN `p_occupation` VARCHAR(255), IN `p_description` TEXT)   BEGIN
+    UPDATE clients
+    SET name = p_name,
+        contact = p_contact,
+        address = p_address,
+        occupation = p_occupation,
         description = p_description
     WHERE id = p_id;
 END$$
@@ -251,6 +278,20 @@ CREATE TABLE `agents` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
+-- Table structure for table `clients`
+--
+
+CREATE TABLE `clients` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `contact` varchar(20) NOT NULL,
+  `address` text DEFAULT NULL,
+  `occupation` varchar(255) DEFAULT NULL,
+  `description` text DEFAULT NULL,
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
 -- Table structure for table `expiredtokens`
 --
 
@@ -351,6 +392,12 @@ ALTER TABLE `agents`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `clients`
+--
+ALTER TABLE `clients`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `expiredtokens`
 --
 ALTER TABLE `expiredtokens`
@@ -389,6 +436,12 @@ ALTER TABLE `userinfo`
 -- AUTO_INCREMENT for table `agents`
 --
 ALTER TABLE `agents`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `clients`
+--
+ALTER TABLE `clients`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --

@@ -1,166 +1,171 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
+import { toast } from "react-toastify";
 import clientService from "../../services/clientService";
 
-export default function AddUpdateClient({ clientData = null }) {
+export default function AddUpdateClientPage() {
   const navigate = useNavigate();
-  const [client, setClient] = useState({
+  const { id } = useParams(); // Get client ID if updating
+  const isEditing = Boolean(id);
+  const [clientDetails, setClientDetails] = useState({
     name: "",
     contact: "",
-    email: "",
     address: "",
     occupation: "",
-    description: "", // New field added
+    image: "",
+    description: "",
   });
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (clientData) {
-      setClient({
-        name: clientData.name || "",
-        contact: clientData.contact || "",
-        email: clientData.email || "",
-        address: clientData.address || "",
-        occupation: clientData.occupation || "",
-        description: clientData.description || "", // Initialize description
+    if (!isEditing) return;
+
+    clientService.getClientById(id)
+      .then(data => {
+        setClientDetails(data.client);
+      })
+      .catch(err => {
+        console.error(err);
       });
-    }
-  }, [clientData]);
+  }, [id, isEditing]);
 
   const handleChange = (e) => {
-    setClient({ ...client, [e.target.name]: e.target.value });
+    setClientDetails({ ...clientDetails, [e.target.name]: e.target.value });
+  };
+
+  const goBack = () => {
+    navigate(-1);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    if (!clientDetails.name || !clientDetails.contact || !clientDetails.address || !clientDetails.occupation) {
+      toast.error("All fields except Description are required!");
+      return;
+    }
 
     try {
-      if (clientData?.id) {
-        // Update existing client
-        await clientService.updateClient(clientData.id, client);
+      if (isEditing) {
+        await clientService.updateClient(id, clientDetails);
+        toast.success("Client updated successfully!");
       } else {
-        // Add new client
-        await clientService.addClient(client);
+        await clientService.addClient(clientDetails);
+        toast.success("Client added successfully!");
       }
-      navigate("/clients"); // Redirect to client list after success
-    } catch (error) {
-      console.error("Error saving client:", error);
-    } finally {
-      setLoading(false);
+
+      navigate("/clients");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Something went wrong!");
     }
   };
 
+  const handleReset = () => {
+    setClientDetails({
+      name: "",
+      contact: "",
+      address: "",
+      occupation: "",
+      image: "",
+      description: "",
+    });
+  };
+
   return (
-    <div className="p-6 bg-gray-100 min-h-screen w-full flex items-center justify-center">
-      <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-lg">
-        <h2 className="text-xl font-bold mb-4 text-center">
-          {clientData ? "Update Client" : "Add New Client"}
-        </h2>
+    <div className="px-6 pt-6 bg-white-100 min-h-screen w-full flex flex-col">
+      <div className="flex justify-between items-center mb-4">
+        <div onClick={goBack} className="flex items-center text-blue-600 cursor-pointer hover:underline">
+          <ArrowLeft size={20} className="mr-2" />
+          {isEditing ? "Client details" : "Clients List"}
+        </div>
+        <h2 className="text-xl font-bold text-center flex-grow mr-28">{isEditing ? "Update" : "Add"} Client</h2>
+      </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4 w-full">
+        <div className="flex items-center border-t pt-4 space-x-4">
+          <img
+            src={clientDetails?.image || "/images/user.png"}
+            alt={clientDetails?.name}
+            className="w-24 h-24 rounded-full object-cover border"
+          />
           <div>
-            <label className="block font-medium">Name</label>
-            <input
-              type="text"
-              name="name"
-              value={client.name}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border rounded-md text-sm"
-              required
-            />
+            <h3 className="text-2xl font-semibold">{clientDetails?.name}</h3>
+            <p className="text-gray-500">{clientDetails?.occupation}</p>
           </div>
+        </div>
 
-          <div>
-            <label className="block font-medium">Contact No.</label>
-            <input
-              type="tel"
-              name="contact"
-              value={client.contact}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border rounded-md text-sm"
-              required
-            />
-          </div>
+        <div>
+          <label className="block text-sm font-medium mb-1 border-t pt-4">Client Name</label>
+          <input
+            type="text"
+            name="name"
+            value={clientDetails.name}
+            onChange={handleChange}
+            className="w-full px-3 py-2 border rounded-md text-sm"
+            required
+          />
+        </div>
 
-          <div>
-            <label className="block font-medium">Email</label>
-            <input
-              type="email"
-              name="email"
-              value={client.email}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border rounded-md text-sm"
-              required
-            />
-          </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">Contact Number</label>
+          <input
+            type="text"
+            name="contact"
+            value={clientDetails.contact}
+            onChange={handleChange}
+            className="w-full px-3 py-2 border rounded-md text-sm"
+            required
+          />
+        </div>
 
-          <div>
-            <label className="block font-medium">Address</label>
-            <textarea
-              name="address"
-              value={client.address}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border rounded-md text-sm"
-              required
-            />
-          </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">Occupation</label>
+          <input
+            type="text"
+            name="occupation"
+            value={clientDetails.occupation}
+            onChange={handleChange}
+            className="w-full px-3 py-2 border rounded-md text-sm"
+            required
+          />
+        </div>
 
-          <div>
-            <label className="block font-medium">Occupation</label>
-            <input
-              type="text"
-              name="occupation"
-              value={client.occupation}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border rounded-md text-sm"
-            />
-          </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">Address</label>
+          <textarea
+            name="address"
+            value={clientDetails.address}
+            onChange={handleChange}
+            className="w-full px-3 py-2 border rounded-md text-sm h-24 resize-none"
+            required
+          />
+        </div>
 
-          {/* New Description Field */}
-          <div>
-            <label className="block font-medium">Description</label>
-            <textarea
-              name="description"
-              value={client.description}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border rounded-md text-sm"
-            />
-          </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">Description (Optional)</label>
+          <textarea
+            name="description"
+            value={clientDetails.description}
+            onChange={handleChange}
+            className="w-full px-3 py-2 border rounded-md text-sm h-24 resize-none"
+          />
+        </div>
+      </form>
 
-          <div className="flex justify-end space-x-2">
-            <button
-              type="button"
-              className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 text-sm"
-              onClick={() =>
-                setClient(
-                  clientData || {
-                    name: "",
-                    contact: "",
-                    email: "",
-                    address: "",
-                    occupation: "",
-                    description: "",
-                  }
-                )
-              }
-              disabled={loading}
-            >
-              Reset
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 text-sm"
-              disabled={loading}
-            >
-              {loading
-                ? "Saving..."
-                : clientData
-                ? "Update Client"
-                : "Add Client"}
-            </button>
-          </div>
-        </form>
+      <div className="flex justify-end space-x-2 pt-4 mt-auto bg-white py-4 w-full sticky bottom-0">
+        <button
+          type="button"
+          className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 text-sm"
+          onClick={handleReset}
+        >
+          Reset
+        </button>
+        <button
+          type="submit"
+          onClick={handleSubmit}
+          className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 text-sm"
+        >
+          {isEditing ? "Update" : "Add"} Client
+        </button>
       </div>
     </div>
   );
