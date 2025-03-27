@@ -23,13 +23,16 @@ router.post("/googleLogin", authController.googleLogin);
 router.post("/forget-password", authController.forgetPassword);
 
 // Reset password
-router.post("/reset-password", authController.resetPassword);
+router.post("/reset-password", validator, authController.resetPassword);
 
 // Send verification link
 router.post("/resend-verification", validator, authController.resendVerification);
 
 // Verify user account
 router.post("/verify-account", validator, authController.verifyAccount);
+
+// Verify user account
+router.post("/verify-token", validator, authController.verifyToken);
 
 module.exports = router;
 

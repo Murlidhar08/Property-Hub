@@ -31,6 +31,7 @@ import AddRequirementPage from "./pages/requirements/AddRequirementPage";
 import Unauthorized from "./pages/errors/Unauthorized";
 import NotFound from "./pages/errors/NotFound";
 import ServerError from "./pages/errors/ServerError";
+import TokenExpired from './pages/errors/TokenExpired'
 
 // Layouts
 import NavLayout from "./layouts/NavLayout";
@@ -94,6 +95,7 @@ function App() {
         <Route path="/verify-email" element={<UserVerified />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
         <Route path="/server-error" element={<ServerError />} />
+        <Route path="/token-expired" element={<TokenExpired />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>

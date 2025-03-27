@@ -20,7 +20,15 @@ export default function ResetPassword() {
             toast.error("Invalid or expired reset link.");
             navigate("/login");
         }
-    }, [token, navigate]);
+        else {
+            // Verify token
+            authService.verifyToken(token)
+                .catch(res => {
+                    if (!res.success)
+                        navigate('/token-expired')
+                });
+        }
+    }, []);
 
     const handleResetPassword = async () => {
         if (!password || !confirmPassword) {

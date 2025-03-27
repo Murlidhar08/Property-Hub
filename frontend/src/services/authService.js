@@ -36,6 +36,10 @@ const authService = {
     verifyAccount: async (payload) => {
         return await API.post("/auth/verify-account", payload);
     },
+
+    verifyToken: async (token) => {
+        return await API.post("/auth/verify-token", { token });
+    },
 };
 
 export default authService;

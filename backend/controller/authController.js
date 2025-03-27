@@ -267,9 +267,7 @@ exports.resetPassword = async (req, res) => {
         await authService.updatePassword(email, finalPassword);
 
         // Force expire token
-        let tokenHash = commonFunction.generateHash(token);
-        let tokenExpireTimestamp = await commonFunction.tokenExpireTimestamp(token);
-        await authService.addExpireToken(tokenHash, tokenExpireTimestamp);
+        await commonFunction.forceExpireToken(token);
 
         return res.json({
             success: true,
@@ -355,4 +353,9 @@ exports.verifyAccount = async (req, res) => {
             message: err.sqlMessage || err.message
         });
     }
+};
+
+// Verify Token
+exports.verifyToken = async (req, res) => {
+    res.json({ success: true });
 };
