@@ -14,6 +14,7 @@ export default function AddUpdateRequirementPage() {
   const [propertyFor, setPropertyFor] = useState([]);
   const [propertyType, setPropertyType] = useState([]);
   const [measurementType, setMeasurementType] = useState([]);
+  const [priceType, setPriceType] = useState([]);
   const [requirementDetails, setRequirementDetails] = useState({
     title: "",
     location: "",
@@ -47,6 +48,11 @@ export default function AddUpdateRequirementPage() {
     // Fetch Property Type options list
     applicationService.getMeasurementType()
       .then(res => setMeasurementType(res.data))
+      .catch(err => console.error(err));
+
+    // Fetch Price Type options list
+    applicationService.getPriceType()
+      .then(res => setPriceType(res.data))
       .catch(err => console.error(err));
   }, []);
 
@@ -178,10 +184,9 @@ export default function AddUpdateRequirementPage() {
             <input type="number" name="maxPrice" value={requirementDetails.maxPrice} onChange={handleChange} placeholder="Up to" className="w-full px-3 py-2 border rounded-md text-sm" required />
             <select name="priceUnit" value={requirementDetails.priceUnit} onChange={handleChange} className="w-full px-3 py-2 border rounded-md text-sm" required>
               <option value="" disabled>Select Unit</option>
-              <option value="hundred">Hundred</option>
-              <option value="thousand">Thousand</option>
-              <option value="lakh">Lakh</option>
-              <option value="crore">Crore</option>
+              {priceType.map(type => (
+                <option key={type.id} value={type.id}>{type.name}</option>
+              ))}
             </select>
           </div>
         </div>
@@ -200,7 +205,11 @@ export default function AddUpdateRequirementPage() {
         {/* Description */}
         <div>
           <label className="block text-sm font-medium mb-1">Description</label>
-          <textarea name="description" value={requirementDetails.description} onChange={handleChange} className="w-full px-3 py-2 border rounded-md text-sm" required />
+          <textarea name="description"
+            value={requirementDetails.description}
+            onChange={handleChange}
+            className="w-full px-3 py-2 border rounded-md text-sm h-24 resize-none"
+            required />
         </div>
       </form>
 

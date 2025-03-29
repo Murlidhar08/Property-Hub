@@ -13,6 +13,9 @@ const applicationService = {
     getPropertyFor: async () => {
         return await API.get("/application/property-for",);
     },
+    getPriceType: async () => {
+        return await API.get("/application/price-type",);
+    },
 };
 
 export default applicationService;

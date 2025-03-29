@@ -60,3 +60,17 @@ exports.getPropertyFor = async (req, res) => {
         });
     }
 };
+exports.getPriceType = async (req, res) => {
+    try {
+        let list = await applicationService.getMastersByTypeName('PriceType');
+        return res.json({
+            success: true,
+            data: list
+        });
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: err.sqlMessage || err.message,
+        });
+    }
+};
