@@ -19,3 +19,15 @@ exports.getMastersIdByName = async (name) => {
         );
     });
 };
+
+exports.getMastersByTypeName = async (typeName) => {
+    return new Promise((resolve, reject) => {
+        db.query("CALL usp_masters_get_all_by_type(?)", [typeName],
+            (err, results) => {
+                if (err) return reject(err);
+
+                resolve(results[0]);
+            }
+        );
+    });
+};
