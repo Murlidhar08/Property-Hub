@@ -25,7 +25,7 @@ import PropertyDetails from "./pages/property/PropertyDetails";
 import AddUpdateClient from "./pages/clients/AddUpdateClient";
 import AddUpdateProperty from "./pages/property/AddUpdateProperty";
 import AddUpdateAgent from "./pages/agents/AddUpdateAgent";
-import AddUpdateRequirementPage from "./pages/requirements/AddUpdateRequirementPage";
+import AddUpdateRequirement from "./pages/requirements/AddUpdateRequirement";
 
 // Error Pages
 import Unauthorized from "./pages/errors/Unauthorized";
@@ -88,8 +88,8 @@ function App() {
 
             {/* Requirements */}
             <Route path="/requirements" element={<Requirements />} />
-            <Route path="/requirements/add" element={<AddUpdateRequirementPage />} />
-            <Route path="/requirements/edit/:id" element={<AddUpdateRequirementPage />} />
+            <Route path="/requirements/add" element={<AddUpdateRequirement />} />
+            <Route path="/requirements/edit/:id" element={<AddUpdateRequirement />} />
 
             {/* Agents */}
             <Route path="/agents" element={<AgentsPage />} />
