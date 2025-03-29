@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 29, 2025 at 11:04 AM
+-- Generation Time: Mar 29, 2025 at 03:39 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -182,6 +182,16 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_masters_getId_by_name` (IN `p_n
 	SELECT fn_get_masters_id_by_name(p_name) as id;
 END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_masters_get_all_by_type` (IN `masterTypeName` VARCHAR(255))   BEGIN
+    DECLARE s_masterTypeId INT;
+
+    -- Get the masterTypeId using the function
+    SET s_masterTypeId = fn_get_mastertypes_id_by_name(masterTypeName);
+
+    -- Return all records from the masters table with the retrieved masterTypeId
+    SELECT id, name FROM masters WHERE masterTypeId = s_masterTypeId;
+END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_register_user` (IN `p_firstName` VARCHAR(100), IN `p_lastName` VARCHAR(100), IN `p_username` VARCHAR(100), IN `p_email` VARCHAR(255), IN `p_password` VARCHAR(255))   BEGIN
     DECLARE varUserId INT;
     DECLARE varRole INT;
@@ -215,9 +225,17 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_register_user` (IN `p_firstName
     SELECT LAST_INSERT_ID() AS userId;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_requirements_add` (IN `p_requirementTypeId` INT, IN `p_location` VARCHAR(255), IN `p_measurementValue` DECIMAL(10,2), IN `p_measurementUnitId` INT, IN `p_minPrice` DECIMAL(15,2), IN `p_maxPrice` DECIMAL(15,2), IN `p_clientId` INT)   BEGIN
-    INSERT INTO requirements (requirementTypeId, location, measurementValue, measurementUnitId, minPrice, maxPrice, clientId, createdAt, updatedAt)
-    VALUES (p_requirementTypeId, p_location, p_measurementValue, p_measurementUnitId, p_minPrice, p_maxPrice, p_clientId, NOW(), NOW());
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_requirements_add` (IN `p_title` VARCHAR(255), IN `p_requirementTypeId` INT, IN `p_location` VARCHAR(255), IN `p_measurementTypeId` INT, IN `p_minMeasurement` DECIMAL(10,2), IN `p_maxMeasurement` DECIMAL(10,2), IN `p_priceTypeId` INT, IN `p_minPrice` DECIMAL(15,2), IN `p_maxPrice` DECIMAL(15,2), IN `p_clientId` INT, IN `p_description` TEXT)   BEGIN
+    INSERT INTO requirements (
+        title, requirementTypeId, location, measurementTypeId, 
+        minMeasurement, maxMeasurement, priceTypeId, minPrice, 
+        maxPrice, clientId, description
+    ) 
+    VALUES (
+        p_title, p_requirementTypeId, p_location, p_measurementTypeId, 
+        p_minMeasurement, p_maxMeasurement, p_priceTypeId, p_minPrice, 
+        p_maxPrice, p_clientId, p_description
+    );
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_requirements_delete` (IN `p_id` INT)   BEGIN
@@ -225,24 +243,47 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_requirements_delete` (IN `p_id`
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_requirements_get_all` ()   BEGIN
-    SELECT * FROM requirements;
+    SELECT 
+        r.id,
+        r.title,
+        r.location,
+        r.minPrice,
+        r.maxPrice,
+        r.minMeasurement,
+        r.maxMeasurement,
+        c.name AS clientName,
+        m1.name AS measurementType,
+        m2.name AS priceType,
+        m3.name AS requirementType,
+        r.description
+    FROM requirements r
+    LEFT JOIN masters m1 ON m1.id = r.measurementTypeId 
+        AND m1.masterTypeId = fn_get_mastertypes_id_by_name('MeasurementType')
+    LEFT JOIN masters m2 ON m2.id = r.priceTypeId 
+        AND m2.masterTypeId = fn_get_mastertypes_id_by_name('PriceType')
+    LEFT JOIN masters m3 ON m3.id = r.requirementTypeId 
+        AND m3.masterTypeId = fn_get_mastertypes_id_by_name('PropertyType')
+	LEFT JOIN clients c ON r.clientId = c.id;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_requirements_get_by_id` (IN `p_id` INT)   BEGIN
     SELECT * FROM requirements WHERE id = p_id;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_requirements_update` (IN `p_id` INT, IN `p_requirementTypeId` INT, IN `p_location` VARCHAR(255), IN `p_measurementValue` DECIMAL(10,2), IN `p_measurementUnitId` INT, IN `p_minPrice` DECIMAL(15,2), IN `p_maxPrice` DECIMAL(15,2), IN `p_clientId` INT)   BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_requirements_update` (IN `p_id` INT, IN `p_title` VARCHAR(255), IN `p_requirementTypeId` INT, IN `p_location` VARCHAR(255), IN `p_measurementTypeId` INT, IN `p_minMeasurement` DECIMAL(10,2), IN `p_maxMeasurement` DECIMAL(10,2), IN `p_priceTypeId` INT, IN `p_minPrice` DECIMAL(15,2), IN `p_maxPrice` DECIMAL(15,2), IN `p_clientId` INT, IN `p_description` TEXT)   BEGIN
     UPDATE requirements 
     SET 
+        title = p_title,
         requirementTypeId = p_requirementTypeId,
         location = p_location,
-        measurementValue = p_measurementValue,
-        measurementUnitId = p_measurementUnitId,
+        measurementTypeId = p_measurementTypeId,
+        minMeasurement = p_minMeasurement,
+        maxMeasurement = p_maxMeasurement,
+        priceTypeId = p_priceTypeId,
         minPrice = p_minPrice,
         maxPrice = p_maxPrice,
         clientId = p_clientId,
-        updatedAt = NOW()
+        description = p_description
     WHERE id = p_id;
 END$$
 
@@ -280,22 +321,22 @@ CREATE DEFINER=`root`@`localhost` FUNCTION `fn_get_masters_name_by_id` (`p_id` I
     RETURN v_name;
 END$$
 
-CREATE DEFINER=`root`@`localhost` FUNCTION `fn_get_typename_by_id` (`p_id` INT(11)) RETURNS VARCHAR(255) CHARSET utf8mb4 COLLATE utf8mb4_general_ci DETERMINISTIC BEGIN
-    DECLARE v_name varchar(255);
-
-    -- Fetch the ID based on the provided value
-    SELECT name INTO v_name FROM master_types WHERE id = p_id LIMIT 1;
-
-    RETURN v_name;
-END$$
-
-CREATE DEFINER=`root`@`localhost` FUNCTION `fn_get_type_id_by_name` (`p_value` VARCHAR(255)) RETURNS INT(11) DETERMINISTIC BEGIN
+CREATE DEFINER=`root`@`localhost` FUNCTION `fn_get_mastertypes_id_by_name` (`p_value` VARCHAR(255)) RETURNS INT(11) DETERMINISTIC BEGIN
     DECLARE v_id INT;
 
     -- Fetch the ID based on the provided value
     SELECT id INTO v_id FROM mastertypes WHERE name = p_value LIMIT 1;
 
     RETURN v_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` FUNCTION `fn_get_mastertype_name_by_id` (`p_id` INT(11)) RETURNS VARCHAR(255) CHARSET utf8mb4 COLLATE utf8mb4_general_ci DETERMINISTIC BEGIN
+    DECLARE v_name varchar(255);
+
+    -- Fetch the ID based on the provided value
+    SELECT name INTO v_name FROM mastertypes WHERE id = p_id LIMIT 1;
+
+    RETURN v_name;
 END$$
 
 DELIMITER ;
@@ -372,19 +413,24 @@ INSERT INTO `masters` (`id`, `name`, `description`, `masterTypeId`, `createdAt`)
 (11, 'Deleted', 'The user account has been deleted and is no longer active.', 3, '2025-03-25 11:16:39'),
 (12, 'Banned', 'The user has been permanently banned from the platform.', 3, '2025-03-25 11:16:39'),
 (13, 'Tenament', 'An independent residential unit', 4, '2025-03-29 07:40:29'),
-(14, 'Plot', 'A piece of land for construction', 4, '2025-03-29 07:40:29'),
-(15, 'Agricultural Land', 'Land used for farming or cultivation', 4, '2025-03-29 07:40:29'),
-(16, 'Non-Agricultural Land', 'Land for commercial or residential use', 4, '2025-03-29 07:40:29'),
-(17, 'Sq Feet', 'Measurement unit in square feet', 5, '2025-03-29 07:48:57'),
-(18, 'Acre', 'Measurement unit in acres', 5, '2025-03-29 07:48:57'),
-(19, 'Bigha', 'Traditional land measurement unit', 5, '2025-03-29 07:48:57'),
-(20, 'Rent', 'Property is available for rent', 6, '2025-03-29 08:17:01'),
-(21, 'Rented', 'Property has been rented out', 6, '2025-03-29 08:17:01'),
-(22, 'Selling', 'Property is available for sale', 6, '2025-03-29 08:17:01'),
-(23, 'SoldOut', 'Property has been sold', 6, '2025-03-29 08:17:01'),
-(26, 'Sell', 'Property is available for selling', 7, '2025-03-29 08:18:27'),
-(27, 'Rent', 'Property is available for rent', 7, '2025-03-29 08:18:27'),
-(28, 'Buy', 'Property is available for buy', 7, '2025-03-29 09:49:09');
+(14, 'Flat', 'Appartment flat', 4, '2025-03-29 11:38:45'),
+(15, 'Plot', 'A piece of land for construction', 4, '2025-03-29 07:40:29'),
+(16, 'Agricultural Land', 'Land used for farming or cultivation', 4, '2025-03-29 07:40:29'),
+(17, 'Non-Agricultural Land', 'Land for commercial or residential use', 4, '2025-03-29 07:40:29'),
+(18, 'Sq Feet', 'Measurement unit in square feet', 5, '2025-03-29 07:48:57'),
+(19, 'Acre', 'Measurement unit in acres', 5, '2025-03-29 07:48:57'),
+(20, 'Bigha', 'Traditional land measurement unit', 5, '2025-03-29 07:48:57'),
+(21, 'Rent', 'Property is available for rent', 6, '2025-03-29 08:17:01'),
+(22, 'Rented', 'Property has been rented out', 6, '2025-03-29 08:17:01'),
+(23, 'Selling', 'Property is available for sale', 6, '2025-03-29 08:17:01'),
+(24, 'SoldOut', 'Property has been sold', 6, '2025-03-29 08:17:01'),
+(25, 'Sell', 'Property is available for selling', 7, '2025-03-29 08:18:27'),
+(26, 'Rent', 'Property is available for rent', 7, '2025-03-29 08:18:27'),
+(27, 'Buy', 'Property is available for buy', 7, '2025-03-29 09:49:09'),
+(28, 'Hundred', 'Measurement unit of money', 8, '2025-03-29 12:23:14'),
+(29, 'Thousand', 'Measurement unit of money', 8, '2025-03-29 12:23:14'),
+(30, 'Lakh', 'Measurement unit of money', 8, '2025-03-29 12:23:14'),
+(31, 'Crore', 'Measurement unit of money', 8, '2025-03-29 12:23:14');
 
 -- --------------------------------------------------------
 
@@ -409,7 +455,8 @@ INSERT INTO `mastertypes` (`id`, `name`, `description`) VALUES
 (4, 'PropertyType', 'Type of property'),
 (5, 'MeasurementType', 'Type of measurement'),
 (6, 'PropertyStatus', 'Defines the status of a property'),
-(7, 'PropertyFor', 'Defines whether a property is for sale or rent');
+(7, 'PropertyFor', 'Defines whether a property is for sale or rent'),
+(8, 'PriceType', 'Type of price');
 
 -- --------------------------------------------------------
 
@@ -437,14 +484,17 @@ CREATE TABLE `properties` (
 
 CREATE TABLE `requirements` (
   `id` int(11) NOT NULL,
+  `title` varchar(255) NOT NULL,
   `requirementTypeId` int(11) NOT NULL,
   `location` varchar(255) NOT NULL,
+  `measurementTypeId` int(11) NOT NULL,
   `minMeasurement` decimal(10,2) NOT NULL,
   `maxMeasurement` decimal(10,2) NOT NULL,
-  `measurementUnitId` int(11) NOT NULL,
+  `priceTypeId` int(11) NOT NULL,
   `minPrice` decimal(15,2) NOT NULL,
   `maxPrice` decimal(15,2) NOT NULL,
   `clientId` int(11) NOT NULL,
+  `description` text DEFAULT NULL,
   `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
   `updatedAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -557,13 +607,13 @@ ALTER TABLE `expiredtokens`
 -- AUTO_INCREMENT for table `masters`
 --
 ALTER TABLE `masters`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT for table `mastertypes`
 --
 ALTER TABLE `mastertypes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `properties`
