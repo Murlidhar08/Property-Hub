@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 29, 2025 at 03:39 PM
+-- Generation Time: Mar 29, 2025 at 06:29 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -225,16 +225,16 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_register_user` (IN `p_firstName
     SELECT LAST_INSERT_ID() AS userId;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_requirements_add` (IN `p_title` VARCHAR(255), IN `p_requirementTypeId` INT, IN `p_location` VARCHAR(255), IN `p_measurementTypeId` INT, IN `p_minMeasurement` DECIMAL(10,2), IN `p_maxMeasurement` DECIMAL(10,2), IN `p_priceTypeId` INT, IN `p_minPrice` DECIMAL(15,2), IN `p_maxPrice` DECIMAL(15,2), IN `p_clientId` INT, IN `p_description` TEXT)   BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_requirements_add` (IN `p_title` VARCHAR(255), IN `p_requirementTypeId` INT, IN `p_location` VARCHAR(255), IN `p_measurementTypeId` INT, IN `p_minMeasurement` DECIMAL(10,2), IN `p_maxMeasurement` DECIMAL(10,2), IN `p_priceTypeId` INT, IN `p_minPrice` DECIMAL(15,2), IN `p_maxPrice` DECIMAL(15,2), IN `p_propertyForTypeId` INT, IN `p_clientId` INT, IN `p_description` TEXT)   BEGIN
     INSERT INTO requirements (
         title, requirementTypeId, location, measurementTypeId, 
         minMeasurement, maxMeasurement, priceTypeId, minPrice, 
-        maxPrice, clientId, description
+        maxPrice, propertyForTypeId, clientId, description
     ) 
     VALUES (
         p_title, p_requirementTypeId, p_location, p_measurementTypeId, 
         p_minMeasurement, p_maxMeasurement, p_priceTypeId, p_minPrice, 
-        p_maxPrice, p_clientId, p_description
+        p_maxPrice, p_propertyForTypeId, p_clientId, p_description
     );
 END$$
 
@@ -263,14 +263,44 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_requirements_get_all` ()   BEGI
         AND m2.masterTypeId = fn_get_mastertypes_id_by_name('PriceType')
     LEFT JOIN masters m3 ON m3.id = r.requirementTypeId 
         AND m3.masterTypeId = fn_get_mastertypes_id_by_name('PropertyType')
-	LEFT JOIN clients c ON r.clientId = c.id;
+	LEFT JOIN clients c ON r.clientId = c.id
+    ORDER BY r.createdAt DESC;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_requirements_get_by_id` (IN `p_id` INT)   BEGIN
-    SELECT * FROM requirements WHERE id = p_id;
+   SELECT 
+		    r.id,
+        r.title,
+        r.requirementTypeId,
+        r.location,
+        r.propertyForTypeId,
+        r.measurementTypeId,
+        r.minMeasurement,
+        r.maxMeasurement,
+        r.priceTypeId,
+        r.minPrice,
+        r.maxPrice,
+        r.clientId,
+        r.description,
+        c.name AS clientName,
+        m1.name AS measurementType,
+        m2.name AS priceType,
+        m3.name AS requirementType,
+        m4.name AS propertyForType
+    FROM requirements r
+    LEFT JOIN masters m1 ON m1.id = r.measurementTypeId 
+        AND m1.masterTypeId = fn_get_mastertypes_id_by_name('MeasurementType')
+    LEFT JOIN masters m2 ON m2.id = r.priceTypeId 
+        AND m2.masterTypeId = fn_get_mastertypes_id_by_name('PriceType')
+    LEFT JOIN masters m3 ON m3.id = r.requirementTypeId 
+        AND m3.masterTypeId = fn_get_mastertypes_id_by_name('PropertyType')
+	LEFT JOIN clients c ON r.clientId = c.id
+    LEFT JOIN masters m4 ON m4.id = r.propertyForTypeId 
+        AND m4.masterTypeId = fn_get_mastertypes_id_by_name('PropertyFor')
+    WHERE r.id = p_id;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_requirements_update` (IN `p_id` INT, IN `p_title` VARCHAR(255), IN `p_requirementTypeId` INT, IN `p_location` VARCHAR(255), IN `p_measurementTypeId` INT, IN `p_minMeasurement` DECIMAL(10,2), IN `p_maxMeasurement` DECIMAL(10,2), IN `p_priceTypeId` INT, IN `p_minPrice` DECIMAL(15,2), IN `p_maxPrice` DECIMAL(15,2), IN `p_clientId` INT, IN `p_description` TEXT)   BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_requirements_update` (IN `p_id` INT, IN `p_title` VARCHAR(255), IN `p_requirementTypeId` INT, IN `p_location` VARCHAR(255), IN `p_measurementTypeId` INT, IN `p_minMeasurement` DECIMAL(10,2), IN `p_maxMeasurement` DECIMAL(10,2), IN `p_priceTypeId` INT, IN `p_minPrice` DECIMAL(15,2), IN `p_maxPrice` DECIMAL(15,2), IN `p_clientId` INT, IN `p_description` TEXT, IN `p_propertyForTypeId` INT)   BEGIN
     UPDATE requirements 
     SET 
         title = p_title,
@@ -283,7 +313,8 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_requirements_update` (IN `p_id`
         minPrice = p_minPrice,
         maxPrice = p_maxPrice,
         clientId = p_clientId,
-        description = p_description
+        description = p_description,
+        propertyForTypeId = p_propertyForTypeId
     WHERE id = p_id;
 END$$
 
@@ -493,6 +524,7 @@ CREATE TABLE `requirements` (
   `priceTypeId` int(11) NOT NULL,
   `minPrice` decimal(15,2) NOT NULL,
   `maxPrice` decimal(15,2) NOT NULL,
+  `propertyForTypeId` int(11) NOT NULL,
   `clientId` int(11) NOT NULL,
   `description` text DEFAULT NULL,
   `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),

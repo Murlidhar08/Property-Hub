@@ -27,7 +27,6 @@ export default function RequirementsPage() {
 
     // Filter requirements based on search query
     const filteredRequirements = requirements.filter((req) =>
-        req.requirementType.toLowerCase().includes(search.toLowerCase()) ||
         req.location.toLowerCase().includes(search.toLowerCase()) ||
         req.clientName.toLowerCase().includes(search.toLowerCase())
     );

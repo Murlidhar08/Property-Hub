@@ -49,6 +49,7 @@ export default function RequirementDetailsPage() {
                     <div>
                         <h3 className="text-2xl font-semibold">{requirement?.title}</h3>
                         <p className="text-gray-500">{requirement?.requirementType}</p>
+                        <p className="text-gray-500">{requirement?.propertyForType}</p>
                     </div>
                 </div>
 
@@ -67,7 +68,9 @@ export default function RequirementDetailsPage() {
                     </div>
                     <div>
                         <h4 className="font-semibold">Client Name</h4>
-                        <p className="text-gray-700">{requirement?.clientName}</p>
+                        <Link to={`/clients/${requirement?.clientId}`} className="flex items-center text-blue-600 hover:underline">
+                            <p>{requirement?.clientName}</p>
+                        </Link>
                     </div>
                     {requirement?.description && (
                         <div>

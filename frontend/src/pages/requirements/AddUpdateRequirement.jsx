@@ -18,8 +18,8 @@ export default function AddUpdateRequirementPage() {
   const [requirementDetails, setRequirementDetails] = useState({
     title: "",
     location: "",
-    propertyFor: "",
-    propertyTypeId: "",
+    propertyForTypeId: "",
+    requirementTypeId: "",
     minMeasurement: "",
     maxMeasurement: "",
     measurementTypeId: "",
@@ -79,8 +79,8 @@ export default function AddUpdateRequirementPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!requirementDetails.title || !requirementDetails.location || !requirementDetails.propertyFor ||
-      !requirementDetails.propertyTypeId || !requirementDetails.minMeasurement || !requirementDetails.maxMeasurement ||
+    if (!requirementDetails.title || !requirementDetails.location || !requirementDetails.requirementTypeId ||
+      !requirementDetails.propertyForTypeId || !requirementDetails.minMeasurement || !requirementDetails.maxMeasurement ||
       !requirementDetails.minPrice || !requirementDetails.maxPrice || !requirementDetails.priceTypeId ||
       !requirementDetails.clientId || !requirementDetails.description) {
       toast.error("All fields except Description are required!");
@@ -106,8 +106,8 @@ export default function AddUpdateRequirementPage() {
     setRequirementDetails({
       title: "",
       location: "",
-      propertyFor: "",
-      propertyTypeId: "",
+      propertyForTypeId: "",
+      requirementTypeId: "",
       minMeasurement: "",
       maxMeasurement: "",
       measurementTypeId: "",
@@ -145,7 +145,7 @@ export default function AddUpdateRequirementPage() {
         {/* Property For */}
         <div>
           <label className="block text-sm font-medium mb-1">Property For</label>
-          <select name="propertyFor" value={requirementDetails.propertyFor} onChange={handleChange} className="w-full px-3 py-2 border rounded-md text-sm" required>
+          <select name="propertyForTypeId" value={requirementDetails.propertyForTypeId} onChange={handleChange} className="w-full px-3 py-2 border rounded-md text-sm" required>
             <option value="" disabled>Select Property For</option>
             {propertyForTypes.map(typeFor => (
               <option key={typeFor.id} value={typeFor.id}>{typeFor.name}</option>
@@ -156,7 +156,7 @@ export default function AddUpdateRequirementPage() {
         {/* Property Type */}
         <div>
           <label className="block text-sm font-medium mb-1">Type</label>
-          <select name="propertyTypeId" value={requirementDetails.propertyTypeId} onChange={handleChange} className="w-full px-3 py-2 border rounded-md text-sm" required>
+          <select name="requirementTypeId" value={requirementDetails.requirementTypeId} onChange={handleChange} className="w-full px-3 py-2 border rounded-md text-sm" required>
             <option value="" disabled>Select Property Type</option>
             {propertyType.map(type => (
               <option key={type.id} value={type.id}>{type.name}</option>
