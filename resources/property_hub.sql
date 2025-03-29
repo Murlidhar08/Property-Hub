@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 29, 2025 at 07:46 AM
+-- Generation Time: Mar 29, 2025 at 11:04 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -215,6 +215,37 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_register_user` (IN `p_firstName
     SELECT LAST_INSERT_ID() AS userId;
 END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_requirements_add` (IN `p_requirementTypeId` INT, IN `p_location` VARCHAR(255), IN `p_measurementValue` DECIMAL(10,2), IN `p_measurementUnitId` INT, IN `p_minPrice` DECIMAL(15,2), IN `p_maxPrice` DECIMAL(15,2), IN `p_clientId` INT)   BEGIN
+    INSERT INTO requirements (requirementTypeId, location, measurementValue, measurementUnitId, minPrice, maxPrice, clientId, createdAt, updatedAt)
+    VALUES (p_requirementTypeId, p_location, p_measurementValue, p_measurementUnitId, p_minPrice, p_maxPrice, p_clientId, NOW(), NOW());
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_requirements_delete` (IN `p_id` INT)   BEGIN
+    DELETE FROM requirements WHERE id = p_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_requirements_get_all` ()   BEGIN
+    SELECT * FROM requirements;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_requirements_get_by_id` (IN `p_id` INT)   BEGIN
+    SELECT * FROM requirements WHERE id = p_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_requirements_update` (IN `p_id` INT, IN `p_requirementTypeId` INT, IN `p_location` VARCHAR(255), IN `p_measurementValue` DECIMAL(10,2), IN `p_measurementUnitId` INT, IN `p_minPrice` DECIMAL(15,2), IN `p_maxPrice` DECIMAL(15,2), IN `p_clientId` INT)   BEGIN
+    UPDATE requirements 
+    SET 
+        requirementTypeId = p_requirementTypeId,
+        location = p_location,
+        measurementValue = p_measurementValue,
+        measurementUnitId = p_measurementUnitId,
+        minPrice = p_minPrice,
+        maxPrice = p_maxPrice,
+        clientId = p_clientId,
+        updatedAt = NOW()
+    WHERE id = p_id;
+END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_update_password` (IN `p_email` VARCHAR(255), IN `p_password` VARCHAR(255))   BEGIN
     -- Update password
     UPDATE userinfo 
@@ -309,7 +340,6 @@ CREATE TABLE `expiredtokens` (
   `tokenHash` char(64) NOT NULL,
   `expiresAt` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
 -- --------------------------------------------------------
 
 --
@@ -321,27 +351,40 @@ CREATE TABLE `masters` (
   `name` varchar(255) NOT NULL,
   `description` text DEFAULT NULL,
   `masterTypeId` int(11) NOT NULL,
-  `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `masters`
 --
 
-INSERT INTO `masters` (`id`, `name`, `description`, `masterTypeId`, `createdAt`, `updatedAt`) VALUES
-(1, 'Local', 'Standard email/password authentication', 1, '2025-03-25 11:16:39', '2025-03-25 11:16:39'),
-(2, 'Google', 'OAuth authentication via Google', 1, '2025-03-25 11:16:39', '2025-03-25 11:16:39'),
-(3, 'Facebook', 'OAuth authentication via Facebook', 1, '2025-03-25 11:16:39', '2025-03-25 11:16:39'),
-(4, 'Admin', 'Full access to application', 2, '2025-03-25 11:16:39', '2025-03-25 11:16:39'),
-(5, 'Agent', 'Access to add, update, delete basic features', 2, '2025-03-25 11:16:39', '2025-03-25 11:16:39'),
-(6, 'Client', 'Read-only view of the details', 2, '2025-03-25 11:16:39', '2025-03-25 11:16:39'),
-(7, 'Verified', 'The user has been verified and has full access.', 3, '2025-03-25 11:16:39', '2025-03-25 11:16:39'),
-(8, 'Unverified', 'The user has not completed the verification process.', 3, '2025-03-25 11:16:39', '2025-03-25 11:16:39'),
-(9, 'PendingApproval', 'The user is awaiting approval from an administrator.', 3, '2025-03-25 11:16:39', '2025-03-25 12:26:10'),
-(10, 'Suspended', 'The user account is temporarily disabled due to a violation or issue.', 3, '2025-03-25 11:16:39', '2025-03-25 11:16:39'),
-(11, 'Deleted', 'The user account has been deleted and is no longer active.', 3, '2025-03-25 11:16:39', '2025-03-25 11:16:39'),
-(12, 'Banned', 'The user has been permanently banned from the platform.', 3, '2025-03-25 11:16:39', '2025-03-25 11:16:39');
+INSERT INTO `masters` (`id`, `name`, `description`, `masterTypeId`, `createdAt`) VALUES
+(1, 'Local', 'Standard email/password authentication', 1, '2025-03-25 11:16:39'),
+(2, 'Google', 'OAuth authentication via Google', 1, '2025-03-25 11:16:39'),
+(3, 'Facebook', 'OAuth authentication via Facebook', 1, '2025-03-25 11:16:39'),
+(4, 'Admin', 'Full access to application', 2, '2025-03-25 11:16:39'),
+(5, 'Agent', 'Access to add, update, delete basic features', 2, '2025-03-25 11:16:39'),
+(6, 'Client', 'Read-only view of the details', 2, '2025-03-25 11:16:39'),
+(7, 'Verified', 'The user has been verified and has full access.', 3, '2025-03-25 11:16:39'),
+(8, 'Unverified', 'The user has not completed the verification process.', 3, '2025-03-25 11:16:39'),
+(9, 'PendingApproval', 'The user is awaiting approval from an administrator.', 3, '2025-03-25 11:16:39'),
+(10, 'Suspended', 'The user account is temporarily disabled due to a violation or issue.', 3, '2025-03-25 11:16:39'),
+(11, 'Deleted', 'The user account has been deleted and is no longer active.', 3, '2025-03-25 11:16:39'),
+(12, 'Banned', 'The user has been permanently banned from the platform.', 3, '2025-03-25 11:16:39'),
+(13, 'Tenament', 'An independent residential unit', 4, '2025-03-29 07:40:29'),
+(14, 'Plot', 'A piece of land for construction', 4, '2025-03-29 07:40:29'),
+(15, 'Agricultural Land', 'Land used for farming or cultivation', 4, '2025-03-29 07:40:29'),
+(16, 'Non-Agricultural Land', 'Land for commercial or residential use', 4, '2025-03-29 07:40:29'),
+(17, 'Sq Feet', 'Measurement unit in square feet', 5, '2025-03-29 07:48:57'),
+(18, 'Acre', 'Measurement unit in acres', 5, '2025-03-29 07:48:57'),
+(19, 'Bigha', 'Traditional land measurement unit', 5, '2025-03-29 07:48:57'),
+(20, 'Rent', 'Property is available for rent', 6, '2025-03-29 08:17:01'),
+(21, 'Rented', 'Property has been rented out', 6, '2025-03-29 08:17:01'),
+(22, 'Selling', 'Property is available for sale', 6, '2025-03-29 08:17:01'),
+(23, 'SoldOut', 'Property has been sold', 6, '2025-03-29 08:17:01'),
+(26, 'Sell', 'Property is available for selling', 7, '2025-03-29 08:18:27'),
+(27, 'Rent', 'Property is available for rent', 7, '2025-03-29 08:18:27'),
+(28, 'Buy', 'Property is available for buy', 7, '2025-03-29 09:49:09');
 
 -- --------------------------------------------------------
 
@@ -352,19 +395,59 @@ INSERT INTO `masters` (`id`, `name`, `description`, `masterTypeId`, `createdAt`,
 CREATE TABLE `mastertypes` (
   `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
-  `description` text DEFAULT NULL,
-  `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `description` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `mastertypes`
 --
 
-INSERT INTO `mastertypes` (`id`, `name`, `description`, `createdAt`, `updatedAt`) VALUES
-(1, 'AuthenticationProvider', 'Defines third-party login providers', '2025-03-25 11:16:39', '2025-03-25 11:16:39'),
-(2, 'Role', 'Defines user roles in the application', '2025-03-25 11:16:39', '2025-03-25 11:16:39'),
-(3, 'UserStatus', 'Defines different statuses for user accounts', '2025-03-25 11:16:39', '2025-03-25 11:16:39');
+INSERT INTO `mastertypes` (`id`, `name`, `description`) VALUES
+(1, 'AuthenticationProvider', 'Defines third-party login providers'),
+(2, 'Role', 'Defines user roles in the application'),
+(3, 'UserStatus', 'Defines different statuses for user accounts'),
+(4, 'PropertyType', 'Type of property'),
+(5, 'MeasurementType', 'Type of measurement'),
+(6, 'PropertyStatus', 'Defines the status of a property'),
+(7, 'PropertyFor', 'Defines whether a property is for sale or rent');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `properties`
+--
+
+CREATE TABLE `properties` (
+  `id` int(11) NOT NULL,
+  `propertyTypeId` int(11) NOT NULL,
+  `address` varchar(255) NOT NULL,
+  `pricePerUnit` decimal(15,2) NOT NULL,
+  `measurementValue` decimal(10,2) NOT NULL,
+  `measurementUnitId` int(11) NOT NULL,
+  `statusId` int(11) NOT NULL,
+  `propertyForId` int(11) NOT NULL,
+  `description` text DEFAULT NULL,
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Table structure for table `requirements`
+--
+
+CREATE TABLE `requirements` (
+  `id` int(11) NOT NULL,
+  `requirementTypeId` int(11) NOT NULL,
+  `location` varchar(255) NOT NULL,
+  `minMeasurement` decimal(10,2) NOT NULL,
+  `maxMeasurement` decimal(10,2) NOT NULL,
+  `measurementUnitId` int(11) NOT NULL,
+  `minPrice` decimal(15,2) NOT NULL,
+  `maxPrice` decimal(15,2) NOT NULL,
+  `clientId` int(11) NOT NULL,
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -417,8 +500,7 @@ ALTER TABLE `expiredtokens`
 -- Indexes for table `masters`
 --
 ALTER TABLE `masters`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `name` (`name`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `mastertypes`
@@ -426,6 +508,18 @@ ALTER TABLE `masters`
 ALTER TABLE `mastertypes`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `name` (`name`);
+
+--
+-- Indexes for table `properties`
+--
+ALTER TABLE `properties`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `requirements`
+--
+ALTER TABLE `requirements`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `userinfo`
@@ -463,13 +557,25 @@ ALTER TABLE `expiredtokens`
 -- AUTO_INCREMENT for table `masters`
 --
 ALTER TABLE `masters`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT for table `mastertypes`
 --
 ALTER TABLE `mastertypes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT for table `properties`
+--
+ALTER TABLE `properties`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `requirements`
+--
+ALTER TABLE `requirements`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `userinfo`

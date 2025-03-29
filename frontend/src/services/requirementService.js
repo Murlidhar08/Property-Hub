@@ -1,28 +1,25 @@
 import API from "./api";
 
-export default {
+const requirementService = {
     getAllRequirements: async () => {
-        const response = await API.get("/requirements");
-        return response.data;
+        return await API.get("/requirements");
     },
 
     getRequirementById: async (id) => {
-        const response = await API.get(`/requirements/${id}`);
-        return response.data;
+        return await API.get(`/requirements/${id}`);
     },
 
     addRequirement: async (requirementData) => {
-        const response = await API.post("/requirements", requirementData);
-        return response.data;
+        return await API.post("/requirements", requirementData);
     },
 
     updateRequirement: async (id, requirementData) => {
-        const response = await API.put(`/requirements/${id}`, requirementData);
-        return response.data;
+        return await API.put(`/requirements/${id}`, requirementData);
     },
 
     deleteRequirement: async (id) => {
-        const response = await API.delete(`/requirements/${id}`);
-        return response.data;
+        return await API.delete(`/requirements/${id}`);
     },
 };
+
+export default requirementService;
