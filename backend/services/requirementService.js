@@ -1,10 +1,10 @@
 const db = require("../config/mySql");
 
 // ➤ Add Requirement
-exports.addRequirement = async ({ title, propertyTypeId, location, measurementTypeId, minMeasurement, maxMeasurement, priceTypeId, minPrice, maxPrice, clientId, description }) => {
+exports.addRequirement = async ({ title, requirementTypeId, location, measurementTypeId, minMeasurement, maxMeasurement, priceTypeId, minPrice, maxPrice, propertyForTypeId, clientId, description }) => {
     return new Promise((resolve, reject) => {
-        db.query("CALL usp_requirements_add(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            [title, propertyTypeId, location, measurementTypeId, minMeasurement, maxMeasurement, priceTypeId, minPrice, maxPrice, clientId, description],
+        db.query("CALL usp_requirements_add(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            [title, requirementTypeId, location, measurementTypeId, minMeasurement, maxMeasurement, priceTypeId, minPrice, maxPrice, propertyForTypeId, clientId, description],
             (err, results) => {
                 if (err) return reject(err);
                 resolve(results[0]);
@@ -38,10 +38,10 @@ exports.getRequirementById = async (id) => {
 };
 
 // ➤ Update Requirement
-exports.updateRequirement = async ({ id, title, requirementTypeId, location, measurementTypeId, minMeasurement, maxMeasurement, priceTypeId, minPrice, maxPrice, clientId, description }) => {
+exports.updateRequirement = async ({ id, title, requirementTypeId, location, measurementTypeId, minMeasurement, maxMeasurement, priceTypeId, minPrice, maxPrice, clientId, description, propertyForTypeId }) => {
     return new Promise((resolve, reject) => {
-        db.query("CALL usp_requirements_update(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            [id, title, requirementTypeId, location, measurementTypeId, minMeasurement, maxMeasurement, priceTypeId, minPrice, maxPrice, clientId, description],
+        db.query("CALL usp_requirements_update(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            [id, title, requirementTypeId, location, measurementTypeId, minMeasurement, maxMeasurement, priceTypeId, minPrice, maxPrice, clientId, description, propertyForTypeId],
             (err, results) => {
                 if (err) return reject(err);
                 resolve(results.affectedRows > 0);

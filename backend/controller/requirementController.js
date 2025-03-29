@@ -27,7 +27,10 @@ exports.addRequirement = async (req, res) => {
     try {
         const validationError = validateRequirementData(req.body);
         if (validationError) {
-            return res.status(400).json({ success: false, message: validationError });
+            return res.status(400).json({
+                success: false,
+                message: validationError
+            });
         }
 
         await requirementService.addRequirement(req.body);
