@@ -1,17 +1,40 @@
 import { Fence, AlbumIcon, Users, GraduationCap } from "lucide-react";
+import { useEffect, useState } from "react";
 
 // Redux
 import { useSelector } from "react-redux";
 import commonFunction from '@/utils/commonFunction.js';
 
+// Service
+import dashboardService from "@/services/dashboardService.js";
+
 const Dashboard = () => {
   const user = useSelector((state) => state.user);
+  const [counts, setCounts] = useState({
+    totalAgents: 0,
+    totalClients: 0,
+    totalProperties: 0,
+    totalRequirements: 0
+  });
+
+  // Fetch clients
+  useEffect(() => {
+    dashboardService.getDashboardCounts()
+      .then(response => {
+        if (response.success) {
+          setCounts(response.data);
+        } else {
+          throw new Error(response.message || "Failed to fetch details.");
+        }
+      })
+      .catch(error => console.error("Error fetching details:", error));
+  }, []);
 
   const cards = [
-    { icon: Fence, value: "5", label: "Total Properties" },
-    { icon: AlbumIcon, value: "12", label: "Total Requirements" },
-    { icon: Users, value: "7", label: "Total Clients" },
-    { icon: GraduationCap, value: "3", label: "Total Agents" },
+    { icon: Fence, value: counts.totalProperties, label: "Total Properties" },
+    { icon: AlbumIcon, value: counts.totalRequirements, label: "Total Requirements" },
+    { icon: Users, value: counts.totalClients, label: "Total Clients" },
+    { icon: GraduationCap, value: counts.totalAgents, label: "Total Agents" },
   ];
 
   return (

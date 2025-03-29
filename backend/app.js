@@ -9,6 +9,7 @@ const cors = require('cors');
 logger.info('Environment Mode: ' + process.env.NODE_ENV);
 
 // Routes
+const dashboardRouter = require("./routes/dashboardRoutes.js");
 const agentsRouter = require("./routes/agentRoutes.js");
 const clientsRouter = require("./routes/clientRoutes.js");
 const requirementsRouter = require("./routes/requirementRoutes.js");
@@ -34,6 +35,7 @@ app.use(
 logger.info('Allowed origins-' + process.env.ALLOW_CORS);
 
 app.use("/api/auth", authRouter);
+app.use("/api/dashboard", dashboardRouter);
 app.use("/api/agents", agentsRouter);
 app.use("/api/clients", clientsRouter);
 app.use("/api/requirements", requirementsRouter);

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 27, 2025 at 07:29 PM
+-- Generation Time: Mar 29, 2025 at 07:46 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -78,6 +78,15 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_client_update` (IN `p_id` INT, 
         occupation = p_occupation,
         description = p_description
     WHERE id = p_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_dashboard_getcounts` ()   BEGIN
+    -- Fetch total properties
+    SELECT 
+        (0) AS totalProperties,
+        (0) AS totalRequirements,
+        (SELECT COUNT(*) FROM clients) AS totalClients,
+        (SELECT COUNT(*) FROM agents) AS totalAgents;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_expiredToken_add` (IN `p_token_hash` CHAR(64), IN `p_expires_at` INT(11))   BEGIN

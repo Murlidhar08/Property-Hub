@@ -32,7 +32,7 @@ exports.googleAuthLogin = async (user) => {
             (err, results) => {
                 // Error handle
                 if (err)
-                    return reject(err.message);
+                    return reject(err);
 
                 // User details
                 resolve(results[0][0]);
