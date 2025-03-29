@@ -2,53 +2,43 @@ const requirementService = require("../services/requirementService");
 
 // Utility function for validating requirement data
 const validateRequirementData = (data) => {
-    const { requirementTypeId, location, measurementValue, measurementUnitId, minPrice, maxPrice, clientId } = data;
+    const {
+        propertyTypeId, location, measurementTypeId, minMeasurement, maxMeasurement,
+        priceTypeId, minPrice, maxPrice, clientId, description
+    } = data;
 
-    if (!requirementTypeId || isNaN(requirementTypeId)) {
-        return "Invalid requirement type.";
-    }
-    if (!location || location.length < 3) {
-        return "Location must be at least 3 characters long.";
-    }
-    if (!measurementValue || isNaN(measurementValue) || measurementValue <= 0) {
-        return "Measurement value must be a positive number.";
-    }
-    if (!measurementUnitId || isNaN(measurementUnitId)) {
-        return "Invalid measurement unit.";
-    }
-    if (!minPrice || isNaN(minPrice) || minPrice < 0) {
-        return "Minimum price must be a non-negative number.";
-    }
-    if (!maxPrice || isNaN(maxPrice) || maxPrice < minPrice) {
-        return "Maximum price must be greater than or equal to the minimum price.";
-    }
-    if (!clientId || isNaN(clientId)) {
-        return "Invalid client ID.";
-    }
+    return null;
+
+    if (!propertyTypeId || isNaN(propertyTypeId)) return "Invalid requirement type.";
+    if (!location || location.length < 3) return "Location must be at least 3 characters long.";
+    if (!measurementTypeId || isNaN(measurementTypeId)) return "Invalid measurement type.";
+    if (!minMeasurement || isNaN(minMeasurement) || minMeasurement <= 0) return "Min measurement must be a positive number.";
+    if (!maxMeasurement || isNaN(maxMeasurement) || maxMeasurement < minMeasurement) return "Max measurement must be greater than or equal to Min measurement.";
+    if (!priceTypeId || isNaN(priceTypeId)) return "Invalid price type.";
+    if (!minPrice || isNaN(minPrice) || minPrice < 0) return "Minimum price must be a non-negative number.";
+    if (!maxPrice || isNaN(maxPrice) || maxPrice < minPrice) return "Maximum price must be greater than or equal to the minimum price.";
+    if (!clientId || isNaN(clientId)) return "Invalid client ID.";
+
     return null;
 };
 
 // Insert Requirement
 exports.addRequirement = async (req, res) => {
     try {
-        let { requirementTypeId, location, measurementValue, measurementUnitId, minPrice, maxPrice, clientId } = req.body;
-
-        // Validate data
         const validationError = validateRequirementData(req.body);
         if (validationError) {
             return res.status(400).json({ success: false, message: validationError });
         }
 
-        // Make Database call
-        await requirementService.addRequirement({ requirementTypeId, location, measurementValue, measurementUnitId, minPrice, maxPrice, clientId });
+        await requirementService.addRequirement(req.body);
         return res.json({
             success: true,
-            message: "Requirement added successfully.",
+            message: "Requirement added successfully."
         });
     } catch (err) {
         return res.status(500).json({
             success: false,
-            message: err.sqlMessage || err.message,
+            message: err.sqlMessage || err.message
         });
     }
 };
@@ -61,7 +51,7 @@ exports.getRequirements = async (req, res) => {
     } catch (err) {
         return res.status(500).json({
             success: false,
-            message: err.sqlMessage || err.message,
+            message: err.sqlMessage || err.message
         });
     }
 };
@@ -84,7 +74,7 @@ exports.getRequirementById = async (req, res) => {
     } catch (err) {
         return res.status(500).json({
             success: false,
-            message: err.sqlMessage || err.message,
+            message: err.sqlMessage || err.message
         });
     }
 };
@@ -93,19 +83,18 @@ exports.getRequirementById = async (req, res) => {
 exports.updateRequirement = async (req, res) => {
     try {
         const { id } = req.params;
-        let { requirementTypeId, location, measurementValue, measurementUnitId, minPrice, maxPrice, clientId } = req.body;
 
         if (!id || isNaN(id)) {
             return res.status(400).json({ success: false, message: "Invalid requirement ID." });
         }
 
-        // Validate data
         const validationError = validateRequirementData(req.body);
         if (validationError) {
             return res.status(400).json({ success: false, message: validationError });
         }
 
-        let updated = await requirementService.updateRequirement({ id, requirementTypeId, location, measurementValue, measurementUnitId, minPrice, maxPrice, clientId });
+        req.body.id = id; // Ensure ID is included in update payload
+        let updated = await requirementService.updateRequirement(req.body);
         if (!updated) {
             return res.status(404).json({ success: false, message: "Requirement not found or not updated." });
         }
@@ -114,7 +103,7 @@ exports.updateRequirement = async (req, res) => {
     } catch (err) {
         return res.status(500).json({
             success: false,
-            message: err.sqlMessage || err.message,
+            message: err.sqlMessage || err.message
         });
     }
 };
@@ -137,7 +126,7 @@ exports.deleteRequirement = async (req, res) => {
     } catch (err) {
         return res.status(500).json({
             success: false,
-            message: err.sqlMessage || err.message,
+            message: err.sqlMessage || err.message
         });
     }
 };

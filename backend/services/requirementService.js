@@ -1,10 +1,10 @@
 const db = require("../config/mySql");
 
-// Add Requirement
-exports.addRequirement = async ({ requirementTypeId, location, measurementValue, measurementUnitId, minPrice, maxPrice, clientId }) => {
+// ➤ Add Requirement
+exports.addRequirement = async ({ title, propertyTypeId, location, measurementTypeId, minMeasurement, maxMeasurement, priceTypeId, minPrice, maxPrice, clientId, description }) => {
     return new Promise((resolve, reject) => {
-        db.query("CALL usp_requirements_add(?, ?, ?, ?, ?, ?, ?)",
-            [requirementTypeId, location, measurementValue, measurementUnitId, minPrice, maxPrice, clientId],
+        db.query("CALL usp_requirements_add(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            [title, propertyTypeId, location, measurementTypeId, minMeasurement, maxMeasurement, priceTypeId, minPrice, maxPrice, clientId, description],
             (err, results) => {
                 if (err) return reject(err);
                 resolve(results[0]);
@@ -13,7 +13,7 @@ exports.addRequirement = async ({ requirementTypeId, location, measurementValue,
     });
 };
 
-// Get all requirements
+// ➤ Get All Requirements
 exports.getAllRequirements = async () => {
     return new Promise((resolve, reject) => {
         db.query("CALL usp_requirements_get_all()", [],
@@ -25,7 +25,7 @@ exports.getAllRequirements = async () => {
     });
 };
 
-// Get requirement by ID
+// ➤ Get Requirement by ID
 exports.getRequirementById = async (id) => {
     return new Promise((resolve, reject) => {
         db.query("CALL usp_requirements_get_by_id(?)", [id],
@@ -37,11 +37,11 @@ exports.getRequirementById = async (id) => {
     });
 };
 
-// Update requirement
-exports.updateRequirement = async ({ id, requirementTypeId, location, measurementValue, measurementUnitId, minPrice, maxPrice, clientId }) => {
+// ➤ Update Requirement
+exports.updateRequirement = async ({ id, title, requirementTypeId, location, measurementTypeId, minMeasurement, maxMeasurement, priceTypeId, minPrice, maxPrice, clientId, description }) => {
     return new Promise((resolve, reject) => {
-        db.query("CALL usp_requirements_update(?, ?, ?, ?, ?, ?, ?, ?)",
-            [id, requirementTypeId, location, measurementValue, measurementUnitId, minPrice, maxPrice, clientId],
+        db.query("CALL usp_requirements_update(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            [id, title, requirementTypeId, location, measurementTypeId, minMeasurement, maxMeasurement, priceTypeId, minPrice, maxPrice, clientId, description],
             (err, results) => {
                 if (err) return reject(err);
                 resolve(results.affectedRows > 0);
@@ -50,7 +50,7 @@ exports.updateRequirement = async ({ id, requirementTypeId, location, measuremen
     });
 };
 
-// Delete requirement
+// ➤ Delete Requirement
 exports.deleteRequirement = async (id) => {
     return new Promise((resolve, reject) => {
         db.query("CALL usp_requirements_delete(?)", [id],

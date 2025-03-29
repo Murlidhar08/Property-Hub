@@ -11,20 +11,21 @@ export default function AddUpdateRequirementPage() {
   const { id } = useParams(); // Get requirement ID if updating
   const isEditing = Boolean(id);
   const [clients, setClients] = useState([]);
-  const [propertyFor, setPropertyFor] = useState([]);
+  const [propertyForTypes, setPropertyForTypes] = useState([]);
   const [propertyType, setPropertyType] = useState([]);
   const [measurementType, setMeasurementType] = useState([]);
   const [priceType, setPriceType] = useState([]);
   const [requirementDetails, setRequirementDetails] = useState({
     title: "",
     location: "",
+    propertyFor: "",
+    propertyTypeId: "",
     minMeasurement: "",
     maxMeasurement: "",
-    measurementUnitId: "",
+    measurementTypeId: "",
     minPrice: "",
     maxPrice: "",
-    priceUnit: "",
-    requirementTypeId: "",
+    priceTypeId: "",
     clientId: "",
     description: "",
   });
@@ -37,7 +38,7 @@ export default function AddUpdateRequirementPage() {
 
     // Fetch property for options list
     applicationService.getPropertyFor()
-      .then(res => setPropertyFor(res.data))
+      .then(res => setPropertyForTypes(res.data))
       .catch(err => console.error(err));
 
     // Fetch Property Type options list
@@ -78,9 +79,10 @@ export default function AddUpdateRequirementPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!requirementDetails.title || !requirementDetails.location || !requirementDetails.measurementValue ||
-      !requirementDetails.minPrice || !requirementDetails.maxPrice || !requirementDetails.requirementTypeId ||
-      !requirementDetails.measurementUnitId || !requirementDetails.clientId || !requirementDetails.priceUnit) {
+    if (!requirementDetails.title || !requirementDetails.location || !requirementDetails.propertyFor ||
+      !requirementDetails.propertyTypeId || !requirementDetails.minMeasurement || !requirementDetails.maxMeasurement ||
+      !requirementDetails.minPrice || !requirementDetails.maxPrice || !requirementDetails.priceTypeId ||
+      !requirementDetails.clientId || !requirementDetails.description) {
       toast.error("All fields except Description are required!");
       console.error("All fields except Description are required!");
       return;
@@ -103,16 +105,17 @@ export default function AddUpdateRequirementPage() {
   const handleReset = () => {
     setRequirementDetails({
       title: "",
-      description: "",
       location: "",
+      propertyFor: "",
+      propertyTypeId: "",
       minMeasurement: "",
       maxMeasurement: "",
-      measurementUnitId: "",
+      measurementTypeId: "",
       minPrice: "",
       maxPrice: "",
-      priceUnit: "",
-      requirementTypeId: "",
+      priceTypeId: "",
       clientId: "",
+      description: "",
     });
   };
 
@@ -144,7 +147,7 @@ export default function AddUpdateRequirementPage() {
           <label className="block text-sm font-medium mb-1">Property For</label>
           <select name="propertyFor" value={requirementDetails.propertyFor} onChange={handleChange} className="w-full px-3 py-2 border rounded-md text-sm" required>
             <option value="" disabled>Select Property For</option>
-            {propertyFor.map(typeFor => (
+            {propertyForTypes.map(typeFor => (
               <option key={typeFor.id} value={typeFor.id}>{typeFor.name}</option>
             ))}
           </select>
@@ -153,7 +156,7 @@ export default function AddUpdateRequirementPage() {
         {/* Property Type */}
         <div>
           <label className="block text-sm font-medium mb-1">Type</label>
-          <select name="requirementTypeId" value={requirementDetails.requirementTypeId} onChange={handleChange} className="w-full px-3 py-2 border rounded-md text-sm" required>
+          <select name="propertyTypeId" value={requirementDetails.propertyTypeId} onChange={handleChange} className="w-full px-3 py-2 border rounded-md text-sm" required>
             <option value="" disabled>Select Property Type</option>
             {propertyType.map(type => (
               <option key={type.id} value={type.id}>{type.name}</option>
@@ -165,9 +168,9 @@ export default function AddUpdateRequirementPage() {
         <div>
           <label className="block text-sm font-medium mb-1">Measurement</label>
           <div className="flex space-x-2">
-            <input type="number" name="minMeasurement" value={requirementDetails.minMeasurementValue} onChange={handleChange} placeholder="From" className="w-full px-3 py-2 border rounded-md text-sm" required />
-            <input type="number" name="maxMeasurement" value={requirementDetails.maxMeasurementValue} onChange={handleChange} placeholder="Up to" className="w-full px-3 py-2 border rounded-md text-sm" required />
-            <select name="measurementUnitId" value={requirementDetails.measurementUnitId} onChange={handleChange} className="w-full px-3 py-2 border rounded-md text-sm" required>
+            <input type="number" name="minMeasurement" value={requirementDetails.minMeasurement} onChange={handleChange} placeholder="From" className="w-full px-3 py-2 border rounded-md text-sm" required />
+            <input type="number" name="maxMeasurement" value={requirementDetails.maxMeasurement} onChange={handleChange} placeholder="Up to" className="w-full px-3 py-2 border rounded-md text-sm" required />
+            <select name="measurementTypeId" value={requirementDetails.measurementTypeId} onChange={handleChange} className="w-full px-3 py-2 border rounded-md text-sm" required>
               <option value="" disabled>Select Unit</option>
               {measurementType.map(type => (
                 <option key={type.id} value={type.id}>{type.name}</option>
@@ -182,7 +185,7 @@ export default function AddUpdateRequirementPage() {
           <div className="flex space-x-2">
             <input type="number" name="minPrice" value={requirementDetails.minPrice} onChange={handleChange} placeholder="Start from" className="w-full px-3 py-2 border rounded-md text-sm" required />
             <input type="number" name="maxPrice" value={requirementDetails.maxPrice} onChange={handleChange} placeholder="Up to" className="w-full px-3 py-2 border rounded-md text-sm" required />
-            <select name="priceUnit" value={requirementDetails.priceUnit} onChange={handleChange} className="w-full px-3 py-2 border rounded-md text-sm" required>
+            <select name="priceTypeId" value={requirementDetails.priceTypeId} onChange={handleChange} className="w-full px-3 py-2 border rounded-md text-sm" required>
               <option value="" disabled>Select Unit</option>
               {priceType.map(type => (
                 <option key={type.id} value={type.id}>{type.name}</option>
@@ -216,7 +219,7 @@ export default function AddUpdateRequirementPage() {
       {/* Action Buttons */}
       <div className="flex justify-end space-x-2 pt-4 mt-auto bg-white py-4 w-full sticky bottom-0">
         <button type="button" className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 text-sm" onClick={handleReset}>Reset</button>
-        <button type="submit" className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 text-sm">{isEditing ? "Update" : "Add"} Requirement</button>
+        <button type="button" onClick={handleSubmit} className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 text-sm">{isEditing ? "Update" : "Add"} Requirement</button>
       </div>
     </div>
   );

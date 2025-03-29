@@ -1,6 +1,5 @@
 const express = require("express");
 const requirementController = require("../controller/requirementController.js");
-
 const router = express.Router();
 
 router.post("/", requirementController.addRequirement);
