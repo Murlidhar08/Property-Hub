@@ -45,6 +45,7 @@ import PendingVerification from './pages/authentication/PendingVerification';
 import UserVerified from './pages/authentication/UserVerified';
 import AgentDisplayPage from './pages/agents/AgentDisplayPage';
 import ClientDisplayPage from './pages/clients/ClientDisplayPage';
+import RequirementDetailsPage from './pages/requirements/RequirementDetailsPage';
 
 function App() {
   return (
@@ -88,6 +89,7 @@ function App() {
 
             {/* Requirements */}
             <Route path="/requirements" element={<Requirements />} />
+            <Route path="/requirements/:id" element={<RequirementDetailsPage />} />
             <Route path="/requirements/add" element={<AddUpdateRequirement />} />
             <Route path="/requirements/edit/:id" element={<AddUpdateRequirement />} />
 
