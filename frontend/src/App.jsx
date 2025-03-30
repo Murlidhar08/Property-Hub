@@ -46,6 +46,9 @@ import UserVerified from './pages/authentication/UserVerified';
 import AgentDisplayPage from './pages/agents/AgentDisplayPage';
 import ClientDisplayPage from './pages/clients/ClientDisplayPage';
 import RequirementDetailsPage from './pages/requirements/RequirementDetailsPage';
+import OwnersPage from './pages/owners/OwnersPage';
+import AddUpdateOwnerPage from './pages/owners/AddUpdateOwner';
+import OwnerDisplayPage from './pages/owners/OwnerDisplayPage';
 
 function App() {
   return (
@@ -98,6 +101,12 @@ function App() {
             <Route path="/agents/:id" element={<AgentDisplayPage />} />
             <Route path="/agents/add" element={<AddUpdateAgent />} />
             <Route path="/agents/edit/:id" element={<AddUpdateAgent />} />
+
+            {/* Owners */}
+            <Route path="/owners" element={<OwnersPage />} />
+            <Route path="/owners/:id" element={<OwnerDisplayPage />} />
+            <Route path="/owners/add" element={<AddUpdateOwnerPage />} />
+            <Route path="/owners/edit/:id" element={<AddUpdateOwnerPage />} />
           </Route>
         </Route>
 

@@ -15,6 +15,7 @@ const agentsRouter = require("./routes/agentRoutes.js");
 const clientsRouter = require("./routes/clientRoutes.js");
 const requirementsRouter = require("./routes/requirementRoutes.js");
 const authRouter = require("./routes/authRoutes.js");
+const ownerRouter = require("./routes/ownerRoutes.js");
 
 // Application Configurations
 const app = express();
@@ -41,6 +42,7 @@ app.use("/api/dashboard", dashboardRouter);
 app.use("/api/agents", agentsRouter);
 app.use("/api/clients", clientsRouter);
 app.use("/api/requirements", requirementsRouter);
+app.use("/api/owners", ownerRouter);
 
 logger.info('Routes are configured.');
 

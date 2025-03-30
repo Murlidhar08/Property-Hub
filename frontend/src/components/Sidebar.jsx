@@ -8,6 +8,7 @@ const menuItems = [
   { name: "Requirements", icon: AlbumIcon, path: "/requirements" },
   { name: "Clients", icon: Users, path: "/clients" },
   { name: "Agents", icon: GraduationCap, path: "/agents" },
+  { name: "Owners", icon: GraduationCap, path: "/owners" },
 ];
 
 export default function Sidebar({ isOpen, toggleSidebar }) {

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 30, 2025 at 11:10 AM
+-- Generation Time: Mar 30, 2025 at 11:59 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -86,7 +86,8 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_dashboard_getcounts` ()   BEGIN
         (SELECT COUNT(*) FROM properties) AS totalProperties,
         (SELECT COUNT(*) FROM requirements) AS totalRequirements,
         (SELECT COUNT(*) FROM clients) AS totalClients,
-        (SELECT COUNT(*) FROM agents) AS totalAgents;
+        (SELECT COUNT(*) FROM agents) AS totalAgents,
+        (SELECT COUNT(*) FROM owners) AS totalOwners;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_expiredToken_add` (IN `p_token_hash` CHAR(64), IN `p_expires_at` INT(11))   BEGIN
@@ -131,6 +132,33 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_masters_get_all_by_type` (IN `m
 
     -- Return all records from the masters table with the retrieved masterTypeId
     SELECT id, name FROM masters WHERE masterTypeId = s_masterTypeId;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_owner_add` (IN `p_name` VARCHAR(255), IN `p_contact` VARCHAR(20), IN `p_email` VARCHAR(255), IN `p_address` VARCHAR(500), IN `p_description` TEXT)   BEGIN
+    INSERT INTO `owners` (`name`, `contact`, `email`, `address`, `description`)
+    VALUES (p_name, p_contact, p_email, p_address, p_description);
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_owner_delete` (IN `p_id` INT)   BEGIN
+    DELETE FROM `owners` WHERE `id` = p_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_owner_get_all` ()   BEGIN
+    SELECT * FROM `owners`;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_owner_get_by_id` (IN `p_id` INT)   BEGIN
+    SELECT * FROM `owners` WHERE `id` = p_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_owner_update` (IN `p_id` INT, IN `p_name` VARCHAR(255), IN `p_contact` VARCHAR(20), IN `p_email` VARCHAR(255), IN `p_address` VARCHAR(500), IN `p_description` TEXT)   BEGIN
+    UPDATE `owners`
+    SET `name` = p_name,
+        `contact` = p_contact,
+        `email` = p_email,
+        `address` = p_address,
+        `description` = p_description
+    WHERE `id` = p_id;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_requirements_add` (IN `p_title` VARCHAR(255), IN `p_requirementTypeId` INT, IN `p_location` VARCHAR(255), IN `p_measurementTypeId` INT, IN `p_minMeasurement` DECIMAL(10,2), IN `p_maxMeasurement` DECIMAL(10,2), IN `p_priceTypeId` INT, IN `p_minPrice` DECIMAL(15,2), IN `p_maxPrice` DECIMAL(15,2), IN `p_propertyForTypeId` INT, IN `p_clientId` INT, IN `p_description` TEXT)   BEGIN
@@ -495,6 +523,23 @@ INSERT INTO `mastertypes` (`id`, `name`, `description`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `owners`
+--
+
+CREATE TABLE `owners` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `contact` varchar(20) NOT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `address` varchar(500) NOT NULL,
+  `image` varchar(255) DEFAULT NULL,
+  `description` text DEFAULT NULL,
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `properties`
 --
 
@@ -598,6 +643,12 @@ ALTER TABLE `mastertypes`
   ADD UNIQUE KEY `name` (`name`);
 
 --
+-- Indexes for table `owners`
+--
+ALTER TABLE `owners`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `properties`
 --
 ALTER TABLE `properties`
@@ -652,6 +703,12 @@ ALTER TABLE `masters`
 --
 ALTER TABLE `mastertypes`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT for table `owners`
+--
+ALTER TABLE `owners`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `properties`

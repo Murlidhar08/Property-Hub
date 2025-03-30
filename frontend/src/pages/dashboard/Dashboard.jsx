@@ -15,7 +15,8 @@ const Dashboard = () => {
     totalAgents: 0,
     totalClients: 0,
     totalProperties: 0,
-    totalRequirements: 0
+    totalRequirements: 0,
+    totalOwners: 0,
   });
 
   // Fetch clients
@@ -36,6 +37,7 @@ const Dashboard = () => {
     { icon: AlbumIcon, value: counts.totalRequirements, label: "Total Requirements", redirectLink: "/requirements" },
     { icon: Users, value: counts.totalClients, label: "Total Clients", redirectLink: "/clients" },
     { icon: GraduationCap, value: counts.totalAgents, label: "Total Agents", redirectLink: "/agents" },
+    { icon: GraduationCap, value: counts.totalOwners, label: "Total Owners", redirectLink: "/owners" },
   ];
 
   return (
