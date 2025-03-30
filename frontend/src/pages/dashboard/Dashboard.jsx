@@ -1,5 +1,6 @@
 import { Fence, AlbumIcon, Users, GraduationCap } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 // Redux
 import { useSelector } from "react-redux";
@@ -31,10 +32,10 @@ const Dashboard = () => {
   }, []);
 
   const cards = [
-    { icon: Fence, value: counts.totalProperties, label: "Total Properties" },
-    { icon: AlbumIcon, value: counts.totalRequirements, label: "Total Requirements" },
-    { icon: Users, value: counts.totalClients, label: "Total Clients" },
-    { icon: GraduationCap, value: counts.totalAgents, label: "Total Agents" },
+    { icon: Fence, value: counts.totalProperties, label: "Total Properties", redirectLink: "/properties" },
+    { icon: AlbumIcon, value: counts.totalRequirements, label: "Total Requirements", redirectLink: "/requirements" },
+    { icon: Users, value: counts.totalClients, label: "Total Clients", redirectLink: "/clients" },
+    { icon: GraduationCap, value: counts.totalAgents, label: "Total Agents", redirectLink: "/agents" },
   ];
 
   return (
@@ -46,15 +47,17 @@ const Dashboard = () => {
       </div>
       <hr className="my-4" />
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-        {cards.map(({ icon: Icon, value, label }, index) => (
-          <div
-            key={index}
-            className="bg-white shadow-sm rounded-xl p-6 flex flex-col items-center text-center transition hover:shadow-lg"
-          >
-            <Icon className="w-12 h-12 text-purple-600 mb-3" />
-            <p className="text-2xl font-semibold text-gray-900">{value}</p>
-            <p className="text-sm text-gray-500">{label}</p>
-          </div>
+        {cards.map(({ icon: Icon, value, label, redirectLink }, index) => (
+          <Link to={redirectLink} key={index} className="no-underline">
+            <div
+              key={index}
+              className="bg-white shadow-sm rounded-xl p-6 flex flex-col items-center text-center transition hover:shadow-lg"
+            >
+              <Icon className="w-12 h-12 text-purple-600 mb-3" />
+              <p className="text-2xl font-semibold text-gray-900">{value}</p>
+              <p className="text-sm text-gray-500">{label}</p>
+            </div>
+          </Link>
         ))}
       </div>
     </div>
