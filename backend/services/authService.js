@@ -3,7 +3,7 @@ const db = require("../config/mySql");
 // Login User
 exports.loginUser = async (identifier) => {
     return new Promise((resolve, reject) => {
-        db.query("CALL usp_login_user(?)", [identifier], (err, results) => {
+        db.query("CALL usp_userinfo_login(?)", [identifier], (err, results) => {
             if (err) return reject(err);
 
             resolve(results[0][0]);
@@ -14,7 +14,7 @@ exports.loginUser = async (identifier) => {
 // Register User
 exports.registerUser = async ({ firstName, lastName, username, email, finalPassword }) => {
     return new Promise((resolve, reject) => {
-        db.query("CALL usp_register_user(?, ?, ?, ?, ?);",
+        db.query("CALL usp_userinfo_register(?, ?, ?, ?, ?);",
             [firstName, lastName, username, email, finalPassword],
             (err, results) => {
                 if (err) return reject(err);
@@ -28,7 +28,7 @@ exports.registerUser = async ({ firstName, lastName, username, email, finalPassw
 exports.googleAuthLogin = async (user) => {
     const { providerUid, firstName, lastName, email, profilePicture } = user;
     return new Promise((resolve, reject) => {
-        db.query("CALL usp_google_auth_login(?, ?, ?, ?, ?)", [providerUid, firstName, lastName, email, profilePicture],
+        db.query("CALL usp_userinfo_google_auth(?, ?, ?, ?, ?)", [providerUid, firstName, lastName, email, profilePicture],
             (err, results) => {
                 // Error handle
                 if (err)
@@ -43,7 +43,7 @@ exports.googleAuthLogin = async (user) => {
 // Update user password
 exports.updatePassword = async (email, password) => {
     return new Promise((resolve, reject) => {
-        db.query("CALL usp_update_password(?, ?)",
+        db.query("CALL usp_userinfo_update_password(?, ?)",
             [email, password],
             (err, results) => {
                 if (err) return reject(err);
@@ -88,7 +88,7 @@ exports.isTokenExpired = async (tokenHash) => {
 // Update verification 
 exports.updateVerifyStatus = async (email) => {
     return new Promise((resolve, reject) => {
-        db.query('CALL usp_verify_user(?)',
+        db.query('CALL usp_userinfo_verify_user(?)',
             [email],
             (err, results) => {
                 if (err)

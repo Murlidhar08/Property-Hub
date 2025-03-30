@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 29, 2025 at 06:29 PM
+-- Generation Time: Mar 30, 2025 at 11:10 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -83,8 +83,8 @@ END$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_dashboard_getcounts` ()   BEGIN
     -- Fetch total properties
     SELECT 
-        (0) AS totalProperties,
-        (0) AS totalRequirements,
+        (SELECT COUNT(*) FROM properties) AS totalProperties,
+        (SELECT COUNT(*) FROM requirements) AS totalRequirements,
         (SELECT COUNT(*) FROM clients) AS totalClients,
         (SELECT COUNT(*) FROM agents) AS totalAgents;
 END$$
@@ -119,65 +119,6 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_expiredToken_verify` (IN `p_tok
     SELECT token_count > 0 as isExpired;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_google_auth_login` (IN `p_providerUid` VARCHAR(255), IN `p_firstName` VARCHAR(255), IN `p_lastName` VARCHAR(255), IN `p_email` VARCHAR(255), IN `p_profilePicture` VARCHAR(500))   BEGIN
-	DECLARE varRole INT;
-    DECLARE varStatus INT;
-    DECLARE varProviderTypeId INT;
-
-	-- Get  provider Type ID
-	SET varProviderTypeId = fn_get_masters_id_by_name('Google');
-
-    -- Check if the user exists based on providerUid (Google UID)
-    IF EXISTS (SELECT 1 FROM userinfo WHERE email = p_email) THEN
-        -- Update existing Google user
-        UPDATE userinfo 
-        SET 
-            firstName = p_firstName,
-            lastName = p_lastName,
-            providerTypeId = varProviderTypeId,
-            isVerified = 1,
-            providerUid = p_providerUid,
-            profilePicture = p_profilePicture
-        WHERE email = p_email;
-    ELSE
-		-- Get role and status, and provider ID
-		SET varRole = fn_get_masters_id_by_name('Client');
-		SET varStatus = fn_get_masters_id_by_name('PendingApproval');
-    
-        -- Insert new Google user with default values
-        INSERT INTO userinfo (providerTypeId, isVerified, providerUid, firstName, lastName, email, profilePicture, roleId, status) 
-        VALUES (varProviderTypeId, 1, p_providerUid, p_firstName, p_lastName, p_email, p_profilePicture, varRole, varStatus);
-    END IF;
-
-    -- Return updated or newly inserted user details
-    SELECT userId, firstName, lastName, email, username, roleId, status, profilePicture, isVerified
-    FROM userinfo 
-    WHERE email = p_email;
-
-END$$
-
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_login_user` (IN `p_identifier` VARCHAR(255))   BEGIN
-    DECLARE varUserCount INT;
-    DECLARE varUserId INT;
-
-    -- Check if user exists with given email or username
-    SELECT COUNT(*), userId
-    INTO varUserCount, varUserId
-    FROM userinfo 
-    WHERE email = p_identifier OR username = p_identifier;
-
-    -- If no user found
-    IF varUserCount = 0 THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Invalid email address';
-    END IF;
-
-    -- Return user details
-    SELECT userId, firstName, lastName, email, username, password, roleId, status, profilePicture, isVerified
-    FROM userinfo 
-    WHERE userId = varUserId;
-END$$
-
 CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_masters_getId_by_name` (IN `p_name` VARCHAR(255))   BEGIN
 	SELECT fn_get_masters_id_by_name(p_name) as id;
 END$$
@@ -190,39 +131,6 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_masters_get_all_by_type` (IN `m
 
     -- Return all records from the masters table with the retrieved masterTypeId
     SELECT id, name FROM masters WHERE masterTypeId = s_masterTypeId;
-END$$
-
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_register_user` (IN `p_firstName` VARCHAR(100), IN `p_lastName` VARCHAR(100), IN `p_username` VARCHAR(100), IN `p_email` VARCHAR(255), IN `p_password` VARCHAR(255))   BEGIN
-    DECLARE varUserId INT;
-    DECLARE varRole INT;
-    DECLARE varStatus INT;
-    DECLARE varProviderTypeId INT;
-
-    -- Check if username already exists
-    SELECT userId INTO varUserId FROM userinfo WHERE username = p_username LIMIT 1;
-    IF varUserId IS NOT NULL THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Username already exists. Please choose a different one.';
-    END IF;
-
-    -- Check if email already exists
-    SELECT userId INTO varUserId FROM userinfo WHERE email = p_email LIMIT 1;
-    IF varUserId IS NOT NULL THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Email is already registered. Try to sign in.';
-    END IF;
-
-    -- Get role, status, and provider ID
-    SET varRole = fn_get_masters_id_by_name('Client');
-    SET varStatus = fn_get_masters_id_by_name('PendingApproval');
-    SET varProviderTypeId = fn_get_masters_id_by_name('Local');
-
-    -- Insert new user with providerId
-    INSERT INTO userinfo (firstName, lastName, email, username, password, roleId, status, providerTypeId)
-    VALUES (p_firstName, p_lastName, p_email, p_username, p_password, varRole, varStatus, varProviderTypeId);
-
-    -- Return the new user ID
-    SELECT LAST_INSERT_ID() AS userId;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_requirements_add` (IN `p_title` VARCHAR(255), IN `p_requirementTypeId` INT, IN `p_location` VARCHAR(255), IN `p_measurementTypeId` INT, IN `p_minMeasurement` DECIMAL(10,2), IN `p_maxMeasurement` DECIMAL(10,2), IN `p_priceTypeId` INT, IN `p_minPrice` DECIMAL(15,2), IN `p_maxPrice` DECIMAL(15,2), IN `p_propertyForTypeId` INT, IN `p_clientId` INT, IN `p_description` TEXT)   BEGIN
@@ -318,14 +226,106 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_requirements_update` (IN `p_id`
     WHERE id = p_id;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_update_password` (IN `p_email` VARCHAR(255), IN `p_password` VARCHAR(255))   BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_userinfo_google_auth` (IN `p_providerUid` VARCHAR(255), IN `p_firstName` VARCHAR(255), IN `p_lastName` VARCHAR(255), IN `p_email` VARCHAR(255), IN `p_profilePicture` VARCHAR(500))   BEGIN
+	DECLARE varRole INT;
+    DECLARE varStatus INT;
+    DECLARE varProviderTypeId INT;
+
+	-- Get  provider Type ID
+	SET varProviderTypeId = fn_get_masters_id_by_name('Google');
+
+    -- Check if the user exists based on providerUid (Google UID)
+    IF EXISTS (SELECT 1 FROM userinfo WHERE email = p_email) THEN
+        -- Update existing Google user
+        UPDATE userinfo 
+        SET 
+            firstName = p_firstName,
+            lastName = p_lastName,
+            providerTypeId = varProviderTypeId,
+            isVerified = 1,
+            providerUid = p_providerUid,
+            profilePicture = p_profilePicture
+        WHERE email = p_email;
+    ELSE
+		-- Get role and status, and provider ID
+		SET varRole = fn_get_masters_id_by_name('Client');
+		SET varStatus = fn_get_masters_id_by_name('PendingApproval');
+    
+        -- Insert new Google user with default values
+        INSERT INTO userinfo (providerTypeId, isVerified, providerUid, firstName, lastName, email, profilePicture, roleId, status) 
+        VALUES (varProviderTypeId, 1, p_providerUid, p_firstName, p_lastName, p_email, p_profilePicture, varRole, varStatus);
+    END IF;
+
+    -- Return updated or newly inserted user details
+    SELECT userId, firstName, lastName, email, username, roleId, status, profilePicture, isVerified
+    FROM userinfo 
+    WHERE email = p_email;
+
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_userinfo_login` (IN `p_identifier` VARCHAR(255))   BEGIN
+    DECLARE varUserCount INT;
+    DECLARE varUserId INT;
+
+    -- Check if user exists with given email or username
+    SELECT COUNT(*), userId
+    INTO varUserCount, varUserId
+    FROM userinfo 
+    WHERE email = p_identifier OR username = p_identifier;
+
+    -- If no user found
+    IF varUserCount = 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Invalid email address';
+    END IF;
+
+    -- Return user details
+    SELECT userId, firstName, lastName, email, username, password, roleId, status, profilePicture, isVerified
+    FROM userinfo 
+    WHERE userId = varUserId;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_userinfo_register` (IN `p_firstName` VARCHAR(100), IN `p_lastName` VARCHAR(100), IN `p_username` VARCHAR(100), IN `p_email` VARCHAR(255), IN `p_password` VARCHAR(255))   BEGIN
+    DECLARE varUserId INT;
+    DECLARE varRole INT;
+    DECLARE varStatus INT;
+    DECLARE varProviderTypeId INT;
+
+    -- Check if username already exists
+    SELECT userId INTO varUserId FROM userinfo WHERE username = p_username LIMIT 1;
+    IF varUserId IS NOT NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Username already exists. Please choose a different one.';
+    END IF;
+
+    -- Check if email already exists
+    SELECT userId INTO varUserId FROM userinfo WHERE email = p_email LIMIT 1;
+    IF varUserId IS NOT NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Email is already registered. Try to sign in.';
+    END IF;
+
+    -- Get role, status, and provider ID
+    SET varRole = fn_get_masters_id_by_name('Client');
+    SET varStatus = fn_get_masters_id_by_name('PendingApproval');
+    SET varProviderTypeId = fn_get_masters_id_by_name('Local');
+
+    -- Insert new user with providerId
+    INSERT INTO userinfo (firstName, lastName, email, username, password, roleId, status, providerTypeId)
+    VALUES (p_firstName, p_lastName, p_email, p_username, p_password, varRole, varStatus, varProviderTypeId);
+
+    -- Return the new user ID
+    SELECT LAST_INSERT_ID() AS userId;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_userinfo_update_password` (IN `p_email` VARCHAR(255), IN `p_password` VARCHAR(255))   BEGIN
     -- Update password
     UPDATE userinfo 
     SET password = p_password 
     WHERE email = p_email;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_verify_user` (IN `p_email` VARCHAR(255))   BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_userinfo_verify_user` (IN `p_email` VARCHAR(255))   BEGIN
 	UPDATE userInfo
     SET isVerified = 1
     WHERE email = p_email;
@@ -382,6 +382,7 @@ CREATE TABLE `agents` (
   `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `contact` varchar(20) NOT NULL,
+  `email` varchar(255) DEFAULT NULL,
   `address` varchar(500) NOT NULL,
   `area` varchar(255) NOT NULL,
   `image` varchar(255) DEFAULT NULL,
@@ -397,8 +398,10 @@ CREATE TABLE `clients` (
   `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `contact` varchar(20) NOT NULL,
+  `email` varchar(255) DEFAULT NULL,
   `address` text DEFAULT NULL,
   `occupation` varchar(255) DEFAULT NULL,
+  `image` varchar(255) DEFAULT NULL,
   `description` text DEFAULT NULL,
   `createdAt` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -497,14 +500,17 @@ INSERT INTO `mastertypes` (`id`, `name`, `description`) VALUES
 
 CREATE TABLE `properties` (
   `id` int(11) NOT NULL,
+  `title` varchar(255) NOT NULL,
   `propertyTypeId` int(11) NOT NULL,
+  `ownerId` int(11) NOT NULL,
   `address` varchar(255) NOT NULL,
   `pricePerUnit` decimal(15,2) NOT NULL,
   `measurementValue` decimal(10,2) NOT NULL,
-  `measurementUnitId` int(11) NOT NULL,
+  `measurementTypeId` int(11) NOT NULL,
   `statusId` int(11) NOT NULL,
-  `propertyForId` int(11) NOT NULL,
+  `propertyForTypeId` int(11) NOT NULL,
   `description` text DEFAULT NULL,
+  `soldAt` timestamp NULL DEFAULT NULL,
   `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
   `updatedAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
