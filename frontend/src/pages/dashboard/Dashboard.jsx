@@ -1,4 +1,4 @@
-import { Fence, AlbumIcon, Users, GraduationCap } from "lucide-react";
+import { Fence, AlbumIcon, Users, GraduationCap, UserRoundCheck } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -37,7 +37,7 @@ const Dashboard = () => {
     { icon: AlbumIcon, value: counts.totalRequirements, label: "Total Requirements", redirectLink: "/requirements" },
     { icon: Users, value: counts.totalClients, label: "Total Clients", redirectLink: "/clients" },
     { icon: GraduationCap, value: counts.totalAgents, label: "Total Agents", redirectLink: "/agents" },
-    { icon: GraduationCap, value: counts.totalOwners, label: "Total Owners", redirectLink: "/owners" },
+    { icon: UserRoundCheck, value: counts.totalOwners, label: "Total Owners", redirectLink: "/owners" },
   ];
 
   return (

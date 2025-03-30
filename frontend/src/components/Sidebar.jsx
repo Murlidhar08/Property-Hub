@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { LayoutDashboard, Fence, Users, GraduationCap, CircleUserRound, AlbumIcon } from "lucide-react";
+import { LayoutDashboard, Fence, Users, GraduationCap, CircleUserRound, AlbumIcon, UserRoundCheck } from "lucide-react";
 import clsx from "clsx";
 
 const menuItems = [
@@ -8,7 +8,7 @@ const menuItems = [
   { name: "Requirements", icon: AlbumIcon, path: "/requirements" },
   { name: "Clients", icon: Users, path: "/clients" },
   { name: "Agents", icon: GraduationCap, path: "/agents" },
-  { name: "Owners", icon: GraduationCap, path: "/owners" },
+  { name: "Owners", icon: UserRoundCheck, path: "/owners" },
 ];
 
 export default function Sidebar({ isOpen, toggleSidebar }) {
