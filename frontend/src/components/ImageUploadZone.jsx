@@ -1,29 +1,51 @@
-import { useState } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import { Upload, Trash } from "lucide-react";
 
 export default function ImageUploadZone() {
     const [images, setImages] = useState([]);
+    const objectUrls = useRef(new Set()); // Store Object URLs to avoid memory leaks
 
-    // Handle file drop
-    const onDrop = (acceptedFiles) => {
-        const newImages = acceptedFiles.map(file => Object.assign(file, {
-            preview: URL.createObjectURL(file)
-        }));
-        setImages([...images, ...newImages]);
-    };
+    // Handle file drop efficiently
+    const onDrop = useCallback((acceptedFiles) => {
+        const newImages = acceptedFiles.map((file) => {
+            const previewUrl = URL.createObjectURL(file);
+            objectUrls.current.add(previewUrl);
+            return { file, preview: previewUrl };
+        });
 
-    // Remove uploaded image
-    const handleRemoveImage = (index) => {
-        setImages(images.filter((_, i) => i !== index));
-    };
+        setImages((prevImages) => [...prevImages, ...newImages]);
+    }, []);
+
+    // Handle image removal
+    const handleRemoveImage = useCallback((index) => {
+        setImages((prevImages) => {
+            const updatedImages = prevImages.filter((_, i) => i !== index);
+            return updatedImages;
+        });
+
+        // Delay URL revocation slightly to ensure UI updates smoothly
+        setTimeout(() => {
+            const removedImage = images[index];
+            if (removedImage) {
+                URL.revokeObjectURL(removedImage.preview);
+                objectUrls.current.delete(removedImage.preview);
+            }
+        }, 50);
+    }, [images]);
+
+    // Cleanup Object URLs on unmount
+    useEffect(() => {
+        return () => {
+            objectUrls.current.forEach((url) => URL.revokeObjectURL(url));
+            objectUrls.current.clear();
+        };
+    }, []);
 
     // React Dropzone Configuration
     const { getRootProps, getInputProps } = useDropzone({
         onDrop,
-        accept: {
-            "image/*": [".png", ".jpeg", ".jpg", ".webp", ".gif"]
-        },
+        accept: { "image/*": [".png", ".jpeg", ".jpg", ".webp", ".gif"] },
         multiple: true,
     });
 
@@ -45,15 +67,16 @@ export default function ImageUploadZone() {
             {images.length > 0 && (
                 <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                     {images.map((image, index) => (
-                        <div key={index} className="relative group">
+                        <div key={image.preview} className="relative group">
                             {/* Image Preview */}
                             <img
                                 src={image.preview}
-                                alt={image.name}
+                                alt={`Preview-${index}`}
                                 className="w-full h-32 object-cover rounded-lg border"
+                                loading="lazy"
                             />
 
-                            {/* Remove Button (Hidden until hover) */}
+                            {/* Remove Button */}
                             <button
                                 type="button"
                                 onClick={() => handleRemoveImage(index)}
