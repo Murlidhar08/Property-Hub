@@ -2,28 +2,23 @@ import API from "./api";
 
 const propertyService = {
     getAllProperties: async () => {
-        const response = await API.get("/properties");
-        return response.data;
+        return await API.get("/properties");
     },
 
     getPropertyById: async (id) => {
-        const response = await API.get(`/properties/${id}`);
-        return response.data;
+        return await API.get(`/properties/${id}`);
     },
 
     addProperty: async (propertyData) => {
-        const response = await API.post("/properties", propertyData);
-        return response.data;
+        return await API.post("/properties", propertyData);
     },
 
     updateProperty: async (id, propertyData) => {
-        const response = await API.put(`/properties/${id}`, propertyData);
-        return response.data;
+        return await API.put(`/properties/${id}`, propertyData);
     },
 
     deleteProperty: async (id) => {
-        const response = await API.delete(`/properties/${id}`);
-        return response.data;
+        return await API.delete(`/properties/${id}`);
     },
 };
 

@@ -119,6 +119,7 @@ export default function AddUpdatePropertyPage() {
         }
     };
 
+
     return (
         <div className="px-6 pt-6 bg-white-100 min-h-screen w-full flex flex-col">
             <div className="flex justify-between items-center mb-4">

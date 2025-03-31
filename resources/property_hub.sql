@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 30, 2025 at 11:59 AM
+-- Generation Time: Mar 31, 2025 at 04:11 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -159,6 +159,45 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_owner_update` (IN `p_id` INT, I
         `address` = p_address,
         `description` = p_description
     WHERE `id` = p_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_property_add` (IN `p_title` VARCHAR(255), IN `p_propertyTypeId` INT, IN `p_address` VARCHAR(255), IN `p_pricePerUnit` DECIMAL(15,2), IN `p_priceTypeId` INT, IN `p_measurementValue` DECIMAL(10,2), IN `p_measurementTypeId` INT, IN `p_statusId` INT, IN `p_ownerId` INT, IN `p_description` TEXT)   BEGIN
+    INSERT INTO properties (
+        title, propertyTypeId, address, pricePerUnit, priceTypeId,
+        measurementValue, measurementTypeId, statusId, ownerId, description, createdAt, updatedAt
+    ) VALUES (
+        p_title, p_propertyTypeId, p_address, p_pricePerUnit, p_priceTypeId,
+        p_measurementValue, p_measurementTypeId, p_statusId, p_ownerId, p_description, NOW(), NOW()
+    );
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_property_delete` (IN `p_id` INT)   BEGIN
+    DELETE FROM properties WHERE id = p_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_property_get_all` ()   BEGIN
+    SELECT * FROM properties;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_property_get_by_id` (IN `p_id` INT)   BEGIN
+    SELECT * FROM properties WHERE id = p_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_property_update` (IN `p_id` INT, IN `p_title` VARCHAR(255), IN `p_propertyTypeId` INT, IN `p_address` VARCHAR(255), IN `p_pricePerUnit` DECIMAL(15,2), IN `p_priceTypeId` INT, IN `p_measurementValue` DECIMAL(10,2), IN `p_measurementTypeId` INT, IN `p_statusId` INT, IN `p_ownerId` INT, IN `p_description` TEXT)   BEGIN
+    UPDATE properties 
+    SET 
+        title = p_title,
+        propertyTypeId = p_propertyTypeId,
+        address = p_address,
+        pricePerUnit = p_pricePerUnit,
+        priceTypeId = p_priceTypeId,
+        measurementValue = p_measurementValue,
+        measurementTypeId = p_measurementTypeId,
+        statusId = p_statusId,
+        ownerId = p_ownerId,
+        description = p_description,
+        updatedAt = NOW()
+    WHERE id = p_id;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_requirements_add` (IN `p_title` VARCHAR(255), IN `p_requirementTypeId` INT, IN `p_location` VARCHAR(255), IN `p_measurementTypeId` INT, IN `p_minMeasurement` DECIMAL(10,2), IN `p_maxMeasurement` DECIMAL(10,2), IN `p_priceTypeId` INT, IN `p_minPrice` DECIMAL(15,2), IN `p_maxPrice` DECIMAL(15,2), IN `p_propertyForTypeId` INT, IN `p_clientId` INT, IN `p_description` TEXT)   BEGIN
@@ -443,7 +482,6 @@ CREATE TABLE `expiredtokens` (
   `tokenHash` char(64) NOT NULL,
   `expiresAt` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
--- --------------------------------------------------------
 
 --
 -- Table structure for table `masters`
@@ -547,14 +585,15 @@ CREATE TABLE `properties` (
   `id` int(11) NOT NULL,
   `title` varchar(255) NOT NULL,
   `propertyTypeId` int(11) NOT NULL,
-  `ownerId` int(11) NOT NULL,
   `address` varchar(255) NOT NULL,
   `pricePerUnit` decimal(15,2) NOT NULL,
+  `priceTypeId` int(11) NOT NULL,
   `measurementValue` decimal(10,2) NOT NULL,
   `measurementTypeId` int(11) NOT NULL,
   `statusId` int(11) NOT NULL,
-  `propertyForTypeId` int(11) NOT NULL,
+  `ownerId` int(11) DEFAULT NULL,
   `description` text DEFAULT NULL,
+  `soldTo` int(11) DEFAULT NULL,
   `soldAt` timestamp NULL DEFAULT NULL,
   `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
   `updatedAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
@@ -604,11 +643,6 @@ CREATE TABLE `userinfo` (
   `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
   `updatedAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-
---
--- Indexes for dumped tables
---
 
 --
 -- Indexes for table `agents`
