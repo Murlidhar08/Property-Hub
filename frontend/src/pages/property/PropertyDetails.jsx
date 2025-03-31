@@ -1,97 +1,127 @@
-import { useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useState } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import { Pencil, Trash2, ArrowLeft } from "lucide-react";
+import propertyService from "@/services/propertyService";
+import { toast } from "react-toastify";
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from "@mui/material";
 
-// Dummy Property Data
-const dummyProperty = {
-  title: "Luxury Villa in LA",
-  type: "Villa",
-  address: "123 Beverly Hills, Los Angeles, CA",
-  price: "2,500,000",
-  measurementValue: "5000",
-  measurementUnit: "Sq Ft",
-  status: "Selling",
-  propertyFor: "Sell",
-  description:
-    "A beautiful luxury villa with modern amenities and a stunning view of the city.",
-};
+export default function PropertyDisplayPage() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [property, setProperty] = useState(null);
+  const [openConfirm, setOpenConfirm] = useState(false);
 
-const dummyImages = [
-  "https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ718nztPNJfCbDJjZG8fOkejBnBAeQw5eAUA&s",
-  "https://media.istockphoto.com/id/814423752/photo/eye-of-model-with-colorful-art-make-up-close-up.jpg?s=2048x2048&w=is&k=20&c=KTpY1O4d7-EuX-R_GR_44Upc-n9esJOZFpcqvA4CM0E=",
-];
+  useEffect(() => {
+    propertyService.getPropertyById(id)
+      .then((data) => {
+        if (data.success) {
+          setProperty(data.property);
+        } else {
+          throw new Error(data.message || "Failed to fetch property details.");
+        }
+      })
+      .catch((err) => {
+        console.error(err.message);
+      });
+  }, [id]);
 
-export default function PropertyDetails({
-  property = dummyProperty,
-  images = dummyImages,
-}) {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [direction, setDirection] = useState(0);
-
-  const nextImage = () => {
-    setDirection(1);
-    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
-  };
-
-  const prevImage = () => {
-    setDirection(-1);
-    setCurrentImageIndex(
-      (prevIndex) => (prevIndex - 1 + images.length) % images.length
-    );
+  const handleDelete = async () => {
+    try {
+      await propertyService.deleteProperty(id);
+      toast.success("Property deleted successfully!");
+      navigate("/properties");
+    } catch (err) {
+      console.error(err.response?.data?.message || "Something went wrong!");
+    }
   };
 
   return (
-    <div className="w-full h-screen bg-gray-100 flex flex-col p-6">
-      {/* Title */}
-      <h1 className="text-3xl font-bold mb-4 text-center">{property.title}</h1>
-
-      {/* Image Slider */}
-      <div className="relative w-full h-96 bg-gray-200 rounded-lg overflow-hidden flex justify-center items-center">
-        <div className="relative w-full h-full flex">
-          <AnimatePresence initial={false} custom={direction}>
-            <motion.div
-              key={currentImageIndex}
-              className="absolute w-full h-full flex"
-              initial={{ x: direction > 0 ? "100%" : "-100%" }}
-              animate={{ x: "0%" }}
-              exit={{ x: direction > 0 ? "-100%" : "100%" }}
-              transition={{ type: "tween", ease: "easeInOut", duration: 0.6 }}
-            >
-              <img
-                src={images[currentImageIndex]}
-                alt="Property"
-                className="w-full h-full object-cover"
-              />
-            </motion.div>
-          </AnimatePresence>
+    <div className="bg-gray-100 min-h-screen w-full flex flex-col">
+      <div className="bg-white px-6 pt-6 w-full h-full flex flex-col flex-grow">
+        {/* Header */}
+        <div className="flex flex-wrap justify-between items-center mb-4">
+          <Link to="/properties" className="flex items-center text-blue-600 hover:underline">
+            <ArrowLeft size={20} className="mr-2" /> Properties List
+          </Link>
         </div>
-        <button
-          onClick={prevImage}
-          className="absolute left-4 bg-gray-800 text-white p-2 rounded-full hover:bg-gray-700"
-        >
-          <ChevronLeft size={24} />
-        </button>
-        <button
-          onClick={nextImage}
-          className="absolute right-4 bg-gray-800 text-white p-2 rounded-full hover:bg-gray-700"
-        >
-          <ChevronRight size={24} />
-        </button>
+
+        {/* Property Details */}
+        <div className="flex items-center border-t pt-4 space-x-4">
+          <img
+            src={property?.image || "/images/owner.png"}
+            alt={property?.title}
+            className="w-32 h-32 rounded-md object-cover border"
+          />
+          <div>
+            <h3 className="text-2xl font-semibold">{property?.title}</h3>
+            <p className="text-gray-500">{property?.propertyType}</p>
+          </div>
+        </div>
+
+        <div className="mt-6 border-t pt-4 space-y-4 flex-grow">
+          <div>
+            <h4 className="font-semibold">Address</h4>
+            <p className="text-gray-700">{property?.address}</p>
+          </div>
+
+          <div>
+            <h4 className="font-semibold">Price</h4>
+            <p className="text-gray-700">
+              {property?.pricePerUnit} {property?.priceType} per {property?.measurementType}
+            </p>
+          </div>
+
+          <div>
+            <h4 className="font-semibold">Measurement</h4>
+            <p className="text-gray-700">
+              {property?.measurementValue} {property?.measurementType}
+            </p>
+          </div>
+
+          <div>
+            <h4 className="font-semibold">Status</h4>
+            <p className="text-gray-700">{property?.status}</p>
+          </div>
+
+          {property?.ownerId && (
+            <div>
+              <h4 className="font-semibold">Owner</h4>
+              <Link to={`/owners/${property?.ownerId}`} className="flex items-center text-blue-600 hover:underline">
+                {property.ownerName}
+              </Link>
+            </div>
+          )}
+
+          {property?.description && (
+            <div>
+              <h4 className="font-semibold">Description</h4>
+              <p className="text-gray-700">{property.description}</p>
+            </div>
+          )}
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex justify-end mt-auto space-x-2 border-t pt-4 bg-white py-4 sticky bottom-0">
+          <Link to={`/properties/edit/${id}`} className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm flex items-center">
+            <Pencil size={16} className="mr-2" /> Edit
+          </Link>
+          <button onClick={() => setOpenConfirm(true)} className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm flex items-center">
+            <Trash2 size={16} className="mr-2" /> Delete
+          </button>
+        </div>
       </div>
 
-      {/* Property Details */}
-      <div className="mt-6 p-6 bg-white rounded-lg shadow-md w-full max-w-4xl mx-auto">
-        <p className="text-lg font-semibold">Type: {property.type}</p>
-        <p className="text-lg">Address: {property.address}</p>
-        <p className="text-lg">Price: ${property.price}</p>
-        <p className="text-lg">
-          Measurement: {property.measurementValue} {property.measurementUnit}
-        </p>
-        <p className="text-lg">Status: {property.status}</p>
-        <p className="text-lg">Property For: {property.propertyFor}</p>
-        <p className="text-lg">Description: {property.description}</p>
-      </div>
+      {/* Confirmation Dialog */}
+      <Dialog open={openConfirm} onClose={() => setOpenConfirm(false)}>
+        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogContent>
+          <DialogContentText>Are you sure you want to delete this property? <br />This action cannot be undone.</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenConfirm(false)} color="primary">Cancel</Button>
+          <Button onClick={handleDelete} color="error">Delete</Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }
