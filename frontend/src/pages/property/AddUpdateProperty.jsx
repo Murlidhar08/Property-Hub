@@ -5,6 +5,8 @@ import { toast } from "react-toastify";
 import propertyService from "@/services/propertyService";
 import applicationService from "@/services/applicationService";
 import ownerService from "@/services/ownerService";
+import QuillEditor from "@/components/QuillEditor";
+import ImageUploadZone from "@/components/ImageUploadZone";
 
 export default function AddUpdatePropertyPage() {
     const navigate = useNavigate();
@@ -76,6 +78,10 @@ export default function AddUpdatePropertyPage() {
         setPropertyDetails({ ...propertyDetails, [e.target.name]: e.target.value });
     };
 
+    const handleQuillEditorChange = (e) => {
+        setPropertyDetails({ ...propertyDetails, "description": e });
+    };
+
     const goBack = () => {
         navigate(-1);
     };
@@ -135,6 +141,12 @@ export default function AddUpdatePropertyPage() {
                 <div>
                     <label className="block text-sm font-medium mb-1">Title</label>
                     <input type="text" name="title" value={propertyDetails.title} onChange={handleChange} className="w-full px-3 py-2 border rounded-md text-sm" required />
+                </div>
+
+                {/* Images */}
+                <div>
+                    <label className="block text-sm font-medium mb-1">Images</label>
+                    <ImageUploadZone />
                 </div>
 
                 {/* Property Type */}
@@ -214,7 +226,10 @@ export default function AddUpdatePropertyPage() {
                 {/* Description */}
                 <div>
                     <label className="block text-sm font-medium mb-1">Description</label>
-                    <textarea name="description" value={propertyDetails.description} onChange={handleChange} className="w-full px-3 py-2 border rounded-md text-sm h-24 resize-none" required />
+                    <QuillEditor
+                        name="description"
+                        value={propertyDetails.description}
+                        onChange={handleQuillEditorChange} />
                 </div>
 
                 {/* Action buttons */}

@@ -4,7 +4,7 @@ import { Save, Upload, Trash } from "lucide-react";
 import QuillEditor from "@/components/QuillEditor";
 import LeafletMap from "@/components/LeafletMap";
 
-export default function AddUpdateProperty() {
+export default function AddUpdatePropertyBackup() {
   const [property, setProperty] = useState({
     title: "",
     type: "Plot",

@@ -76,9 +76,6 @@ function App() {
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/account" element={<AccountPage />} />
 
-            {/* Details page */}
-            <Route path="/properties/:id" element={<PropertyDetails />} />
-
             {/* Client */}
             <Route path="/clients" element={<ClientsPage />} />
             <Route path="/clients/:id" element={<ClientDisplayPage />} />
@@ -87,6 +84,7 @@ function App() {
 
             {/* Properties */}
             <Route path="/properties" element={<PropertyPage />} />
+            <Route path="/properties/:id" element={<PropertyDetails />} />
             <Route path="/properties/add" element={<AddUpdateProperty />} />
             <Route path="/properties/edit/:id" element={<AddUpdateProperty />} />
 

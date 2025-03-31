@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Grid, List, MapPin, Ruler, DollarSign } from "lucide-react";
+import { Plus, Grid, List, MapPin, Ruler, IndianRupee } from "lucide-react";
 import { Link } from "react-router-dom";
 import propertyService from "@/services/propertyService";
 
@@ -131,7 +131,7 @@ export default function PropertyPage() {
                       {property.measurementValue} {property.measurementType}
                     </span>
                     <span className="flex items-center gap-1">
-                      <DollarSign className="h-4 w-4 text-gray-600" />
+                      <IndianRupee className="h-4 w-4 text-gray-600" />
                       {property.pricePerUnit} {property.priceType}/{property.measurementType}
                     </span>
                   </div>

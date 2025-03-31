@@ -59,11 +59,13 @@ export default function PropertyDisplayPage() {
         </div>
 
         <div className="mt-6 border-t pt-4 space-y-4 flex-grow">
+          {/* Address */}
           <div>
             <h4 className="font-semibold">Address</h4>
             <p className="text-gray-700">{property?.address}</p>
           </div>
 
+          {/* Price */}
           <div>
             <h4 className="font-semibold">Price</h4>
             <p className="text-gray-700">
@@ -71,6 +73,7 @@ export default function PropertyDisplayPage() {
             </p>
           </div>
 
+          {/* Measurement */}
           <div>
             <h4 className="font-semibold">Measurement</h4>
             <p className="text-gray-700">
@@ -78,12 +81,14 @@ export default function PropertyDisplayPage() {
             </p>
           </div>
 
+          {/* Status */}
           <div>
             <h4 className="font-semibold">Status</h4>
             <p className="text-gray-700">{property?.status}</p>
           </div>
 
-          {property?.ownerId && (
+          {/* Owner */}
+          {!!property?.ownerId && (
             <div>
               <h4 className="font-semibold">Owner</h4>
               <Link to={`/owners/${property?.ownerId}`}
@@ -93,10 +98,11 @@ export default function PropertyDisplayPage() {
             </div>
           )}
 
+          {/* description */}
           {property?.description && (
             <div>
               <h4 className="font-semibold">Description</h4>
-              <p className="text-gray-700">{property.description}</p>
+              <div className="text-gray-700 border p-2" dangerouslySetInnerHTML={{ __html: property.description }} />
             </div>
           )}
         </div>
