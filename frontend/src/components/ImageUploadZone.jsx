@@ -1,12 +1,13 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
-import { Upload, Trash } from "lucide-react";
+import { Upload, Trash, X } from "lucide-react";
 
 export default function ImageUploadZone() {
     const [images, setImages] = useState([]);
-    const objectUrls = useRef(new Set()); // Store Object URLs to avoid memory leaks
+    const [fullscreenImage, setFullscreenImage] = useState(null);
+    const objectUrls = useRef(new Set());
 
-    // Handle file drop efficiently
+    // Handle file drop
     const onDrop = useCallback((acceptedFiles) => {
         const newImages = acceptedFiles.map((file) => {
             const previewUrl = URL.createObjectURL(file);
@@ -24,7 +25,6 @@ export default function ImageUploadZone() {
             return updatedImages;
         });
 
-        // Delay URL revocation slightly to ensure UI updates smoothly
         setTimeout(() => {
             const removedImage = images[index];
             if (removedImage) {
@@ -33,6 +33,23 @@ export default function ImageUploadZone() {
             }
         }, 50);
     }, [images]);
+
+    // Close fullscreen image on ESC key press
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            if (event.key === "Escape") {
+                setFullscreenImage(null);
+            }
+        };
+
+        if (fullscreenImage) {
+            document.addEventListener("keydown", handleKeyDown);
+        }
+
+        return () => {
+            document.removeEventListener("keydown", handleKeyDown);
+        };
+    }, [fullscreenImage]);
 
     // Cleanup Object URLs on unmount
     useEffect(() => {
@@ -68,12 +85,13 @@ export default function ImageUploadZone() {
                 <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                     {images.map((image, index) => (
                         <div key={image.preview} className="relative group">
-                            {/* Image Preview */}
+                            {/* Clickable Image Preview */}
                             <img
                                 src={image.preview}
                                 alt={`Preview-${index}`}
-                                className="w-full h-32 object-cover rounded-lg border"
+                                className="w-full h-32 object-cover rounded-lg border cursor-pointer"
                                 loading="lazy"
+                                onClick={() => setFullscreenImage(image.preview)}
                             />
 
                             {/* Remove Button */}
@@ -86,6 +104,30 @@ export default function ImageUploadZone() {
                             </button>
                         </div>
                     ))}
+                </div>
+            )}
+
+            {/* Fullscreen Image Preview */}
+            {fullscreenImage && (
+                <div
+                    className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50"
+                    onClick={() => setFullscreenImage(null)} // Close when clicking outside
+                >
+                    {/* Close Button */}
+                    <button
+                        onClick={() => setFullscreenImage(null)}
+                        className="absolute top-4 right-4 bg-gray-800 text-white p-2 rounded-full hover:bg-gray-700 cursor-pointer"
+                    >
+                        <X className="w-6 h-6" />
+                    </button>
+
+                    {/* Fullscreen Image - Prevent clicks from closing when clicking image */}
+                    <img
+                        src={fullscreenImage}
+                        alt="Fullscreen Preview"
+                        className="max-w-full max-h-full rounded-lg shadow-lg cursor-default"
+                        onClick={(e) => e.stopPropagation()} // Prevent closing when clicking the image itself
+                    />
                 </div>
             )}
         </div>
