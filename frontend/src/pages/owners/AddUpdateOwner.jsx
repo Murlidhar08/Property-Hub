@@ -56,7 +56,7 @@ export default function AddUpdateOwnerPage() {
 
             navigate("/owners");
         } catch (err) {
-            toast.error(err.response?.data?.message || "Something went wrong!");
+            console.error(err.response?.data?.message || "Something went wrong!");
         }
     };
 

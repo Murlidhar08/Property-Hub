@@ -115,7 +115,7 @@ export default function AddUpdatePropertyPage() {
             }
             navigate("/properties");
         } catch (err) {
-            toast.error(err.response?.data?.message || "Something went wrong!");
+            console.error(err.response?.data?.message || "Something went wrong!");
         }
     };
 

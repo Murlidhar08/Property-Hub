@@ -21,7 +21,7 @@ export default function ClientDisplayPage() {
                 }
             })
             .catch((err) => {
-                toast.error(err.message);
+                console.error(err.message);
             });
     }, [id]);
 
@@ -31,7 +31,7 @@ export default function ClientDisplayPage() {
             toast.success("Client deleted successfully!");
             navigate("/clients");
         } catch (err) {
-            toast.error(err.response?.data?.message || "Something went wrong!");
+            console.error(err.response?.data?.message || "Something went wrong!");
         }
     };
 

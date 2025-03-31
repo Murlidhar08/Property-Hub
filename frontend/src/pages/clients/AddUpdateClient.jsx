@@ -55,7 +55,7 @@ export default function AddUpdateClientPage() {
 
       navigate("/clients");
     } catch (err) {
-      toast.error(err.response?.data?.message || "Something went wrong!");
+      console.error(err.response?.data?.message || "Something went wrong!");
     }
   };
 

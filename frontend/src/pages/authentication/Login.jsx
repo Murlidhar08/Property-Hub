@@ -50,7 +50,7 @@ export default function Login() {
         // set Token here
         dispatch(setToken(response.token));
 
-        toast.error("Login successful! Redirecting...");
+        toast.success("Login successful! Redirecting...");
         navigate("/");
       }
       else if (response.message == 'pendingVerification') {

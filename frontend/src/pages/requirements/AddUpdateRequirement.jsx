@@ -98,7 +98,7 @@ export default function AddUpdateRequirementPage() {
       }
       navigate("/requirements");
     } catch (err) {
-      toast.error(err.response?.data?.message || "Something went wrong!");
+      console.error(err.response?.data?.message || "Something went wrong!");
     }
   };
 

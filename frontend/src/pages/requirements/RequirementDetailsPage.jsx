@@ -21,7 +21,7 @@ export default function RequirementDetailsPage() {
                 }
             })
             .catch((err) => {
-                toast.error(err.message);
+                console.error(err.message);
             });
     }, [id]);
 
@@ -31,7 +31,7 @@ export default function RequirementDetailsPage() {
             toast.success("Requirement deleted successfully!");
             navigate("/requirements");
         } catch (err) {
-            toast.error(err.response?.data?.message || "Something went wrong!");
+            console.error(err.response?.data?.message || "Something went wrong!");
         }
     };
 

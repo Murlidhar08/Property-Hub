@@ -28,15 +28,16 @@ const PendingVerification = () => {
             localStorage.removeItem('token');
             navigate('/login')
         } catch (error) {
-            toast.error("Failed to resend email. Please try again later.", {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                theme: "colored",
-            });
+            console.error("Failed to resend email. Please try again later.")
+            // toast.error("Failed to resend email. Please try again later.", {
+            //     position: "top-right",
+            //     autoClose: 3000,
+            //     hideProgressBar: false,
+            //     closeOnClick: true,
+            //     pauseOnHover: true,
+            //     draggable: true,
+            //     theme: "colored",
+            // });
         }
 
         setLoading(false);

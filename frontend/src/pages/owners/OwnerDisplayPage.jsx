@@ -21,7 +21,7 @@ export default function OwnerDisplayPage() {
                 }
             })
             .catch((err) => {
-                toast.error(err.message);
+                console.error(err.message);
             });
     }, [id]);
 
@@ -31,7 +31,7 @@ export default function OwnerDisplayPage() {
             toast.success("Owner deleted successfully!");
             navigate("/owners");
         } catch (err) {
-            toast.error(err.response?.data?.message || "Something went wrong!");
+            console.error(err.response?.data?.message || "Something went wrong!");
         }
     };
 
