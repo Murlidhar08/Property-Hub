@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 31, 2025 at 04:11 PM
+-- Generation Time: Mar 31, 2025 at 07:19 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -176,11 +176,54 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_property_delete` (IN `p_id` INT
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_property_get_all` ()   BEGIN
-    SELECT * FROM properties;
+    SELECT 
+        p.id,
+        p.title,
+        p.propertyTypeId,
+        mp.name AS propertyType,
+        p.address,
+        p.pricePerUnit,
+        p.priceTypeId,
+        mpr.name AS priceType,
+        p.measurementValue,
+        mm.name AS measurementType,
+        ms.name AS status,
+        p.ownerId,
+        o.name AS ownerName,
+        p.description
+    FROM properties p 
+    LEFT JOIN masters mp ON p.propertyTypeId = mp.id
+    LEFT JOIN masters mpr on p.priceTypeId = mpr.id
+    LEFT JOIN masters mm on p.measurementTypeId = mm.id
+    LEFT JOIN masters ms on p.statusId = ms.id
+    LEFT JOIN owners o on p.ownerId = o.id;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_property_get_by_id` (IN `p_id` INT)   BEGIN
-    SELECT * FROM properties WHERE id = p_id;
+    SELECT 
+        p.id,
+        p.title,
+        p.propertyTypeId,
+        mp.name AS propertyType,
+        p.address,
+        p.pricePerUnit,
+        p.priceTypeId,
+        mpr.name AS priceType,
+        p.measurementValue,
+        p.measurementTypeId,
+        mm.name AS measurementType,
+        p.statusId,
+        ms.name AS status,
+        p.ownerId,
+        o.name AS ownerName,
+        p.description
+    FROM properties p 
+    LEFT JOIN masters mp ON p.propertyTypeId = mp.id
+    LEFT JOIN masters mpr on p.priceTypeId = mpr.id
+    LEFT JOIN masters mm on p.measurementTypeId = mm.id
+    LEFT JOIN masters ms on p.statusId = ms.id
+    LEFT JOIN owners o on p.ownerId = o.id
+    WHERE p.id = p_id;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_property_update` (IN `p_id` INT, IN `p_title` VARCHAR(255), IN `p_propertyTypeId` INT, IN `p_address` VARCHAR(255), IN `p_pricePerUnit` DECIMAL(15,2), IN `p_priceTypeId` INT, IN `p_measurementValue` DECIMAL(10,2), IN `p_measurementTypeId` INT, IN `p_statusId` INT, IN `p_ownerId` INT, IN `p_description` TEXT)   BEGIN

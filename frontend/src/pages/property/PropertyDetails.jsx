@@ -67,7 +67,7 @@ export default function PropertyDisplayPage() {
           <div>
             <h4 className="font-semibold">Price</h4>
             <p className="text-gray-700">
-              {property?.pricePerUnit} {property?.priceType} per {property?.measurementType}
+              {property?.pricePerUnit} {property?.priceType}/{property?.measurementType}
             </p>
           </div>
 
@@ -86,7 +86,8 @@ export default function PropertyDisplayPage() {
           {property?.ownerId && (
             <div>
               <h4 className="font-semibold">Owner</h4>
-              <Link to={`/owners/${property?.ownerId}`} className="flex items-center text-blue-600 hover:underline">
+              <Link to={`/owners/${property?.ownerId}`}
+                className="flex items-center text-blue-600 hover:underline">
                 {property.ownerName}
               </Link>
             </div>
