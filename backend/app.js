@@ -17,6 +17,10 @@ const requirementsRouter = require("./routes/requirementRoutes.js");
 const authRouter = require("./routes/authRoutes.js");
 const ownerRouter = require("./routes/ownerRoutes.js");
 const propertyRoutes = require("./routes/propertyRoutes.js");
+const accountRoutes = require("./routes/accountRoutes.js");
+
+// Validators
+const validator = require("./validators/jwtValidator.js");
 
 // Application Configurations
 const app = express();
@@ -38,13 +42,14 @@ app.use(
 logger.info('Allowed origins-' + process.env.ALLOW_CORS);
 
 app.use("/api/auth", authRouter);
-app.use("/api/application", applicationRouter);
-app.use("/api/dashboard", dashboardRouter);
-app.use("/api/agents", agentsRouter);
-app.use("/api/clients", clientsRouter);
-app.use("/api/requirements", requirementsRouter);
-app.use("/api/owners", ownerRouter);
-app.use("/api/properties", propertyRoutes);
+app.use("/api/application", validator, applicationRouter);
+app.use("/api/dashboard", validator, dashboardRouter);
+app.use("/api/agents", validator, agentsRouter);
+app.use("/api/clients", validator, clientsRouter);
+app.use("/api/requirements", validator, requirementsRouter);
+app.use("/api/owners", validator, ownerRouter);
+app.use("/api/properties", validator, propertyRoutes);
+app.use("/api/account", validator, accountRoutes);
 
 logger.info('Routes are configured.');
 

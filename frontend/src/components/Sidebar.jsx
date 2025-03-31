@@ -1,6 +1,7 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { LayoutDashboard, Fence, Users, GraduationCap, CircleUserRound, AlbumIcon, UserRoundCheck } from "lucide-react";
+import { LayoutDashboard, Fence, Users, GraduationCap, AlbumIcon, UserRoundCheck, MinusIcon, PlusIcon } from "lucide-react";
 import clsx from "clsx";
+import { useSelector } from "react-redux";
 
 const menuItems = [
   { name: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
@@ -14,6 +15,7 @@ const menuItems = [
 export default function Sidebar({ isOpen, toggleSidebar }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const user = useSelector((state) => state.user);
 
   return (
     <div
@@ -25,7 +27,7 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
       <div className="flex items-center justify-between">
         <div className={clsx("text-xl font-bold", !isOpen && "hidden")}>PropertyHub</div>
         <button onClick={toggleSidebar} className="p-2 rounded-md focus:outline-none">
-          {isOpen ? "➖" : "➕"}
+          {isOpen ? <MinusIcon /> : <PlusIcon />}
         </button>
       </div>
 
@@ -50,12 +52,15 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
       <div className="mt-auto">
         <div
           className={clsx(
-            "flex items-center gap-4 p-3 rounded-md cursor-pointer transition",
+            "flex items-center gap-4 p-2 rounded-md cursor-pointer transition",
             location.pathname === "/account" ? "bg-white text-black" : "hover:bg-gray-700"
           )}
           onClick={() => navigate("/account")}
         >
-          <CircleUserRound className="h-5 w-5 text-white" />
+          <img
+            className="w-8 h-8 rounded-full ring-2 ring-gray-300 dark:ring-gray-500"
+            src={user.profilePicture || "/images/user.png"}
+            alt={user.username} />
           <span className={clsx(!isOpen && "hidden")}>Account</span>
         </div>
       </div>

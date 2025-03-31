@@ -50,16 +50,7 @@ exports.login = async (req, res) => {
             success: true,
             message: "Login successful",
             token: token,
-            user: {
-                userId: user.userId,
-                email: user.email,
-                roleId: user.roleId,
-                status: user.status,
-                username: user.username,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                profilePicture: user.profilePicture
-            }
+            user: getUserDetails(user)
         });
     } catch (err) {
         return res.status(500).json({
@@ -130,16 +121,7 @@ exports.getProfile = async (req, res) => {
 
         return res.json({
             success: true,
-            user: {
-                userId: user.userId,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                email: user.email,
-                username: user.username,
-                roleId: user.roleId,
-                status: user.status,
-                profilePicture: user.profilePicture
-            }
+            user: getUserDetails(user)
         });
     } catch (err) {
         return res.status(500).json({
@@ -176,7 +158,7 @@ exports.googleLogin = async (req, res, next) => {
         res.status(200).json({
             success: true,
             token,
-            user,
+            user: getUserDetails(user),
         });
     } catch (err) {
         res.status(500).json({
@@ -366,4 +348,19 @@ const generateUserToken = (user) => {
         username: user.username,
         status: user.status
     });
+}
+
+// Get User details
+const getUserDetails = (user) => {
+    return {
+        userId: user.userId,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        username: user.username,
+        roleId: user.roleId,
+        roleName: user.roleName,
+        status: user.status,
+        profilePicture: user.profilePicture,
+    };
 }

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 31, 2025 at 07:19 PM
+-- Generation Time: Mar 31, 2025 at 10:10 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -367,10 +367,21 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_userinfo_google_auth` (IN `p_pr
     END IF;
 
     -- Return updated or newly inserted user details
-    SELECT userId, firstName, lastName, email, username, roleId, status, profilePicture, isVerified
-    FROM userinfo 
-    WHERE email = p_email;
-
+	SELECT	
+		u.userId, 
+		u.firstName, 
+		u.lastName, 
+		u.email, 
+		u.username, 
+		u.password, 
+		u.roleId, 
+        m.name As roleName,
+		u.status, 
+		u.profilePicture, 
+		u.isVerified
+    FROM userinfo u
+    LEFT JOIN masters m on u.roleId = m.id and m.masterTypeId = fn_get_mastertypes_id_by_name('Role')
+	WHERE email = p_email;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_userinfo_login` (IN `p_identifier` VARCHAR(255))   BEGIN
@@ -390,9 +401,30 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_userinfo_login` (IN `p_identifi
     END IF;
 
     -- Return user details
-    SELECT userId, firstName, lastName, email, username, password, roleId, status, profilePicture, isVerified
-    FROM userinfo 
+    SELECT	
+		u.userId, 
+		u.firstName, 
+		u.lastName, 
+		u.email, 
+		u.username, 
+		u.password, 
+		u.roleId, 
+        m.name As roleName,
+		u.status, 
+		u.profilePicture, 
+		u.isVerified
+    FROM userinfo u
+    LEFT JOIN masters m on u.roleId = m.id and m.masterTypeId = fn_get_mastertypes_id_by_name('Role')
     WHERE userId = varUserId;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_userinfo_names_update` (IN `p_userId` INT, IN `p_firstName` VARCHAR(255), IN `p_lastName` VARCHAR(255), IN `p_username` VARCHAR(255))   BEGIN
+    UPDATE userinfo
+    SET 
+        firstName = p_firstName,
+        lastName = p_lastName,
+        username = p_username
+    WHERE userId = p_userId;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_userinfo_register` (IN `p_firstName` VARCHAR(100), IN `p_lastName` VARCHAR(100), IN `p_username` VARCHAR(100), IN `p_email` VARCHAR(255), IN `p_password` VARCHAR(255))   BEGIN
