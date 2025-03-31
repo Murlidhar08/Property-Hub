@@ -53,7 +53,7 @@ export default function OwnerDisplayPage() {
                     />
                     <div>
                         <h3 className="text-2xl font-semibold">{owner?.name}</h3>
-                        <p className="text-gray-500">{owner?.email}</p>
+                        <p className="text-gray-500">{owner?.address}</p>
                     </div>
                 </div>
 
@@ -66,7 +66,7 @@ export default function OwnerDisplayPage() {
                     </div>
                     <div>
                         <h4 className="font-semibold">Email</h4>
-                        <p className="text-gray-700">{owner?.email}</p>
+                        <a className="text-blue-600 underline" href={`mailto:${owner?.email}`}>{owner?.email}</a>
                     </div>
                     <div>
                         <h4 className="font-semibold">Address</h4>

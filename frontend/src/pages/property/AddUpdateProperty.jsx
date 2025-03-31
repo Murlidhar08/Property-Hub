@@ -1,259 +1,227 @@
-import { useState } from "react";
-import { useDropzone } from "react-dropzone";
-import { Save, Upload, Trash } from "lucide-react";
-import QuillEditor from "@/components/QuillEditor";
-import LeafletMap from "@/components/LeafletMap";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
+import { toast } from "react-toastify";
+import propertyService from "@/services/propertyService";
+import applicationService from "@/services/applicationService";
+import ownerService from "@/services/ownerService";
 
-export default function AddUpdateProperty() {
-  const [property, setProperty] = useState({
-    title: "",
-    type: "Plot",
-    address: "",
-    price: "",
-    measurementValue: "",
-    measurementUnit: "Feet",
-    description: "",
-    mapLocation: "",
-    comments: "",
-    status: "Selling",
-    propertyFor: "Sell",
-  });
+export default function AddUpdatePropertyPage() {
+    const navigate = useNavigate();
+    const { id } = useParams();
+    const isEditing = Boolean(id);
+    const [propertyTypes, setPropertyTypes] = useState([]);
+    const [measurementTypes, setMeasurementTypes] = useState([]);
+    const [priceTypes, setPriceTypes] = useState([]);
+    const [propertyStatus, setPropertyStatus] = useState([]);
+    const [owners, setOwners] = useState([]);
+    const [hasOwner, setHasOwner] = useState(false);
+    const [propertyDetails, setPropertyDetails] = useState({
+        title: "",
+        propertyTypeId: "",
+        address: "",
+        pricePerUnit: "",
+        priceTypeId: "",
+        measurementValue: "",
+        measurementTypeId: "",
+        statusId: "",
+        ownerId: "",
+        description: ""
+    });
 
-  const [images, setImages] = useState([]);
+    useEffect(() => {
+        // Property types
+        applicationService.getPropertyType()
+            .then(res => setPropertyTypes(res.data))
+            .catch(err => console.error(err));
 
-  // Handle file drop
-  const onDrop = (acceptedFiles) => {
-    setImages([...images, ...acceptedFiles]);
-  };
+        // Fetch list of measurement types
+        applicationService.getMeasurementType()
+            .then(res => setMeasurementTypes(res.data))
+            .catch(err => console.error(err));
 
-  // Remove uploaded image
-  const handleRemoveImage = (index) => {
-    setImages(images.filter((_, i) => i !== index));
-  };
+        // Fetch Price Type options list
+        applicationService.getPriceType()
+            .then(res => setPriceTypes(res.data))
+            .catch(err => console.error(err));
 
-  // Handle form submission
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Property Data:", property);
-    console.log("Uploaded Images:", images);
-  };
+        // Fetch property for options list
+        applicationService.getPropertyStatus()
+            .then(res => setPropertyStatus(res.data))
+            .catch(err => console.error(err));
 
-  // React Dropzone Configuration
-  const { getRootProps, getInputProps } = useDropzone({
-    onDrop,
-    accept: "image/*",
-    multiple: true,
-  });
+        // Fetch list of owners
+        ownerService.getAllOwners()
+            .then(res => {
+                return setOwners(res.owners)
+            })
+            .catch(err => console.error(err));
+    }, []);
 
-  return (
-    <div className="p-6 bg-gray-100 max-h-screen w-full flex flex-col">
-      <h1 className="text-2xl font-bold">Add Property</h1>
-      <hr className="my-4" />
+    useEffect(() => {
+        if (!isEditing) return;
+        propertyService.getPropertyById(id)
+            .then(res => {
+                setPropertyDetails(res.property);
 
-      <form
-        onSubmit={handleSubmit}
-        className="space-y-4 bg-white p-6 rounded-md shadow"
-      >
-        {/* Title */}
-        <div>
-          <label className="block text-sm font-medium">Title</label>
-          <input
-            type="text"
-            name="title"
-            value={property.title}
-            onChange={(e) =>
-              setProperty((prev) => ({ ...prev, title: e.target.value }))
+                if (res.property.ownerId)
+                    setHasOwner(true);
+            })
+            .catch(err => {
+                console.error(err);
+            });
+    }, [isEditing, id]);
+
+    const handleChange = (e) => {
+        setPropertyDetails({ ...propertyDetails, [e.target.name]: e.target.value });
+    };
+
+    const goBack = () => {
+        navigate(-1);
+    };
+
+    const handleReset = () => {
+        setPropertyDetails({
+            title: "",
+            propertyTypeId: "",
+            address: "",
+            pricePerUnit: "",
+            priceTypeId: "",
+            measurementValue: "",
+            measurementTypeId: "",
+            statusId: "",
+            ownerId: "",
+            description: ""
+        })
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!propertyDetails.title || !propertyDetails.address || !propertyDetails.measurementValue ||
+            !propertyDetails.measurementTypeId || !propertyDetails.propertyTypeId || !propertyDetails.pricePerUnit ||
+            !propertyDetails.priceTypeId || !propertyDetails.statusId || !propertyDetails.description) {
+            toast.error("All fields are required!");
+            return;
+        }
+
+
+        try {
+            if (isEditing) {
+                await propertyService.updateProperty(id, propertyDetails);
+                toast.success("Property updated successfully!");
+            } else {
+                await propertyService.addProperty(propertyDetails);
+                toast.success("Property added successfully!");
             }
-            className="w-full p-2 border rounded-md"
-          />
-        </div>
+            navigate("/properties");
+        } catch (err) {
+            toast.error(err.response?.data?.message || "Something went wrong!");
+        }
+    };
 
-        {/* Image Upload with react-dropzone */}
-        <div>
-          <label className="block text-sm font-medium">Property Images</label>
-          <div
-            {...getRootProps()}
-            className="border-2 border-dashed border-gray-300 p-6 rounded-lg bg-gray-50 cursor-pointer flex flex-col items-center justify-center hover:bg-gray-100"
-          >
-            <input {...getInputProps()} />
-            <Upload className="w-6 h-6 text-gray-500 mb-2" />
-            <span className="text-gray-500 text-sm">
-              Drag & drop or click to upload images
-            </span>
-          </div>
-        </div>
+    return (
+        <div className="px-6 pt-6 bg-white-100 min-h-screen w-full flex flex-col">
+            <div className="flex justify-between items-center mb-4">
+                <div onClick={goBack} className="flex items-center text-blue-600 cursor-pointer hover:underline">
+                    <ArrowLeft size={20} className="mr-2" />
+                    {isEditing ? "Property Details" : "Property List"}
+                </div>
+                <h2 className="text-xl font-bold text-center flex-grow mr-28">{isEditing ? "Update" : "Add"} Property</h2>
+            </div>
 
-        {/* Display Uploaded Images */}
-        {images.length > 0 && (
-          <div className="mt-4 space-y-2">
-            {images.map((image, index) => (
-              <div
-                key={index}
-                className="flex justify-between items-center bg-gray-100 p-2 rounded-md"
-              >
-                <span className="text-sm truncate">{image.name}</span>
-                <button
-                  type="button"
-                  onClick={() => handleRemoveImage(index)}
-                  className="text-red-500 hover:text-red-700"
-                >
-                  <Trash className="w-5 h-5" />
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
+            <form onSubmit={handleSubmit} className="space-y-4 w-full">
+                {/* Title */}
+                <div>
+                    <label className="block text-sm font-medium mb-1">Title</label>
+                    <input type="text" name="title" value={propertyDetails.title} onChange={handleChange} className="w-full px-3 py-2 border rounded-md text-sm" required />
+                </div>
 
-        {/* Property Type */}
-        <div>
-          <label className="block text-sm font-medium">Type</label>
-          <select
-            name="type"
-            value={property.type}
-            onChange={(e) =>
-              setProperty((prev) => ({ ...prev, type: e.target.value }))
-            }
-            className="w-full p-2 border rounded-md"
-          >
-            <option>Plot</option>
-            <option>Agriculture</option>
-            <option>Non-agriculture</option>
-          </select>
-        </div>
+                {/* Property Type */}
+                <div>
+                    <label className="block text-sm font-medium mb-1">Type</label>
+                    <select name="propertyTypeId" value={propertyDetails.propertyTypeId} onChange={handleChange} className="w-full px-3 py-2 border rounded-md text-sm" required>
+                        <option value="" disabled>Select Property Type</option>
+                        {propertyTypes.map(type => (
+                            <option key={type.id} value={type.id}>{type.name}</option>
+                        ))}
+                    </select>
+                </div>
 
-        {/* Address */}
-        <div>
-          <label className="block text-sm font-medium">Address</label>
-          <input
-            type="text"
-            name="address"
-            value={property.address}
-            onChange={(e) =>
-              setProperty((prev) => ({ ...prev, address: e.target.value }))
-            }
-            className="w-full p-2 border rounded-md"
-          />
-        </div>
+                {/* Property Status */}
+                <div>
+                    <label className="block text-sm font-medium mb-1">Property Status</label>
+                    <select name="statusId" value={propertyDetails.statusId} onChange={handleChange} className="w-full px-3 py-2 border rounded-md text-sm" required>
+                        <option value="" disabled>Select Property Status</option>
+                        {propertyStatus.map(typeFor => (
+                            <option key={typeFor.id} value={typeFor.id}>{typeFor.name}</option>
+                        ))}
+                    </select>
+                </div>
 
-        {/* Price */}
-        <div>
-          <label className="block text-sm font-medium">Price</label>
-          <input
-            type="number"
-            name="price"
-            value={property.price}
-            onChange={(e) =>
-              setProperty((prev) => ({ ...prev, price: e.target.value }))
-            }
-            className="w-full p-2 border rounded-md"
-          />
-        </div>
+                {/* Measurement */}
+                <div>
+                    <label className="block text-sm font-medium mb-1">Measurement</label>
+                    <div className="flex space-x-2">
+                        <input type="number" name="measurementValue" value={propertyDetails.measurementValue} onChange={handleChange} className="w-full px-3 py-2 border rounded-md text-sm" required />
+                        <select name="measurementTypeId" value={propertyDetails.measurementTypeId} onChange={handleChange} className="w-full px-3 py-2 border rounded-md text-sm" required>
+                            <option value="" disabled>Select Unit</option>
+                            {measurementTypes.map(type => (
+                                <option key={type.id} value={type.id}>{type.name}</option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
 
-        {/* Measurement Details */}
-        <div className="flex gap-4">
-          <div className="flex-1">
-            <label className="block text-sm font-medium">Measurement</label>
-            <input
-              type="number"
-              name="measurementValue"
-              value={property.measurementValue}
-              onChange={(e) =>
-                setProperty((prev) => ({
-                  ...prev,
-                  measurementValue: e.target.value,
-                }))
-              }
-              className="w-full p-2 border rounded-md"
-            />
-          </div>
-          <div className="flex-1">
-            <label className="block text-sm font-medium">Unit</label>
-            <select
-              name="measurementUnit"
-              value={property.measurementUnit}
-              onChange={(e) =>
-                setProperty((prev) => ({
-                  ...prev,
-                  measurementUnit: e.target.value,
-                }))
-              }
-              className="w-full p-2 border rounded-md"
-            >
-              <option>Feet</option>
-              <option>Acre</option>
-              <option>Bigha</option>
-            </select>
-          </div>
-        </div>
 
-        {/* Status */}
-        <div>
-          <label className="block text-sm font-medium">Status</label>
-          <select
-            name="status"
-            value={property.status}
-            onChange={(e) =>
-              setProperty((prev) => ({ ...prev, status: e.target.value }))
-            }
-            className="w-full p-2 border rounded-md"
-          >
-            <option>Selling</option>
-            <option>Sold</option>
-            <option>Not Selling</option>
-          </select>
-        </div>
+                {/* Address */}
+                <div>
+                    <label className="block text-sm font-medium mb-1">Address</label>
+                    <input type="text" name="address" value={propertyDetails.address} onChange={handleChange} className="w-full px-3 py-2 border rounded-md text-sm" required />
+                </div>
 
-        {/* Property For */}
-        <div>
-          <label className="block text-sm font-medium">Property For</label>
-          <select
-            name="propertyFor"
-            value={property.propertyFor}
-            onChange={(e) =>
-              setProperty((prev) => ({ ...prev, propertyFor: e.target.value }))
-            }
-            className="w-full p-2 border rounded-md"
-          >
-            <option>Sell</option>
-            <option>Rent</option>
-          </select>
-        </div>
+                {/* Price */}
+                <div>
+                    <label className="block text-sm font-medium mb-1">Price</label>
+                    <div className="flex space-x-2">
+                        <input type="number" name="pricePerUnit" value={propertyDetails.pricePerUnit} onChange={handleChange} className="w-full px-3 py-2 border rounded-md text-sm" required />
+                        <select name="priceTypeId" value={propertyDetails.priceTypeId} onChange={handleChange} className="w-full px-3 py-2 border rounded-md text-sm" required>
+                            <option value="" disabled>Select Price Type</option>
+                            {priceTypes.map(type => (
+                                <option key={type.id} value={type.id}>{type.name}</option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
 
-        {/* Description */}
-        <div>
-          <label className="block text-sm font-medium">Description</label>
-          <QuillEditor />
-        </div>
+                {/* Has Owner */}
+                <div>
+                    <label className="block text-sm font-medium mb-1">Has Owner</label>
+                    <input type="checkbox" checked={hasOwner} onChange={() => setHasOwner(!hasOwner)} />
+                </div>
+                {hasOwner && (
+                    <div>
+                        <label className="block text-sm font-medium mb-1">Owner</label>
+                        <select name="ownerId" value={propertyDetails.ownerId} onChange={handleChange} className="w-full px-3 py-2 border rounded-md text-sm" required>
+                            <option value="" disabled>Select Owner</option>
+                            {owners?.map(owner => (
+                                <option key={owner.id} value={owner.id}>{owner.name}</option>
+                            ))}
+                        </select>
+                    </div>
+                )}
 
-        {/* Map Location */}
-        <div className="hidden">
-          <label className="block text-sm font-medium">Map Location</label>
-          <LeafletMap />
-        </div>
+                {/* Description */}
+                <div>
+                    <label className="block text-sm font-medium mb-1">Description</label>
+                    <textarea name="description" value={propertyDetails.description} onChange={handleChange} className="w-full px-3 py-2 border rounded-md text-sm h-24 resize-none" required />
+                </div>
 
-        {/* Comments */}
-        <div>
-          <label className="block text-sm font-medium">Comments</label>
-          <textarea
-            name="comments"
-            value={property.comments}
-            onChange={(e) =>
-              setProperty((prev) => ({ ...prev, comments: e.target.value }))
-            }
-            className="w-full p-2 border rounded-md"
-          ></textarea>
+                {/* Action buttons */}
+                <div className="flex justify-end space-x-2 pt-4 mt-auto bg-white py-4 w-full sticky bottom-0">
+                    <button type="button" className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 text-sm" onClick={handleReset}>Reset</button>
+                    <button type="submit" className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 text-sm">{isEditing ? "Update" : "Add"} Property</button>
+                </div>
+            </form>
         </div>
-
-        {/* Form Actions */}
-        <div className="flex justify-end space-x-4">
-          <button className="bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500">
-            Cancel
-          </button>
-          <button className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">
-            <Save className="inline mr-2" /> Save Property
-          </button>
-        </div>
-      </form>
-    </div>
-  );
+    );
 }
