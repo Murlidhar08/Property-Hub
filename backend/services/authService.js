@@ -1,4 +1,4 @@
-const db = require("../config/mySql");
+const db = require("../lib/mySql");
 
 // Login User
 exports.loginUser = async (identifier) => {

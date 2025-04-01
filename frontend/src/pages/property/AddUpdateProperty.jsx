@@ -28,7 +28,8 @@ export default function AddUpdatePropertyPage() {
         measurementTypeId: "",
         statusId: "",
         ownerId: "",
-        description: ""
+        description: "",
+        images: []
     });
 
     useEffect(() => {
@@ -97,7 +98,8 @@ export default function AddUpdatePropertyPage() {
             measurementTypeId: "",
             statusId: "",
             ownerId: "",
-            description: ""
+            description: "",
+            images: []
         })
     };
 
@@ -110,13 +112,25 @@ export default function AddUpdatePropertyPage() {
             return;
         }
 
+        const formData = new FormData();
+
+        Object.keys(propertyDetails).forEach((key) => {
+            if (key === "images" && Array.isArray(propertyDetails.images)) {
+                propertyDetails.images.forEach((image) => {
+                    formData.append("files", image); // Append each image
+                });
+            } else {
+                formData.append(key, propertyDetails[key]);
+            }
+        });
+
 
         try {
             if (isEditing) {
-                await propertyService.updateProperty(id, propertyDetails);
+                await propertyService.updateProperty(id, formData);
                 toast.success("Property updated successfully!");
             } else {
-                await propertyService.addProperty(propertyDetails);
+                await propertyService.addProperty(formData);
                 toast.success("Property added successfully!");
             }
             navigate("/properties");
@@ -125,6 +139,9 @@ export default function AddUpdatePropertyPage() {
         }
     };
 
+    const handleImageChange = (files) => {
+        setPropertyDetails((prevDetails) => ({ ...prevDetails, images: files }));
+    };
 
     return (
         <div className="px-6 pt-6 bg-white-100 min-h-screen w-full flex flex-col">
@@ -146,7 +163,7 @@ export default function AddUpdatePropertyPage() {
                 {/* Images */}
                 <div>
                     <label className="block text-sm font-medium mb-1">Images</label>
-                    <ImageUploadZone />
+                    <ImageUploadZone onImagesChange={handleImageChange} />
                 </div>
 
                 {/* Property Type */}
@@ -186,11 +203,6 @@ export default function AddUpdatePropertyPage() {
                 </div>
 
 
-                {/* Address */}
-                <div>
-                    <label className="block text-sm font-medium mb-1">Address</label>
-                    <input type="text" name="address" value={propertyDetails.address} onChange={handleChange} className="w-full px-3 py-2 border rounded-md text-sm" required />
-                </div>
 
                 {/* Price */}
                 <div>
@@ -204,6 +216,12 @@ export default function AddUpdatePropertyPage() {
                             ))}
                         </select>
                     </div>
+                </div>
+
+                {/* Address */}
+                <div>
+                    <label className="block text-sm font-medium mb-1">Address</label>
+                    <input type="text" name="address" value={propertyDetails.address} onChange={handleChange} className="w-full px-3 py-2 border rounded-md text-sm" required />
                 </div>
 
                 {/* Has Owner */}

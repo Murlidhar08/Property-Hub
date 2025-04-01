@@ -1,4 +1,4 @@
-const db = require("../config/mySql");
+const db = require("../lib/mySql");
 
 // Add Agent
 exports.addAgent = async ({ name, contact, address, area, image, description }) => {

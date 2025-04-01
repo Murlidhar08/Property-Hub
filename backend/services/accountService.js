@@ -1,4 +1,4 @@
-const db = require("../config/mySql");
+const db = require("../lib/mySql");
 
 // Update user account details (firstName, lastName, username)
 exports.updateUserInfo = async ({ userId, firstName, lastName, username }) => {

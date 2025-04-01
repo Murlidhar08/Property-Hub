@@ -26,6 +26,7 @@ OnlyLocal
 
 # BACKEND
 backend/.env
+backend/uploads
 
 # FRONTEND
 frontend/.env

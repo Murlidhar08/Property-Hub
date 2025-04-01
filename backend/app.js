@@ -3,7 +3,7 @@ const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
-const logger = require('./config/logger');
+const logger = require('./lib/logger');
 const cors = require('cors');
 
 logger.info('Environment Mode: ' + process.env.NODE_ENV);

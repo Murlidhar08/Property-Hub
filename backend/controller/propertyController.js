@@ -1,4 +1,5 @@
 const propertyService = require("../services/propertyService");
+const { moveMultipleFiles } = require("../config/fileOperations");
 
 // Utility function for validating property data
 const validatePropertyData = (data) => {
@@ -36,24 +37,52 @@ const validatePropertyData = (data) => {
 
 // Insert Property
 exports.addProperty = async (req, res) => {
-    try {
-        let { title, propertyTypeId, address, pricePerUnit, priceTypeId, measurementValue, measurementTypeId, statusId, ownerId, description } = req.body;
+    // First, validate input data
+    const validationError = validatePropertyData(req.body);
+    if (validationError) {
+        return res.status(400).json({ success: false, message: validationError });
+    }
 
-        // Validate input data
-        const validationError = validatePropertyData(req.body);
-        if (validationError) {
-            return res.status(400).json({ success: false, message: validationError });
-        }
+
+    try {
+        // Destructure the validated body data
+        const { title, propertyTypeId, address, pricePerUnit, priceTypeId, measurementValue, measurementTypeId, statusId, ownerId, description } = req.body;
+
+        // Get file paths of uploaded images
+        const images = req.files ? req.files.map((file) => `/temp/${file.filename}`) : [];
 
         // Call service to insert property
-        await propertyService.addProperty({ title, propertyTypeId, address, pricePerUnit, priceTypeId, measurementValue, measurementTypeId, statusId, ownerId, description });
+        let propertyId = await propertyService.addProperty({
+            title,
+            propertyTypeId,
+            address,
+            pricePerUnit,
+            priceTypeId,
+            measurementValue,
+            measurementTypeId,
+            statusId,
+            ownerId,
+            description
+        });
 
-        return res.json({ success: true, message: "Property added successfully." });
+        // Move uploaded images to the final directory
+        let uploadedList = [];
+        if (images.length > 0) {
+            const destinationPath = `/property/${propertyId}/`;
+            uploadedList = await moveMultipleFiles(images, destinationPath);
+        }
+
+        // Add uploaded files to database with relative path
+        // DB OPERATION PENDING
+
+        return res.json({
+            success: true,
+            message: "Property added successfully."
+        });
     } catch (err) {
         return res.status(500).json({ success: false, message: err.sqlMessage || err.message });
     }
 };
-
 // Get all properties
 exports.getProperties = async (req, res) => {
     try {

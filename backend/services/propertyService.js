@@ -1,4 +1,4 @@
-const db = require("../config/mySql");
+const db = require("../lib/mySql");
 
 // Add Property
 exports.addProperty = async ({ title, propertyTypeId, address, pricePerUnit, priceTypeId, measurementValue, measurementTypeId, statusId, ownerId, description }) => {
@@ -9,7 +9,7 @@ exports.addProperty = async ({ title, propertyTypeId, address, pricePerUnit, pri
             (err, results) => {
                 if (err) return reject(err);
 
-                resolve(results[0]);
+                resolve(results[0][0]['id']);
             }
         );
     });

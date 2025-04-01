@@ -1,4 +1,4 @@
-const db = require("../config/mySql");
+const db = require("../lib/mySql");
 
 // ➤ Add Requirement
 exports.addRequirement = async ({ title, requirementTypeId, location, measurementTypeId, minMeasurement, maxMeasurement, priceTypeId, minPrice, maxPrice, propertyForTypeId, clientId, description }) => {

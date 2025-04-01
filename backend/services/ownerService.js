@@ -1,4 +1,4 @@
-const db = require("../config/mySql");
+const db = require("../lib/mySql");
 
 // Add Owner
 exports.addOwner = async ({ name, contact, email, address, description }) => {

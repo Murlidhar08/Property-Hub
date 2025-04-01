@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import { Upload, Trash, X } from "lucide-react";
 
-export default function ImageUploadZone() {
+export default function ImageUploadZone({ onImagesChange }) {
     const [images, setImages] = useState([]);
     const [fullscreenImage, setFullscreenImage] = useState(null);
     const objectUrls = useRef(new Set());
@@ -15,24 +15,28 @@ export default function ImageUploadZone() {
             return { file, preview: previewUrl };
         });
 
-        setImages((prevImages) => [...prevImages, ...newImages]);
-    }, []);
+        setImages((prevImages) => {
+            const updatedImages = [...prevImages, ...newImages];
+            onImagesChange(updatedImages.map(img => img.file)); // Send updated file list
+            return updatedImages;
+        });
+    }, [onImagesChange]);
 
     // Handle image removal
     const handleRemoveImage = useCallback((index) => {
         setImages((prevImages) => {
             const updatedImages = prevImages.filter((_, i) => i !== index);
-            return updatedImages;
-        });
+            onImagesChange(updatedImages.map(img => img.file)); // Send updated file list
 
-        setTimeout(() => {
-            const removedImage = images[index];
+            // Cleanup object URL
+            const removedImage = prevImages[index];
             if (removedImage) {
                 URL.revokeObjectURL(removedImage.preview);
                 objectUrls.current.delete(removedImage.preview);
             }
-        }, 50);
-    }, [images]);
+            return updatedImages;
+        });
+    }, [onImagesChange]);
 
     // Close fullscreen image on ESC key press
     useEffect(() => {

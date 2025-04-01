@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 31, 2025 at 10:10 PM
+-- Generation Time: Apr 01, 2025 at 07:56 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -169,6 +169,9 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_property_add` (IN `p_title` VAR
         p_title, p_propertyTypeId, p_address, p_pricePerUnit, p_priceTypeId,
         p_measurementValue, p_measurementTypeId, p_statusId, p_ownerId, p_description, NOW(), NOW()
     );
+    
+    -- Get the last inserted ID and set it to the OUT parameter
+    SELECT LAST_INSERT_ID() AS id;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_property_delete` (IN `p_id` INT)   BEGIN
