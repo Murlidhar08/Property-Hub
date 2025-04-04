@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 04, 2025 at 04:03 PM
+-- Generation Time: Apr 04, 2025 at 07:50 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -231,13 +231,23 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_property_get_all` ()   BEGIN
         ms.name AS status,
         p.ownerId,
         o.name AS ownerName,
-        p.description
+        p.description,
+        pd.documentRelativePath AS image
     FROM properties p 
     LEFT JOIN masters mp ON p.propertyTypeId = mp.id
-    LEFT JOIN masters mpr on p.priceTypeId = mpr.id
-    LEFT JOIN masters mm on p.measurementTypeId = mm.id
-    LEFT JOIN masters ms on p.statusId = ms.id
-    LEFT JOIN owners o on p.ownerId = o.id;
+    LEFT JOIN masters mpr ON p.priceTypeId = mpr.id
+    LEFT JOIN masters mm ON p.measurementTypeId = mm.id
+    LEFT JOIN masters ms ON p.statusId = ms.id
+    LEFT JOIN owners o ON p.ownerId = o.id
+    LEFT JOIN (
+        SELECT pd1.propertyId, pd1.documentRelativePath
+        FROM propertydocuments pd1
+        INNER JOIN (
+            SELECT propertyId, MIN(id) AS min_id
+            FROM propertydocuments
+            GROUP BY propertyId
+        ) pd2 ON pd1.propertyId = pd2.propertyId AND pd1.id = pd2.min_id
+    ) pd ON pd.propertyId = p.id;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_property_get_by_id` (IN `p_id` INT)   BEGIN
@@ -257,14 +267,29 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_property_get_by_id` (IN `p_id` 
         ms.name AS status,
         p.ownerId,
         o.name AS ownerName,
-        p.description
-    FROM properties p 
-    LEFT JOIN masters mp ON p.propertyTypeId = mp.id
-    LEFT JOIN masters mpr on p.priceTypeId = mpr.id
-    LEFT JOIN masters mm on p.measurementTypeId = mm.id
-    LEFT JOIN masters ms on p.statusId = ms.id
-    LEFT JOIN owners o on p.ownerId = o.id
-    WHERE p.id = p_id;
+        p.description,
+        (
+            SELECT 
+                GROUP_CONCAT(pd.documentRelativePath SEPARATOR ',') 
+            FROM 
+                propertydocuments pd 
+            WHERE 
+                pd.propertyId = p.id
+        ) AS images
+    FROM 
+        properties p 
+    LEFT JOIN 
+        masters mp ON p.propertyTypeId = mp.id
+    LEFT JOIN 
+        masters mpr ON p.priceTypeId = mpr.id
+    LEFT JOIN 
+        masters mm ON p.measurementTypeId = mm.id
+    LEFT JOIN 
+        masters ms ON p.statusId = ms.id
+    LEFT JOIN 
+        owners o ON p.ownerId = o.id
+    WHERE 
+        p.id = p_id;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_property_update` (IN `p_id` INT, IN `p_title` VARCHAR(255), IN `p_propertyTypeId` INT, IN `p_address` VARCHAR(255), IN `p_pricePerUnit` DECIMAL(15,2), IN `p_priceTypeId` INT, IN `p_measurementValue` DECIMAL(10,2), IN `p_measurementTypeId` INT, IN `p_statusId` INT, IN `p_ownerId` INT, IN `p_description` TEXT)   BEGIN
@@ -768,7 +793,6 @@ CREATE TABLE `requirements` (
   `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
   `updatedAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
 -- --------------------------------------------------------
 
 --
@@ -840,9 +864,7 @@ ALTER TABLE `properties`
 -- Indexes for table `propertydocuments`
 --
 ALTER TABLE `propertydocuments`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `propertyId` (`propertyId`),
-  ADD KEY `documentTypeId` (`documentTypeId`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `requirements`
@@ -927,13 +949,6 @@ ALTER TABLE `userinfo`
 --
 -- Constraints for dumped tables
 --
-
---
--- Constraints for table `propertydocuments`
---
-ALTER TABLE `propertydocuments`
-  ADD CONSTRAINT `propertydocuments_ibfk_1` FOREIGN KEY (`propertyId`) REFERENCES `properties` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `propertydocuments_ibfk_2` FOREIGN KEY (`documentTypeId`) REFERENCES `masters` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `userinfo`
