@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 01, 2025 at 07:56 PM
+-- Generation Time: Apr 04, 2025 at 04:03 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -159,6 +159,44 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_owner_update` (IN `p_id` INT, I
         `address` = p_address,
         `description` = p_description
     WHERE `id` = p_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_propertydocument_create` (IN `p_documentRelativePaths` TEXT, IN `p_propertyId` INT, IN `p_documentTypeId` INT, IN `p_uploadedBy` INT)   BEGIN
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE docPath VARCHAR(500);
+    DECLARE cur CURSOR FOR 
+        SELECT TRIM(value) FROM (
+            SELECT SUBSTRING_INDEX(SUBSTRING_INDEX(p_documentRelativePaths, ',', numbers.n), ',', -1) AS value
+            FROM (SELECT 1 n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL 
+                  SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL 
+                  SELECT 9 UNION ALL SELECT 10) numbers
+            WHERE CHAR_LENGTH(p_documentRelativePaths) - CHAR_LENGTH(REPLACE(p_documentRelativePaths, ',', '')) >= numbers.n - 1
+        ) temp;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    OPEN cur;
+
+    read_loop: LOOP
+        FETCH cur INTO docPath;
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
+
+        INSERT INTO propertydocuments (documentRelativePath, propertyId, documentTypeId, uploadedBy)
+        VALUES (docPath, p_propertyId, p_documentTypeId, p_uploadedBy);
+    END LOOP;
+
+    CLOSE cur;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_propertydocument_delete` (IN `p_documentId` INT)   BEGIN
+    DELETE FROM propertydocuments WHERE id = p_documentId;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_propertydocument_get_by_propertyId` (IN `p_propertyId` INT)   BEGIN
+    SELECT id, documentRelativePath, fn_get_mastertype_name_by_id(documentTypeId) AS documentType
+    FROM propertydocuments
+    WHERE propertyId = p_propertyId;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_property_add` (IN `p_title` VARCHAR(255), IN `p_propertyTypeId` INT, IN `p_address` VARCHAR(255), IN `p_pricePerUnit` DECIMAL(15,2), IN `p_priceTypeId` INT, IN `p_measurementValue` DECIMAL(10,2), IN `p_measurementTypeId` INT, IN `p_statusId` INT, IN `p_ownerId` INT, IN `p_description` TEXT)   BEGIN
@@ -421,15 +459,6 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_userinfo_login` (IN `p_identifi
     WHERE userId = varUserId;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_userinfo_names_update` (IN `p_userId` INT, IN `p_firstName` VARCHAR(255), IN `p_lastName` VARCHAR(255), IN `p_username` VARCHAR(255))   BEGIN
-    UPDATE userinfo
-    SET 
-        firstName = p_firstName,
-        lastName = p_lastName,
-        username = p_username
-    WHERE userId = p_userId;
-END$$
-
 CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_userinfo_register` (IN `p_firstName` VARCHAR(100), IN `p_lastName` VARCHAR(100), IN `p_username` VARCHAR(100), IN `p_email` VARCHAR(255), IN `p_password` VARCHAR(255))   BEGIN
     DECLARE varUserId INT;
     DECLARE varRole INT;
@@ -468,6 +497,31 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_userinfo_update_password` (IN `
     UPDATE userinfo 
     SET password = p_password 
     WHERE email = p_email;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_userinfo_update_profile` (IN `p_userId` INT, IN `p_firstName` VARCHAR(100), IN `p_lastName` VARCHAR(100), IN `p_username` VARCHAR(100))   BEGIN
+    -- Check if the username is already used by another user
+    IF EXISTS (
+        SELECT 1 FROM userinfo WHERE username = p_username AND userId != p_userId
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Username already exists.';
+    ELSE
+        -- Update user details
+        UPDATE userinfo
+        SET
+            firstName = p_firstName,
+            lastName = p_lastName,
+            username = p_username
+        WHERE userId = p_userId;
+    END IF;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_userinfo_update_profile_picture` (IN `p_userId` INT, IN `p_profilePicture` VARCHAR(500))   BEGIN
+    -- Update profile picture for the user
+    UPDATE userinfo
+    SET profilePicture = p_profilePicture
+    WHERE userId = p_userId;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_userinfo_verify_user` (IN `p_email` VARCHAR(255))   BEGIN
@@ -608,7 +662,8 @@ INSERT INTO `masters` (`id`, `name`, `description`, `masterTypeId`, `createdAt`)
 (28, 'Hundred', 'Measurement unit of money', 8, '2025-03-29 12:23:14'),
 (29, 'Thousand', 'Measurement unit of money', 8, '2025-03-29 12:23:14'),
 (30, 'Lakh', 'Measurement unit of money', 8, '2025-03-29 12:23:14'),
-(31, 'Crore', 'Measurement unit of money', 8, '2025-03-29 12:23:14');
+(31, 'Crore', 'Measurement unit of money', 8, '2025-03-29 12:23:14'),
+(32, 'PropertyPreview', 'Type of property document', 9, '2025-04-03 00:57:31');
 
 -- --------------------------------------------------------
 
@@ -634,7 +689,8 @@ INSERT INTO `mastertypes` (`id`, `name`, `description`) VALUES
 (5, 'MeasurementType', 'Type of measurement'),
 (6, 'PropertyStatus', 'Defines the status of a property'),
 (7, 'PropertyFor', 'Defines whether a property is for sale or rent'),
-(8, 'PriceType', 'Type of price');
+(8, 'PriceType', 'Type of price'),
+(9, 'DocumentType', 'Type of document which is uploaded');
 
 -- --------------------------------------------------------
 
@@ -675,6 +731,20 @@ CREATE TABLE `properties` (
   `soldAt` timestamp NULL DEFAULT NULL,
   `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
   `updatedAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `propertydocuments`
+--
+
+CREATE TABLE `propertydocuments` (
+  `id` int(11) NOT NULL,
+  `documentRelativePath` varchar(500) NOT NULL,
+  `propertyId` int(11) NOT NULL,
+  `documentTypeId` int(11) NOT NULL,
+  `uploadedBy` int(11) NOT NULL,
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -767,6 +837,14 @@ ALTER TABLE `properties`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `propertydocuments`
+--
+ALTER TABLE `propertydocuments`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `propertyId` (`propertyId`),
+  ADD KEY `documentTypeId` (`documentTypeId`);
+
+--
 -- Indexes for table `requirements`
 --
 ALTER TABLE `requirements`
@@ -808,13 +886,13 @@ ALTER TABLE `expiredtokens`
 -- AUTO_INCREMENT for table `masters`
 --
 ALTER TABLE `masters`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT for table `mastertypes`
 --
 ALTER TABLE `mastertypes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `owners`
@@ -826,6 +904,12 @@ ALTER TABLE `owners`
 -- AUTO_INCREMENT for table `properties`
 --
 ALTER TABLE `properties`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `propertydocuments`
+--
+ALTER TABLE `propertydocuments`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -843,6 +927,13 @@ ALTER TABLE `userinfo`
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `propertydocuments`
+--
+ALTER TABLE `propertydocuments`
+  ADD CONSTRAINT `propertydocuments_ibfk_1` FOREIGN KEY (`propertyId`) REFERENCES `properties` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `propertydocuments_ibfk_2` FOREIGN KEY (`documentTypeId`) REFERENCES `masters` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `userinfo`

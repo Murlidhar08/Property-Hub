@@ -1,5 +1,8 @@
 const propertyService = require("../services/propertyService");
+const propertyDocumentService = require("../services/propertyDocumentService");
 const { moveMultipleFiles } = require("../config/fileOperations");
+const { getMastersIdByName } = require("../services/applicationService");
+const config = require("../config/config");
 
 // Utility function for validating property data
 const validatePropertyData = (data) => {
@@ -43,13 +46,12 @@ exports.addProperty = async (req, res) => {
         return res.status(400).json({ success: false, message: validationError });
     }
 
+    // Get file paths of uploaded images
+    const images = req.files ? req.files.map((file) => `/temp/${file.filename}`) : [];
 
     try {
         // Destructure the validated body data
         const { title, propertyTypeId, address, pricePerUnit, priceTypeId, measurementValue, measurementTypeId, statusId, ownerId, description } = req.body;
-
-        // Get file paths of uploaded images
-        const images = req.files ? req.files.map((file) => `/temp/${file.filename}`) : [];
 
         // Call service to insert property
         let propertyId = await propertyService.addProperty({
@@ -73,7 +75,13 @@ exports.addProperty = async (req, res) => {
         }
 
         // Add uploaded files to database with relative path
-        // DB OPERATION PENDING
+        let documentTypeId = await getMastersIdByName(config.PROPERTY_PREVIEW);
+        await propertyDocumentService.addPropertyDocuments({
+            documentRelativePaths: uploadedList.join(','),
+            propertyId: propertyId,
+            documentTypeId,
+            uploadedBy: req.user.userId
+        });
 
         return res.json({
             success: true,

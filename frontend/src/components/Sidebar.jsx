@@ -1,7 +1,11 @@
+// Packages
 import { useNavigate, useLocation } from "react-router-dom";
 import { LayoutDashboard, Fence, Users, GraduationCap, AlbumIcon, UserRoundCheck, MinusIcon, PlusIcon } from "lucide-react";
 import clsx from "clsx";
 import { useSelector } from "react-redux";
+
+// Utils
+import commonFunction from '../utils/commonFunction';
 
 const menuItems = [
   { name: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
@@ -59,8 +63,15 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
         >
           <img
             className="w-8 h-8 rounded-full ring-2 ring-gray-300 dark:ring-gray-500"
-            src={user.profilePicture || "/images/user.png"}
-            alt={user.username} />
+            src={
+              user.profilePicture
+                ? `${commonFunction.getDocumentPath(user.profilePicture)}?t=${new Date().getTime()}`
+                : "/images/user.png"
+            }
+            alt={user.username}
+            onError={(e) => { e.target.src = "/images/user.png" }}
+          />
+
           <span className={clsx(!isOpen && "hidden")}>Account</span>
         </div>
       </div>

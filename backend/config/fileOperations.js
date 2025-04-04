@@ -42,3 +42,28 @@ module.exports.moveMultipleFiles = (filesList, destinationDir) => {
         }
     });
 };
+
+module.exports.moveFilesWithRename = (source, destinationFolder, filename) => {
+    return new Promise((resolve, reject) => {
+        // Absolute source path
+        const sourcePath = path.join(__dirname, "../uploads", source);
+
+        // Get the extension from the source file
+        const fileExtension = path.extname(sourcePath);
+
+        // Construct the final destination path
+        const destinationPath = path.join(__dirname, "../uploads", destinationFolder, `${filename}${fileExtension}`);
+
+        // Ensure the destination directory exists
+        const destinationDir = path.dirname(destinationPath);
+        if (!fs.existsSync(destinationDir)) {
+            fs.mkdirSync(destinationDir, { recursive: true });
+        }
+
+        // Move and rename the file, overwrite if exists
+        fs.rename(sourcePath, destinationPath, (err) => {
+            if (err) return reject(err);
+            resolve(path.join(destinationFolder, `${filename}${fileExtension}`));
+        });
+    });
+};

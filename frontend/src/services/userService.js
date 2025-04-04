@@ -2,23 +2,19 @@ import API from "./api";
 
 const userService = {
     getAllUsers: async () => {
-        const response = await API.get("/users");
-        return response.data;
+        return await API.get("/users");
     },
 
     getUserById: async (id) => {
-        const response = await API.get(`/users/${id}`);
-        return response.data;
+        return await API.get(`/users/${id}`);
     },
 
     updateUserRole: async (id, role) => {
-        const response = await API.put(`/users/${id}/role`, { role });
-        return response.data;
+        return await API.put(`/users/${id}/role`, { role });
     },
 
     deleteUser: async (id) => {
-        const response = await API.delete(`/users/${id}`);
-        return response.data;
+        return await API.delete(`/users/${id}`);
     },
 };
 

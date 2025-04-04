@@ -108,7 +108,7 @@ export default function PropertyPage() {
                 {/* Image with Overlay */}
                 <div className="relative">
                   <img
-                    src={property.img || "https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"}
+                    src={property.img || "/images/property_image.png"}
                     alt={property.title}
                     className="w-full h-48 object-cover transition duration-300 hover:opacity-90"
                   />

@@ -1,4 +1,5 @@
 const accountService = require("../services/accountService");
+const { moveFilesWithRename } = require("../config/fileOperations");
 
 // Utility function for validating user data
 const validateUserData = (data) => {
@@ -46,6 +47,31 @@ exports.updateUserInfo = async (req, res) => {
         return res.json({
             success: true,
             message: "User information updated successfully."
+        });
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: err.sqlMessage || err.message,
+        });
+    }
+};
+
+// Update Profile iamge
+exports.updateProfileImage = async (req, res) => {
+    try {
+        const userId = req.user.userId;
+        const images = req.files ? `/temp/${req.files[0].filename}` : '';
+
+        // Move file to users location
+        let profilePicture = await moveFilesWithRename(images, '/profile/', userId);
+        let status = await accountService.updateUserProfilePicture({
+            userId,
+            profilePicture
+        })
+
+        return res.json({
+            success: !!status,
+            message: "User profile updated successfully."
         });
     } catch (err) {
         return res.status(500).json({
