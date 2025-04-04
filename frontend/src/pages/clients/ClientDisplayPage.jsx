@@ -64,6 +64,12 @@ export default function ClientDisplayPage() {
                             {client?.contact}
                         </a>
                     </div>
+                    {client?.email && (
+                        <div>
+                            <h4 className="font-semibold">Email Address</h4>
+                            <a className="text-blue-600 underline" href={`mailto:${client?.email}`}>{client?.email}</a>
+                        </div>
+                    )}
                     <div>
                         <h4 className="font-semibold">Address</h4>
                         <p className="text-gray-700">{client?.address}</p>
