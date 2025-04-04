@@ -1,9 +1,14 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Pencil, Trash2, ArrowLeft } from "lucide-react";
-import propertyService from "@/services/propertyService";
 import { toast } from "react-toastify";
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from "@mui/material";
+
+// Components
+import ImageCarousel from "@/components/ImageCarousel";
+
+// Services
+import propertyService from "@/services/propertyService";
 
 export default function PropertyDisplayPage() {
   const { id } = useParams();
@@ -45,20 +50,26 @@ export default function PropertyDisplayPage() {
           </Link>
         </div>
 
-        {/* Property Details */}
-        <div className="flex items-center border-t pt-4 space-x-4">
-          <img
+        <div className="flex items-center border-t border-b py-4 space-x-4">
+          {/* <img
             src={property?.image || "/images/owner.png"}
             alt={property?.title}
             className="w-32 h-32 rounded-md object-cover border"
-          />
+          /> */}
+
           <div>
             <h3 className="text-2xl font-semibold">{property?.title}</h3>
             <p className="text-gray-500">{property?.propertyType}</p>
           </div>
         </div>
 
-        <div className="mt-6 border-t pt-4 space-y-4 flex-grow">
+        {/* images */}
+        <div className="p-8">
+          <ImageCarousel images={property?.images?.split(',')} />
+        </div>
+
+        {/* Property Details */}
+        <div className="mt-6 space-y-4 flex-grow">
           {/* Address */}
           <div>
             <h4 className="font-semibold">Address</h4>
@@ -78,6 +89,14 @@ export default function PropertyDisplayPage() {
             <h4 className="font-semibold">Measurement</h4>
             <p className="text-gray-700">
               {property?.measurementValue} {property?.measurementType}
+            </p>
+          </div>
+
+          {/* Total price calculation */}
+          <div>
+            <h4 className="font-semibold">Total Price</h4>
+            <p className="text-gray-700">
+              {property?.measurementValue * property?.pricePerUnit} {property?.priceType}
             </p>
           </div>
 

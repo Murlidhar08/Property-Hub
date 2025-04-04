@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Plus, Grid, List, MapPin, Ruler, IndianRupee } from "lucide-react";
 import { Link } from "react-router-dom";
 import propertyService from "@/services/propertyService";
+import commonFunction from '../../utils/commonFunction';
 
 export default function PropertyPage() {
   const [properties, setProperties] = useState([]);
@@ -108,7 +109,7 @@ export default function PropertyPage() {
                 {/* Image with Overlay */}
                 <div className="relative">
                   <img
-                    src={property.img || "/images/property_image.png"}
+                    src={commonFunction.getDocumentPath(property.image) || "/images/property_image.png"}
                     alt={property.title}
                     className="w-full h-48 object-cover transition duration-300 hover:opacity-90"
                   />
