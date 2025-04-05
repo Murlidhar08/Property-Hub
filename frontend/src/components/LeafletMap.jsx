@@ -1,70 +1,33 @@
-import React, { useState, useRef, useMemo, useCallback } from "react";
-// import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-// import "leaflet/dist/leaflet.css";
+// src/components/LeafletMap.jsx
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+import { useEffect } from 'react';
 
-const center = {
-  lat: 51.505,
-  lng: -0.09,
-};
+// Fix Leaflet default icon issue in some builds
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
 
-const DraggableMarker = () => {
-  const [draggable, setDraggable] = useState(false);
-  const [position, setPosition] = useState(center);
-  const markerRef = useRef(null);
-
-  const eventHandlers = useMemo(
-    () => ({
-      dragend() {
-        const marker = markerRef.current;
-        if (marker != null) {
-          setPosition(marker.getLatLng());
-        }
-      },
-    }),
-    []
-  );
-
-  const toggleDraggable = useCallback(() => {
-    setDraggable((d) => !d);
+export default function LeafletMap({ center = [27.700769, 85.300140], zoom = 13, markerText = "Here I am!" }) {
+  useEffect(() => {
+    
   }, []);
 
   return (
-    <></>
-    // <Marker
-    //   draggable={draggable}
-    //   eventHandlers={eventHandlers}
-    //   position={position}
-    //   ref={markerRef}
-    // >
-    //   <Popup minWidth={90}>
-    //     <span onClick={toggleDraggable}>
-    //       {draggable
-    //         ? "Marker is draggable"
-    //         : "Click here to make marker draggable"}
-    //     </span>
-    //   </Popup>
-    // </Marker>
+    <div className="w-full h-96 rounded-lg shadow">
+      <MapContainer center={center} zoom={zoom} scrollWheelZoom={false} className="w-full h-full z-0">
+        <TileLayer
+          attribution='&copy; <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        <Marker position={center}>
+          <Popup>{markerText}</Popup>
+        </Marker>
+      </MapContainer>
+    </div>
   );
-};
-
-const LeafletMap = () => {
-  return (
-    <>
-      <h1>Map</h1>
-    </>
-    // <MapContainer
-    //   center={center}
-    //   zoom={13}
-    //   scrollWheelZoom={false}
-    //   style={{ height: "500px", width: "100%" }}
-    // >
-    //   <TileLayer
-    //     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    //     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-    //   />
-    //   <DraggableMarker />
-    // </MapContainer>
-  );
-};
-
-export default LeafletMap;
+}

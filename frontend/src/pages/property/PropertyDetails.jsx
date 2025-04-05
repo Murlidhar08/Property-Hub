@@ -9,6 +9,7 @@ import ImageCarousel from "@/components/ImageCarousel";
 
 // Services
 import propertyService from "@/services/propertyService";
+import LeafletMap from '@/components/LeafletMap';
 
 export default function PropertyDisplayPage() {
   const { id } = useParams();
@@ -51,12 +52,6 @@ export default function PropertyDisplayPage() {
         </div>
 
         <div className="flex items-center border-t border-b py-4 space-x-4">
-          {/* <img
-            src={property?.image || "/images/owner.png"}
-            alt={property?.title}
-            className="w-32 h-32 rounded-md object-cover border"
-          /> */}
-
           <div>
             <h3 className="text-2xl font-semibold">{property?.title}</h3>
             <p className="text-gray-500">{property?.propertyType}</p>
@@ -124,6 +119,9 @@ export default function PropertyDisplayPage() {
               <div className="text-gray-700 border p-2" dangerouslySetInnerHTML={{ __html: property.description }} />
             </div>
           )}
+
+          {/* MAP */}
+          <LeafletMap />
         </div>
 
         {/* Action Buttons */}

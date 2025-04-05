@@ -2,8 +2,8 @@ import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 
 // Styles
-import "./styles/App.css";
-import "react-toastify/dist/ReactToastify.css";
+import './styles/App.css';
+import 'react-toastify/dist/ReactToastify.css';
 
 // Authentication
 import Login from "./pages/authentication/Login";
