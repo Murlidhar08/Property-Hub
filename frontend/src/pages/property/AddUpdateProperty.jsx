@@ -36,6 +36,7 @@ export default function AddUpdatePropertyPage() {
         statusId: "",
         ownerId: "",
         description: "",
+        mapDetails: {},
         images: []
     });
 
@@ -72,10 +73,20 @@ export default function AddUpdatePropertyPage() {
         if (!isEditing) return;
         propertyService.getPropertyById(id)
             .then(res => {
-                setPropertyDetails(res.property);
+                // Location details
+                if (res.property.mapDetails) {
+                    setHasLocation(true);
 
-                if (res.property.ownerId)
-                    setHasOwner(true);
+                    // Deserialize map details
+                    res.property.mapDetails = JSON.parse(res.property.mapDetails);
+                }
+                else
+                    res.property.mapDetails = {};
+
+                // Owner
+                if (res.property.ownerId) setHasOwner(true);
+
+                setPropertyDetails(res.property);
             })
             .catch(err => {
                 console.error(err);
@@ -95,6 +106,7 @@ export default function AddUpdatePropertyPage() {
     };
 
     const handleReset = () => {
+        // Reset the form fields to their initial state
         setPropertyDetails({
             title: "",
             propertyTypeId: "",
@@ -106,8 +118,13 @@ export default function AddUpdatePropertyPage() {
             statusId: "",
             ownerId: "",
             description: "",
+            mapDetails: {},
             images: []
         })
+
+        // Reset the checkboxes
+        setHasOwner(false);
+        setHasLocation(false);
     };
 
     const handleSubmit = async (e) => {
@@ -270,8 +287,9 @@ export default function AddUpdatePropertyPage() {
                         <LeafletMap
                             zoomLevel={7}
                             coordinates={{ lat: 22.085639901650328, lng: 69.27978515625001 }}
-                            onLocationSelect={({ lat, lng, zoom }) => {
-                                console.log("Selected:", lat, lng, "Zoom:", zoom);
+                            onLocationSelect={(data) => {
+                                console.log("Clicked: ", data);
+                                // setPropertyDetails({ ...propertyDetails, "mapDetails": data });
                             }}
                         />
                     </div>

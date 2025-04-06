@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 04, 2025 at 07:50 PM
+-- Generation Time: Apr 06, 2025 at 07:39 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -751,6 +751,7 @@ CREATE TABLE `properties` (
   `measurementTypeId` int(11) NOT NULL,
   `statusId` int(11) NOT NULL,
   `ownerId` int(11) DEFAULT NULL,
+  `mapDetails` varchar(500) DEFAULT NULL,
   `description` text DEFAULT NULL,
   `soldTo` int(11) DEFAULT NULL,
   `soldAt` timestamp NULL DEFAULT NULL,
