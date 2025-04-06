@@ -129,6 +129,7 @@ export default function LeafletMap({
 
       {/* Search Toggle Button */}
       <button
+        type='button'
         onClick={() => setShowSearch(!showSearch)}
         className="absolute top-4 right-4 z-[9999] bg-white p-2 rounded-full shadow hover:scale-105 transition"
       >
@@ -151,6 +152,7 @@ export default function LeafletMap({
             }}
           />
           <button
+            type="button"
             onClick={handleSearch}
             disabled={loading}
             className="text-blue-600 hover:underline disabled:text-gray-400"
