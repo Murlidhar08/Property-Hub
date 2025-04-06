@@ -1,12 +1,18 @@
+// Packages
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { toast } from "react-toastify";
+
+// Services
 import propertyService from "@/services/propertyService";
 import applicationService from "@/services/applicationService";
 import ownerService from "@/services/ownerService";
 import QuillEditor from "@/components/QuillEditor";
 import ImageUploadZone from "@/components/ImageUploadZone";
+
+// Components
+import LeafletMap from "@/components/LeafletMap";
 
 export default function AddUpdatePropertyPage() {
     const navigate = useNavigate();
@@ -18,6 +24,7 @@ export default function AddUpdatePropertyPage() {
     const [propertyStatus, setPropertyStatus] = useState([]);
     const [owners, setOwners] = useState([]);
     const [hasOwner, setHasOwner] = useState(false);
+    const [hasLocation, setHasLocation] = useState(false);
     const [propertyDetails, setPropertyDetails] = useState({
         title: "",
         propertyTypeId: "",
@@ -249,6 +256,26 @@ export default function AddUpdatePropertyPage() {
                         value={propertyDetails.description}
                         onChange={handleQuillEditorChange} />
                 </div>
+
+                {/* Location */}
+                <div>
+                    <label className="block text-sm font-medium mb-1">Has Location</label>
+                    <input type="checkbox" checked={hasLocation} onChange={() => setHasLocation(!hasLocation)} />
+                </div>
+                {hasLocation && (
+                    <div>
+                        <label className="block text-sm font-medium mb-1">Location</label>
+
+                        {/* Map location */}
+                        <LeafletMap
+                            zoomLevel={7}
+                            coordinates={{ lat: 22.085639901650328, lng: 69.27978515625001 }}
+                            onLocationSelect={({ lat, lng, zoom }) => {
+                                console.log("Selected:", lat, lng, "Zoom:", zoom);
+                            }}
+                        />
+                    </div>
+                )}
 
                 {/* Action buttons */}
                 <div className="flex justify-end space-x-2 pt-4 mt-auto bg-white py-4 w-full sticky bottom-0">

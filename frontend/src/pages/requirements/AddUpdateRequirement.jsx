@@ -1,7 +1,10 @@
+// Packages
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { toast } from "react-toastify";
+
+// Services
 import requirementService from "@/services/requirementService";
 import clientService from "@/services/clientService";
 import applicationService from "@/services/applicationService";

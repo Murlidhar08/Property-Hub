@@ -5,7 +5,7 @@ import {
   useMapEvents,
   useMap,
 } from "react-leaflet";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { Search } from "lucide-react";
@@ -20,11 +20,12 @@ const markerIcon = new L.Icon({
 });
 
 const LocationMarker = ({ onClick, readOnly = true }) => {
-  useMapEvents({
+  const map = useMapEvents({
     click(e) {
       if (readOnly) return;
       const { lat, lng } = e.latlng;
-      onClick({ lat, lng });
+      const zoom = map.getZoom();
+      onClick({ lat, lng, zoom });
     },
   });
   return null;
@@ -32,21 +33,35 @@ const LocationMarker = ({ onClick, readOnly = true }) => {
 
 const MapController = ({ mapRef }) => {
   const map = useMap();
-  mapRef.current = map;
+  useEffect(() => {
+    mapRef.current = map;
+  }, [map]);
   return null;
 };
 
-export default function LeafletMap({ onLocationSelect, readOnly = false }) {
-  const [position, setPosition] = useState({ lat: 27.7172, lng: 85.324 });
+export default function LeafletMap({
+  onLocationSelect,
+  readOnly = false,
+  zoomLevel = 13, // ✅ Accept zoom as prop
+  coordinates = { lat: 27.7172, lng: 85.324 } // Optional prop for initial center
+}) {
+  const [position, setPosition] = useState(coordinates);
+  const [zoom, setZoom] = useState(zoomLevel);
   const [showSearch, setShowSearch] = useState(false);
   const [loading, setLoading] = useState(false);
   const searchRef = useRef(null);
   const mapRef = useRef(null);
 
-  const handleMapClick = (coords) => {
+  useEffect(() => {
+    setPosition(coordinates);
+    setZoom(zoomLevel);
+  }, [coordinates, zoomLevel]);
+
+  const handleMapClick = ({ lat, lng, zoom }) => {
     if (readOnly) return;
-    setPosition(coords);
-    onLocationSelect?.(coords);
+    setPosition({ lat, lng });
+    setZoom(zoom);
+    onLocationSelect?.({ lat, lng, zoom }); // ✅ Return zoom with coords
   };
 
   const handleSearch = async () => {
@@ -68,9 +83,7 @@ export default function LeafletMap({ onLocationSelect, readOnly = false }) {
         const { lat, lon, boundingbox } = result;
         const newCoords = { lat: parseFloat(lat), lng: parseFloat(lon) };
         setPosition(newCoords);
-        onLocationSelect?.(newCoords);
 
-        // If bounding box exists, use it to fit map bounds
         if (boundingbox && mapRef.current) {
           const bounds = [
             [parseFloat(boundingbox[0]), parseFloat(boundingbox[2])], // SouthWest
@@ -78,9 +91,12 @@ export default function LeafletMap({ onLocationSelect, readOnly = false }) {
           ];
           mapRef.current.fitBounds(bounds);
         } else {
-          // Fallback if no bounding box
-          mapRef.current.setView(newCoords, 13);
+          mapRef.current.setView(newCoords, zoomLevel);
         }
+
+        const currentZoom = mapRef.current.getZoom();
+        setZoom(currentZoom);
+        onLocationSelect?.({ ...newCoords, zoom: currentZoom }); // ✅ Include zoom
       }
     } catch (err) {
       console.error("Search failed:", err);
@@ -93,7 +109,7 @@ export default function LeafletMap({ onLocationSelect, readOnly = false }) {
     <div className="relative w-full h-96 rounded-lg overflow-hidden shadow">
       <MapContainer
         center={position}
-        zoom={13}
+        zoom={zoom}
         scrollWheelZoom={true}
         className="w-full h-full"
       >
