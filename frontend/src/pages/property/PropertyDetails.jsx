@@ -121,7 +121,11 @@ export default function PropertyDisplayPage() {
           )}
 
           {/* MAP */}
-          <LeafletMap />
+          <LeafletMap
+            onLocationSelect={(coords) => {
+              console.log("Clicked coordinates:", coords);
+            }}
+          />
         </div>
 
         {/* Action Buttons */}
