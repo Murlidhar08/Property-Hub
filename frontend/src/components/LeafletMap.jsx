@@ -57,16 +57,30 @@ export default function LeafletMap({ onLocationSelect, readOnly = false }) {
 
     try {
       const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${query}`
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+          query
+        )}`
       );
       const data = await res.json();
 
       if (data.length > 0) {
-        const { lat, lon } = data[0];
+        const result = data[0];
+        const { lat, lon, boundingbox } = result;
         const newCoords = { lat: parseFloat(lat), lng: parseFloat(lon) };
         setPosition(newCoords);
         onLocationSelect?.(newCoords);
-        mapRef.current?.setView(newCoords, mapRef.current.getZoom());
+
+        // If bounding box exists, use it to fit map bounds
+        if (boundingbox && mapRef.current) {
+          const bounds = [
+            [parseFloat(boundingbox[0]), parseFloat(boundingbox[2])], // SouthWest
+            [parseFloat(boundingbox[1]), parseFloat(boundingbox[3])], // NorthEast
+          ];
+          mapRef.current.fitBounds(bounds);
+        } else {
+          // Fallback if no bounding box
+          mapRef.current.setView(newCoords, 13);
+        }
       }
     } catch (err) {
       console.error("Search failed:", err);
