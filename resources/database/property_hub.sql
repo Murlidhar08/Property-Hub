@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 09, 2025 at 07:41 AM
+-- Generation Time: Apr 09, 2025 at 02:44 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -605,8 +605,8 @@ DELIMITER ;
 -- Table structure for table `agents`
 --
 
-CREATE TABLE `agents` (
-  `id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `agents` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `contact` varchar(20) NOT NULL,
   `email` varchar(255) DEFAULT NULL,
@@ -614,15 +614,18 @@ CREATE TABLE `agents` (
   `area` varchar(255) NOT NULL,
   `image` varchar(255) DEFAULT NULL,
   `description` text DEFAULT NULL,
-  `createdAt` timestamp NOT NULL DEFAULT current_timestamp()
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
 
 --
 -- Table structure for table `clients`
 --
 
-CREATE TABLE `clients` (
-  `id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `clients` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `contact` varchar(20) NOT NULL,
   `email` varchar(255) DEFAULT NULL,
@@ -630,36 +633,44 @@ CREATE TABLE `clients` (
   `occupation` varchar(255) DEFAULT NULL,
   `image` varchar(255) DEFAULT NULL,
   `description` text DEFAULT NULL,
-  `createdAt` timestamp NOT NULL DEFAULT current_timestamp()
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
 
 --
 -- Table structure for table `expiredtokens`
 --
 
-CREATE TABLE `expiredtokens` (
-  `id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `expiredtokens` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `tokenHash` char(64) NOT NULL,
-  `expiresAt` int(11) NOT NULL
+  `expiresAt` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `tokenHash` (`tokenHash`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
 
 --
 -- Table structure for table `masters`
 --
 
-CREATE TABLE `masters` (
-  `id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `masters` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `description` text DEFAULT NULL,
   `masterTypeId` int(11) NOT NULL,
-  `createdAt` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `masters`
 --
 
-INSERT INTO `masters` (`id`, `name`, `description`, `masterTypeId`, `createdAt`) VALUES
+INSERT IGNORE INTO `masters` (`id`, `name`, `description`, `masterTypeId`, `createdAt`) VALUES
 (1, 'Local', 'Standard email/password authentication', 1, '2025-03-25 11:16:39'),
 (2, 'Google', 'OAuth authentication via Google', 1, '2025-03-25 11:16:39'),
 (3, 'Facebook', 'OAuth authentication via Facebook', 1, '2025-03-25 11:16:39'),
@@ -699,17 +710,19 @@ INSERT INTO `masters` (`id`, `name`, `description`, `masterTypeId`, `createdAt`)
 -- Table structure for table `mastertypes`
 --
 
-CREATE TABLE `mastertypes` (
-  `id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `mastertypes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
-  `description` text DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `description` text DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `mastertypes`
 --
 
-INSERT INTO `mastertypes` (`id`, `name`, `description`) VALUES
+INSERT IGNORE INTO `mastertypes` (`id`, `name`, `description`) VALUES
 (1, 'AuthenticationProvider', 'Defines third-party login providers'),
 (2, 'Role', 'Defines user roles in the application'),
 (3, 'UserStatus', 'Defines different statuses for user accounts'),
@@ -726,15 +739,16 @@ INSERT INTO `mastertypes` (`id`, `name`, `description`) VALUES
 -- Table structure for table `owners`
 --
 
-CREATE TABLE `owners` (
-  `id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `owners` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `contact` varchar(20) NOT NULL,
   `email` varchar(255) DEFAULT NULL,
   `address` varchar(500) NOT NULL,
   `image` varchar(255) DEFAULT NULL,
   `description` text DEFAULT NULL,
-  `createdAt` timestamp NOT NULL DEFAULT current_timestamp()
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -743,8 +757,8 @@ CREATE TABLE `owners` (
 -- Table structure for table `properties`
 --
 
-CREATE TABLE `properties` (
-  `id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `properties` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(255) NOT NULL,
   `propertyTypeId` int(11) NOT NULL,
   `address` varchar(255) NOT NULL,
@@ -759,29 +773,34 @@ CREATE TABLE `properties` (
   `soldTo` int(11) DEFAULT NULL,
   `soldAt` timestamp NULL DEFAULT NULL,
   `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 -- --------------------------------------------------------
 
 --
 -- Table structure for table `propertydocuments`
 --
 
-CREATE TABLE `propertydocuments` (
-  `id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `propertydocuments` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `documentRelativePath` varchar(500) NOT NULL,
   `propertyId` int(11) NOT NULL,
   `documentTypeId` int(11) NOT NULL,
   `uploadedBy` int(11) NOT NULL,
-  `createdAt` timestamp NOT NULL DEFAULT current_timestamp()
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
 
 --
 -- Table structure for table `requirements`
 --
 
-CREATE TABLE `requirements` (
-  `id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `requirements` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(255) NOT NULL,
   `requirementTypeId` int(11) NOT NULL,
   `location` varchar(255) NOT NULL,
@@ -795,16 +814,18 @@ CREATE TABLE `requirements` (
   `clientId` int(11) NOT NULL,
   `description` text DEFAULT NULL,
   `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 -- --------------------------------------------------------
 
 --
 -- Table structure for table `userinfo`
 --
 
-CREATE TABLE `userinfo` (
-  `userId` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `userinfo` (
+  `userId` int(11) NOT NULL AUTO_INCREMENT,
   `firstName` varchar(255) NOT NULL,
   `lastName` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
@@ -817,138 +838,15 @@ CREATE TABLE `userinfo` (
   `roleId` int(11) NOT NULL,
   `status` int(11) NOT NULL DEFAULT 1,
   `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`userId`),
+  UNIQUE KEY `email` (`email`),
+  UNIQUE KEY `username` (`username`),
+  UNIQUE KEY `provider_uid_unique` (`providerTypeId`,`providerUid`),
+  KEY `users_ibfk_1` (`roleId`),
+  CONSTRAINT `fk_users_provider` FOREIGN KEY (`providerTypeId`) REFERENCES `masters` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_users_role` FOREIGN KEY (`roleId`) REFERENCES `masters` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Indexes for table `agents`
---
-ALTER TABLE `agents`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `clients`
---
-ALTER TABLE `clients`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `expiredtokens`
---
-ALTER TABLE `expiredtokens`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `tokenHash` (`tokenHash`);
-
---
--- Indexes for table `masters`
---
-ALTER TABLE `masters`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `mastertypes`
---
-ALTER TABLE `mastertypes`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `name` (`name`);
-
---
--- Indexes for table `owners`
---
-ALTER TABLE `owners`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `properties`
---
-ALTER TABLE `properties`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `propertydocuments`
---
-ALTER TABLE `propertydocuments`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `requirements`
---
-ALTER TABLE `requirements`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `userinfo`
---
-ALTER TABLE `userinfo`
-  ADD PRIMARY KEY (`userId`),
-  ADD UNIQUE KEY `email` (`email`),
-  ADD UNIQUE KEY `username` (`username`),
-  ADD UNIQUE KEY `provider_uid_unique` (`providerTypeId`,`providerUid`),
-  ADD KEY `users_ibfk_1` (`roleId`);
-
---
--- AUTO_INCREMENT for dumped tables
---
-
---
--- AUTO_INCREMENT for table `agents`
---
-ALTER TABLE `agents`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `clients`
---
-ALTER TABLE `clients`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `expiredtokens`
---
-ALTER TABLE `expiredtokens`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `masters`
---
-ALTER TABLE `masters`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
-
---
--- AUTO_INCREMENT for table `mastertypes`
---
-ALTER TABLE `mastertypes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
-
---
--- AUTO_INCREMENT for table `owners`
---
-ALTER TABLE `owners`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `properties`
---
-ALTER TABLE `properties`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `propertydocuments`
---
-ALTER TABLE `propertydocuments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `requirements`
---
-ALTER TABLE `requirements`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `userinfo`
---
-ALTER TABLE `userinfo`
-  MODIFY `userId` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- Constraints for dumped tables
