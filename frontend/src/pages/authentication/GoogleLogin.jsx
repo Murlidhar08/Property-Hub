@@ -1,30 +1,42 @@
+// Packages
 import { useGoogleLogin } from "@react-oauth/google";
-import authService from "@/services/authService";
 import { useNavigate } from 'react-router-dom';
-
 import { FaGoogle } from "react-icons/fa";
 import { motion } from "framer-motion";
+import { toast } from 'react-toastify';
 
-// Redux
-import { useDispatch } from "react-redux";
-import { setUser, setToken } from "@/redux/slices/userSlice";
+// Services
+import authService from "@/services/authService";
 
 const GoolgeLogin = () => {
     const navigate = useNavigate();
-    const dispatch = useDispatch();
     const responseGoogle = async (authResult) => {
         try {
             if (authResult["code"]) {
+                // Clear previous token
+                localStorage.clear("token");
+
+                // Call the login function with the authResult code
                 const result = await authService.googleLogin(authResult.code);
 
-                // Set User details here
-                dispatch(setUser(result.user));
+                if (result.success) {
+                    toast.success("Login successful! Redirecting...");
 
-                // set Token here
-                dispatch(setToken(result.token));
+                    // Set token
+                    if (result.token)
+                        localStorage.setItem("token", result.token);
 
-                navigate('/dashboard');
+                    // navigate to dashboard with hard refresh
+                    window.location.href = '/';
+                }
+                else if (result.message == 'pendingVerification') {
+                    navigate("/pending-verification");
+                }
+                else if (result.message == 'pendingApproval') {
+                    navigate("/pending-approval");
+                }
             } else {
+                toast.error("Login failed. Please try again.");
                 console.log(authResult);
                 throw new Error(authResult);
             }

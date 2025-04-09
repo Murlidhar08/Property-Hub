@@ -32,15 +32,19 @@ export default function Login() {
         return;
       }
 
+      // Remove previous token if exists
+      if (localStorage.getItem('token'))
+        localStorage.clear("token");
+
+      // Request to login
       const response = await authService.login({ identifier, password });
 
-      // Set token
-      if (response.token)
-        localStorage.setItem("token", response.token);
-
       if (response.success) {
-
         toast.success("Login successful! Redirecting...");
+
+        // Set token
+        if (response.token)
+          localStorage.setItem("token", response.token);
 
         // navigate to dashboard with hard refresh
         window.location.href = '/';

@@ -127,7 +127,7 @@ exports.getProfile = async (req, res) => {
         if (user.status == val) {
             return res.json({
                 success: false,
-                message: 'pendingApproval'                
+                message: 'pendingApproval'
             });
         }
 
@@ -167,10 +167,18 @@ exports.googleLogin = async (req, res, next) => {
         let user = await authService.googleAuthLogin(addUser);
         const token = generateUserToken(user);
 
+        // Validate for Approval
+        let val = await applicationService.getMastersIdByName('pendingApproval');
+        if (user.status == val) {
+            return res.json({
+                success: false,
+                message: 'pendingApproval'
+            });
+        }
+
         res.status(200).json({
             success: true,
             token,
-            user: getUserDetails(user),
         });
     } catch (err) {
         res.status(500).json({
