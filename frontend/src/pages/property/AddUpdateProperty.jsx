@@ -143,7 +143,11 @@ export default function AddUpdatePropertyPage() {
                 propertyDetails.images.forEach((image) => {
                     formData.append("files", image); // Append each image
                 });
-            } else {
+            }
+            if (key === "mapDetails") {
+                formData.append(key, JSON.stringify(propertyDetails[key])); // Append map details as string
+            }
+            else {
                 formData.append(key, propertyDetails[key]);
             }
         });
@@ -285,11 +289,11 @@ export default function AddUpdatePropertyPage() {
 
                         {/* Map location */}
                         <LeafletMap
-                            zoomLevel={7}
-                            coordinates={{ lat: 22.085639901650328, lng: 69.27978515625001 }}
+                            zoom={propertyDetails?.mapDetails?.zoom || 10}
+                            coordinates={{ lat: propertyDetails?.mapDetails?.lat, lng: propertyDetails?.mapDetails?.lng }}
                             onLocationSelect={(data) => {
                                 console.log("Clicked: ", data);
-                                // setPropertyDetails({ ...propertyDetails, "mapDetails": data });
+                                setPropertyDetails({ ...propertyDetails, "mapDetails": data });
                             }}
                         />
                     </div>

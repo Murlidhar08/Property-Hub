@@ -1,11 +1,11 @@
 const db = require("../lib/mySql");
 
 // Add Property
-exports.addProperty = async ({ title, propertyTypeId, address, pricePerUnit, priceTypeId, measurementValue, measurementTypeId, statusId, ownerId, description }) => {
+exports.addProperty = async ({ title, propertyTypeId, address, pricePerUnit, priceTypeId, measurementValue, measurementTypeId, statusId, ownerId, mapDetails, description }) => {
     return new Promise((resolve, reject) => {
         db.query(
-            "CALL usp_property_add(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            [title, propertyTypeId, address, pricePerUnit, priceTypeId, measurementValue, measurementTypeId, statusId, ownerId, description],
+            "CALL usp_property_add(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            [title, propertyTypeId, address, pricePerUnit, priceTypeId, measurementValue, measurementTypeId, statusId, ownerId, mapDetails, description],
             (err, results) => {
                 if (err) return reject(err);
 
@@ -42,11 +42,11 @@ exports.getPropertyById = async (id) => {
 };
 
 // Update property
-exports.updateProperty = async ({ id, title, propertyTypeId, address, pricePerUnit, priceTypeId, measurementValue, measurementTypeId, statusId, ownerId, description }) => {
+exports.updateProperty = async ({ id, title, propertyTypeId, address, pricePerUnit, priceTypeId, measurementValue, measurementTypeId, statusId, ownerId, mapDetails, description }) => {
     return new Promise((resolve, reject) => {
         db.query(
-            "CALL usp_property_update(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            [id, title, propertyTypeId, address, pricePerUnit, priceTypeId, measurementValue, measurementTypeId, statusId, ownerId, description],
+            "CALL usp_property_update(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            [id, title, propertyTypeId, address, pricePerUnit, priceTypeId, measurementValue, measurementTypeId, statusId, ownerId, mapDetails, description],
             (err, results) => {
                 if (err) return reject(err);
 

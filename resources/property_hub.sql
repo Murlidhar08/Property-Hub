@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 06, 2025 at 07:39 AM
+-- Generation Time: Apr 09, 2025 at 07:41 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -151,12 +151,13 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_owner_get_by_id` (IN `p_id` INT
     SELECT * FROM `owners` WHERE `id` = p_id;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_owner_update` (IN `p_id` INT, IN `p_name` VARCHAR(255), IN `p_contact` VARCHAR(20), IN `p_email` VARCHAR(255), IN `p_address` VARCHAR(500), IN `p_description` TEXT)   BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_owner_update` (IN `p_id` INT, IN `p_name` VARCHAR(255), IN `p_contact` VARCHAR(20), IN `p_email` VARCHAR(255), IN `p_address` VARCHAR(500), IN `p_mapDetails` VARCHAR(500), IN `p_description` TEXT)   BEGIN
     UPDATE `owners`
     SET `name` = p_name,
         `contact` = p_contact,
         `email` = p_email,
         `address` = p_address,
+        `mapDetails` = p_mapDetails,
         `description` = p_description
     WHERE `id` = p_id;
 END$$
@@ -199,13 +200,13 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_propertydocument_get_by_propert
     WHERE propertyId = p_propertyId;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_property_add` (IN `p_title` VARCHAR(255), IN `p_propertyTypeId` INT, IN `p_address` VARCHAR(255), IN `p_pricePerUnit` DECIMAL(15,2), IN `p_priceTypeId` INT, IN `p_measurementValue` DECIMAL(10,2), IN `p_measurementTypeId` INT, IN `p_statusId` INT, IN `p_ownerId` INT, IN `p_description` TEXT)   BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_property_add` (IN `p_title` VARCHAR(255), IN `p_propertyTypeId` INT, IN `p_address` VARCHAR(255), IN `p_pricePerUnit` DECIMAL(15,2), IN `p_priceTypeId` INT, IN `p_measurementValue` DECIMAL(10,2), IN `p_measurementTypeId` INT, IN `p_statusId` INT, IN `p_ownerId` INT, IN `p_mapDetails` VARCHAR(255), IN `p_description` TEXT)   BEGIN
     INSERT INTO properties (
         title, propertyTypeId, address, pricePerUnit, priceTypeId,
-        measurementValue, measurementTypeId, statusId, ownerId, description, createdAt, updatedAt
+        measurementValue, measurementTypeId, statusId, ownerId, mapDetails, description
     ) VALUES (
         p_title, p_propertyTypeId, p_address, p_pricePerUnit, p_priceTypeId,
-        p_measurementValue, p_measurementTypeId, p_statusId, p_ownerId, p_description, NOW(), NOW()
+        p_measurementValue, p_measurementTypeId, p_statusId, p_ownerId, p_mapDetails, p_description
     );
     
     -- Get the last inserted ID and set it to the OUT parameter
@@ -267,6 +268,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_property_get_by_id` (IN `p_id` 
         ms.name AS status,
         p.ownerId,
         o.name AS ownerName,
+        p.mapDetails,
         p.description,
         (
             SELECT 
@@ -292,7 +294,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_property_get_by_id` (IN `p_id` 
         p.id = p_id;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_property_update` (IN `p_id` INT, IN `p_title` VARCHAR(255), IN `p_propertyTypeId` INT, IN `p_address` VARCHAR(255), IN `p_pricePerUnit` DECIMAL(15,2), IN `p_priceTypeId` INT, IN `p_measurementValue` DECIMAL(10,2), IN `p_measurementTypeId` INT, IN `p_statusId` INT, IN `p_ownerId` INT, IN `p_description` TEXT)   BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_property_update` (IN `p_id` INT, IN `p_title` VARCHAR(255), IN `p_propertyTypeId` INT, IN `p_address` VARCHAR(255), IN `p_pricePerUnit` DECIMAL(15,2), IN `p_priceTypeId` INT, IN `p_measurementValue` DECIMAL(10,2), IN `p_measurementTypeId` INT, IN `p_statusId` INT, IN `p_ownerId` INT, IN `p_mapDetails` VARCHAR(255), IN `p_description` TEXT)   BEGIN
     UPDATE properties 
     SET 
         title = p_title,
@@ -304,8 +306,8 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_property_update` (IN `p_id` INT
         measurementTypeId = p_measurementTypeId,
         statusId = p_statusId,
         ownerId = p_ownerId,
-        description = p_description,
-        updatedAt = NOW()
+        mapDetails = p_mapDetails,
+        description = p_description
     WHERE id = p_id;
 END$$
 
@@ -422,6 +424,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_userinfo_google_auth` (IN `p_pr
             providerUid = p_providerUid,
             profilePicture = p_profilePicture
         WHERE email = p_email;
+        
     ELSE
 		-- Get role and status, and provider ID
 		SET varRole = fn_get_masters_id_by_name('Client');

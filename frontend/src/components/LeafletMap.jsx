@@ -10,6 +10,7 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { Search } from "lucide-react";
 
+// Marker icon
 const markerIcon = new L.Icon({
   iconUrl: "https://unpkg.com/leaflet@1.9.3/dist/images/marker-icon.png",
   iconSize: [25, 41],
@@ -19,6 +20,19 @@ const markerIcon = new L.Icon({
   shadowSize: [41, 41],
 });
 
+// Helper: Validate coordinates
+const isValidCoordinates = (coords) =>
+  coords &&
+  typeof coords.lat === "number" &&
+  typeof coords.lng === "number" &&
+  !isNaN(coords.lat) &&
+  !isNaN(coords.lng);
+
+// Helper: Validate zoom
+const getValidZoom = (value, fallback = 10) =>
+  typeof value === "number" && value >= 0 && value <= 22 ? value : fallback;
+
+// Marker on map click
 const LocationMarker = ({ onClick, readOnly = true }) => {
   const map = useMapEvents({
     click(e) {
@@ -31,6 +45,7 @@ const LocationMarker = ({ onClick, readOnly = true }) => {
   return null;
 };
 
+// Access map instance
 const MapController = ({ mapRef }) => {
   const map = useMap();
   useEffect(() => {
@@ -42,25 +57,36 @@ const MapController = ({ mapRef }) => {
 export default function LeafletMap({
   onLocationSelect,
   readOnly = false,
-  zoom = 13, // ✅ Accept zoom as prop
-  coordinates = { lat: 27.7172, lng: 85.324 } // Optional prop for initial center
+  zoom, // Optional prop
+  coordinates, // Optional prop
 }) {
-  // States
-  const [position, setPosition] = useState(coordinates);
-  const [chartZoom, setChartZoom] = useState(zoom); // ✅ Updated state and setter
+  const fallbackCoordinates = { lat: 22.24421828559716, lng: 68.97302627563478 };
+  const validCoordinates = isValidCoordinates(coordinates)
+    ? coordinates
+    : fallbackCoordinates;
+
+  const initialZoom = getValidZoom(zoom, 14);
+
+  const [position, setPosition] = useState(validCoordinates);
+  const [chartZoom, setChartZoom] = useState(initialZoom);
   const [showSearch, setShowSearch] = useState(false);
   const [loading, setLoading] = useState(false);
   const searchRef = useRef(null);
   const mapRef = useRef(null);
 
   useEffect(() => {
+    const nextZoom = getValidZoom(zoom, 10);
+    const nextCoords = isValidCoordinates(coordinates)
+      ? coordinates
+      : fallbackCoordinates;
+
     if (
-      coordinates.lat !== position.lat ||
-      coordinates.lng !== position.lng ||
-      zoom !== chartZoom
+      nextCoords.lat !== position.lat ||
+      nextCoords.lng !== position.lng ||
+      nextZoom !== chartZoom
     ) {
-      setPosition(coordinates);
-      setChartZoom(zoom);
+      setPosition(nextCoords);
+      setChartZoom(nextZoom);
     }
   }, [coordinates, zoom]);
 
@@ -98,7 +124,7 @@ export default function LeafletMap({
           ];
           mapRef.current.fitBounds(bounds);
         } else {
-          mapRef.current.setView(newCoords, zoom);
+          mapRef.current.setView(newCoords, chartZoom);
         }
 
         const currentZoom = mapRef.current.getZoom();
@@ -121,7 +147,6 @@ export default function LeafletMap({
         className="w-full h-full"
       >
         <MapController mapRef={mapRef} />
-
         <TileLayer
           attribution='&copy; <a href="https://osm.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -129,12 +154,14 @@ export default function LeafletMap({
         {!readOnly && (
           <LocationMarker onClick={handleMapClick} readOnly={readOnly} />
         )}
-        {position && (
-          <Marker position={[position.lat, position.lng]} icon={markerIcon} />
+        {isValidCoordinates(coordinates) && (
+          <Marker
+            position={[position.lat, position.lng]}
+            icon={markerIcon}
+          />
         )}
       </MapContainer>
 
-      {/* Search Toggle Button */}
       <button
         type="button"
         onClick={() => setShowSearch(!showSearch)}
@@ -143,7 +170,6 @@ export default function LeafletMap({
         <Search className="w-5 h-5 text-gray-600" />
       </button>
 
-      {/* Search Field */}
       {showSearch && (
         <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-[9999] bg-white px-4 py-2 rounded-lg shadow flex items-center gap-2 transition-opacity duration-300 opacity-100">
           <input

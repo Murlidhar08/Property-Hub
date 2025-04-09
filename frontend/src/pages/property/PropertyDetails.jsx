@@ -1,3 +1,4 @@
+// Packages
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Pencil, Trash2, ArrowLeft } from "lucide-react";
@@ -15,13 +16,29 @@ export default function PropertyDisplayPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [property, setProperty] = useState(null);
+  const [hasImages, setHasImages] = useState(null);
+  const [hasLocation, setHasLocation] = useState(false);
   const [openConfirm, setOpenConfirm] = useState(false);
 
   useEffect(() => {
     propertyService.getPropertyById(id)
       .then((data) => {
         if (data.success) {
+          // Images validation
+          setHasImages(!!data.property.images);
+
+          // Location details
+          if (data.property?.mapDetails) {
+            setHasLocation(true);
+
+            // Deserialize map details
+            data.property.mapDetails = JSON.parse(data.property.mapDetails);
+          }
+          else
+            data.property.mapDetails = {};
+
           setProperty(data.property);
+
         } else {
           throw new Error(data.message || "Failed to fetch property details.");
         }
@@ -59,7 +76,7 @@ export default function PropertyDisplayPage() {
         </div>
 
         {/* images */}
-        <div className="p-8">
+        <div className="p-8" hidden={!hasImages}>
           <ImageCarousel images={property?.images?.split(',')} />
         </div>
 
@@ -122,9 +139,10 @@ export default function PropertyDisplayPage() {
 
           {/* MAP */}
           <LeafletMap
-            onLocationSelect={(coords) => {
-              console.log("Clicked coordinates:", coords);
-            }}
+            hidden={!hasLocation}
+            zoom={property?.mapDetails?.zoom || 10}
+            coordinates={{ lat: property?.mapDetails?.lat, lng: property?.mapDetails?.lng }}
+            readOnly={true}
           />
         </div>
 

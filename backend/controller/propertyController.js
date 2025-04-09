@@ -51,7 +51,7 @@ exports.addProperty = async (req, res) => {
 
     try {
         // Destructure the validated body data
-        const { title, propertyTypeId, address, pricePerUnit, priceTypeId, measurementValue, measurementTypeId, statusId, ownerId, description } = req.body;
+        const { title, propertyTypeId, address, pricePerUnit, priceTypeId, measurementValue, measurementTypeId, statusId, ownerId, mapDetails, description } = req.body;
 
         // Call service to insert property
         let propertyId = await propertyService.addProperty({
@@ -64,6 +64,7 @@ exports.addProperty = async (req, res) => {
             measurementTypeId,
             statusId,
             ownerId,
+            mapDetails,
             description
         });
 
@@ -125,7 +126,7 @@ exports.getPropertyById = async (req, res) => {
 exports.updateProperty = async (req, res) => {
     try {
         const { id } = req.params;
-        let { title, propertyTypeId, address, pricePerUnit, priceTypeId, measurementValue, measurementTypeId, statusId, ownerId, description } = req.body;
+        let { title, propertyTypeId, address, pricePerUnit, priceTypeId, measurementValue, measurementTypeId, statusId, ownerId, mapDetails, description } = req.body;
 
         if (!id || isNaN(id)) {
             return res.status(400).json({ success: false, message: "Invalid property ID." });
@@ -137,7 +138,7 @@ exports.updateProperty = async (req, res) => {
             return res.status(400).json({ success: false, message: validationError });
         }
 
-        let updated = await propertyService.updateProperty({ id, title, propertyTypeId, address, pricePerUnit, priceTypeId, measurementValue, measurementTypeId, statusId, ownerId, description });
+        let updated = await propertyService.updateProperty({ id, title, propertyTypeId, address, pricePerUnit, priceTypeId, measurementValue, measurementTypeId, statusId, ownerId, mapDetails, description });
 
         if (!updated) {
             return res.status(404).json({ success: false, message: "Property not found or not updated." });
