@@ -6,49 +6,49 @@ import './styles/App.css';
 import "react-toastify/dist/ReactToastify.css";
 
 // Authentication
-import Login from "./pages/authentication/Login";
-import Register from "./pages/authentication/Register";
-import ForgotPassword from "./pages/authentication/ForgetPassword";
-import PendingApproval from "./pages/authentication/PendingApproval";
+import Login from "@/pages/authentication/Login";
+import Register from "@/pages/authentication/Register";
+import ForgotPassword from "@/pages/authentication/ForgetPassword";
+import PendingApproval from "@/pages/authentication/PendingApproval";
 
 // Main Pages
-import AdminPage from "./pages/admin/AdminPage";
-import ClientsPage from "./pages/clients/ClientsPage";
-import PropertyPage from "./pages/property/PropertyPage";
-import Requirements from "./pages/requirements/Requirements";
-import AccountPage from "./pages/account/AccountPage";
+import AdminPage from "@/pages/admin/AdminPage";
+import ClientsPage from "@/pages/clients/ClientsPage";
+import PropertyPage from "@/pages/property/PropertyPage";
+import Requirements from "@/pages/requirements/Requirements";
+import AccountPage from "@/pages/account/AccountPage";
 
 // Details Page
-import PropertyDetails from "./pages/property/PropertyDetails";
+import PropertyDetails from "@/pages/property/PropertyDetails";
 
 // Add/Update Pages
-import AddUpdateClient from "./pages/clients/AddUpdateClient";
-import AddUpdateProperty from "./pages/property/AddUpdateProperty";
-import AddUpdateAgent from "./pages/agents/AddUpdateAgent";
-import AddUpdateRequirement from "./pages/requirements/AddUpdateRequirement";
+import AddUpdateClient from "@/pages/clients/AddUpdateClient";
+import AddUpdateProperty from "@/pages/property/AddUpdateProperty";
+import AddUpdateAgent from "@/pages/agents/AddUpdateAgent";
+import AddUpdateRequirement from "@/pages/requirements/AddUpdateRequirement";
 
 // Error Pages
-import Unauthorized from "./pages/errors/Unauthorized";
-import NotFound from "./pages/errors/NotFound";
-import ServerError from "./pages/errors/ServerError";
-import TokenExpired from './pages/errors/TokenExpired'
+import Unauthorized from "@/pages/errors/Unauthorized";
+import NotFound from "@/pages/errors/NotFound";
+import ServerError from "@/pages/errors/ServerError";
+import TokenExpired from '@/pages/errors/TokenExpired'
 
 // Layouts
-import NavLayout from "./layouts/NavLayout";
+import NavLayout from "@/layouts/NavLayout";
 import PublicLayout from "@/layouts/PublicLayout";
-import Dashboard from "./pages/dashboard/Dashboard";
-import AgentsPage from "./pages/agents/AgentsPage";
+import Dashboard from "@/pages/dashboard/Dashboard";
+import AgentsPage from "@/pages/agents/AgentsPage";
 import ProtectedLayout from "@/layouts/ProtectedLayout";
 import AuthInitializer from "@/layouts/AuthInitializer";
-import ResetPassword from './pages/authentication/ResetPassword';
-import PendingVerification from './pages/authentication/PendingVerification';
-import UserVerified from './pages/authentication/UserVerified';
-import AgentDisplayPage from './pages/agents/AgentDisplayPage';
-import ClientDisplayPage from './pages/clients/ClientDisplayPage';
-import RequirementDetailsPage from './pages/requirements/RequirementDetailsPage';
-import OwnersPage from './pages/owners/OwnersPage';
-import AddUpdateOwnerPage from './pages/owners/AddUpdateOwner';
-import OwnerDisplayPage from './pages/owners/OwnerDisplayPage';
+import ResetPassword from '@/pages/authentication/ResetPassword';
+import PendingVerification from '@/pages/authentication/PendingVerification';
+import UserVerified from '@/pages/authentication/UserVerified';
+import AgentDisplayPage from '@/pages/agents/AgentDisplayPage';
+import ClientDisplayPage from '@/pages/clients/ClientDisplayPage';
+import RequirementDetailsPage from '@/pages/requirements/RequirementDetailsPage';
+import OwnersPage from '@/pages/owners/OwnersPage';
+import AddUpdateOwnerPage from '@/pages/owners/AddUpdateOwner';
+import OwnerDisplayPage from '@/pages/owners/OwnerDisplayPage';
 
 function App() {
   return (
