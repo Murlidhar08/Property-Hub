@@ -1,7 +1,12 @@
+// Packages
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+
+// Redux
 import { setUser, setToken } from "@/redux/slices/userSlice";
+
+// Services
 import authService from "@/services/authService";
 
 const AuthInitializer = () => {
@@ -29,6 +34,10 @@ const AuthInitializer = () => {
                 }
                 else if (res.message == 'pendingVerification')
                     navigate("/pending-verification");
+                else if (res.message == 'pendingApproval') {
+                    navigate("/pending-approval");
+                    localStorage.removeItem("token"); // Remove token if user is not approved
+                }
                 else
                     navigate("/login");
             } catch (error) {

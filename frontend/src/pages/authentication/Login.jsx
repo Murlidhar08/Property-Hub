@@ -5,13 +5,9 @@ import { FiLogIn } from "react-icons/fi";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
-import { useDispatch } from "react-redux";
 
 // Components
 import GoogleLogin from "@/pages/authentication/GoogleLogin.jsx";
-
-// Store
-import { setUser, setToken } from "@/redux/slices/userSlice";
 
 // Services
 import authService from "@/services/authService";
@@ -21,7 +17,6 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
   const handleLogin = async () => {
     setLoading(true);
@@ -44,21 +39,18 @@ export default function Login() {
         localStorage.setItem("token", response.token);
 
       if (response.success) {
-        // Set User details here
-        dispatch(setUser(response.user));
-
-        // set Token here
-        dispatch(setToken(response.token));
 
         toast.success("Login successful! Redirecting...");
-        navigate("/");
+
+        // navigate to dashboard with hard refresh
+        window.location.href = '/';
       }
       else if (response.message == 'pendingVerification') {
         navigate("/pending-verification");
       }
-      // else if (response.message == 'pendingApproval') {
-      //   navigate("/pending-approval");
-      // }
+      else if (response.message == 'pendingApproval') {
+        navigate("/pending-approval");
+      }
       else {
         toast.error("Invalid credentials. Please try again.");
       }

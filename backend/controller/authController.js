@@ -8,6 +8,9 @@ const authService = require('../services/authService');
 const config = require('../config/config')
 const encryptionUtil = require('../config/encryptionUtil');
 
+// services
+const applicationService = require('../services/applicationService');
+
 // Login user
 exports.login = async (req, res) => {
     const { identifier, password } = req.body;
@@ -35,22 +38,21 @@ exports.login = async (req, res) => {
             });
         }
 
-        // PENDING: Validate for Approval
-        // let val = await applicationService.getMastersIdByName('pendingApproval');
-        // if (user.status == val) {
-        //     return res.json({
-        //         success: false,
-        //         message: 'pendingApproval',
-        //         token: token
-        //     });
-        // }
+        // Validate for Approval
+        let val = await applicationService.getMastersIdByName('pendingApproval');
+        if (user.status == val) {
+            return res.json({
+                success: false,
+                message: 'pendingApproval',
+                token: token
+            });
+        }
 
         // Return the token and user details
         res.json({
             success: true,
             message: "Login successful",
-            token: token,
-            user: getUserDetails(user)
+            token: token
         });
     } catch (err) {
         return res.status(500).json({
@@ -109,13 +111,23 @@ exports.getProfile = async (req, res) => {
     const email = req.user.email;
     try {
         let user = await authService.loginUser(email);
+        let token = req.token;
 
         // Validate email verification
         if (!user.isVerified) {
             return res.json({
                 success: false,
                 message: 'pendingVerification',
-                token: req.token
+                token
+            });
+        }
+
+        // Validate for Approval
+        let val = await applicationService.getMastersIdByName('pendingApproval');
+        if (user.status == val) {
+            return res.json({
+                success: false,
+                message: 'pendingApproval'                
             });
         }
 
