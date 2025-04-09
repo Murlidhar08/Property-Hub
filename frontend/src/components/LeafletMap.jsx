@@ -59,6 +59,7 @@ export default function LeafletMap({
   readOnly = false,
   zoom, // Optional prop
   coordinates, // Optional prop
+  hidden = false,
 }) {
   const fallbackCoordinates = { lat: 22.24421828559716, lng: 68.97302627563478 };
   const validCoordinates = isValidCoordinates(coordinates)
@@ -139,7 +140,7 @@ export default function LeafletMap({
   };
 
   return (
-    <div className="relative w-full h-96 rounded-lg overflow-hidden shadow">
+    <div className="relative w-full h-96 rounded-lg overflow-hidden shadow" hidden={hidden}>
       <MapContainer
         center={position}
         zoom={chartZoom}
