@@ -42,11 +42,12 @@ const MapController = ({ mapRef }) => {
 export default function LeafletMap({
   onLocationSelect,
   readOnly = false,
-  zoomLevel = 13, // ✅ Accept zoom as prop
+  zoom = 13, // ✅ Accept zoom as prop
   coordinates = { lat: 27.7172, lng: 85.324 } // Optional prop for initial center
 }) {
+  // States
   const [position, setPosition] = useState(coordinates);
-  const [zoom, setZoom] = useState(zoomLevel);
+  const [chartZoom, setChartZoom] = useState(zoom); // ✅ Updated state and setter
   const [showSearch, setShowSearch] = useState(false);
   const [loading, setLoading] = useState(false);
   const searchRef = useRef(null);
@@ -56,18 +57,18 @@ export default function LeafletMap({
     if (
       coordinates.lat !== position.lat ||
       coordinates.lng !== position.lng ||
-      zoomLevel !== zoom
+      zoom !== chartZoom
     ) {
       setPosition(coordinates);
-      setZoom(zoomLevel);
+      setChartZoom(zoom);
     }
-  }, [coordinates, zoomLevel]);
+  }, [coordinates, zoom]);
 
   const handleMapClick = ({ lat, lng, zoom }) => {
     if (readOnly) return;
     setPosition({ lat, lng });
-    setZoom(zoom);
-    onLocationSelect?.({ lat, lng, zoom }); // ✅ Return zoom with coords
+    setChartZoom(zoom);
+    onLocationSelect?.({ lat, lng, zoom });
   };
 
   const handleSearch = async () => {
@@ -92,17 +93,17 @@ export default function LeafletMap({
 
         if (boundingbox && mapRef.current) {
           const bounds = [
-            [parseFloat(boundingbox[0]), parseFloat(boundingbox[2])], // SouthWest
-            [parseFloat(boundingbox[1]), parseFloat(boundingbox[3])], // NorthEast
+            [parseFloat(boundingbox[0]), parseFloat(boundingbox[2])],
+            [parseFloat(boundingbox[1]), parseFloat(boundingbox[3])],
           ];
           mapRef.current.fitBounds(bounds);
         } else {
-          mapRef.current.setView(newCoords, zoomLevel);
+          mapRef.current.setView(newCoords, zoom);
         }
 
         const currentZoom = mapRef.current.getZoom();
-        setZoom(currentZoom);
-        onLocationSelect?.({ ...newCoords, zoom: currentZoom }); // ✅ Include zoom
+        setChartZoom(currentZoom);
+        onLocationSelect?.({ ...newCoords, zoom: currentZoom });
       }
     } catch (err) {
       console.error("Search failed:", err);
@@ -115,7 +116,7 @@ export default function LeafletMap({
     <div className="relative w-full h-96 rounded-lg overflow-hidden shadow">
       <MapContainer
         center={position}
-        zoom={zoom}
+        zoom={chartZoom}
         scrollWheelZoom={true}
         className="w-full h-full"
       >
@@ -135,7 +136,7 @@ export default function LeafletMap({
 
       {/* Search Toggle Button */}
       <button
-        type='button'
+        type="button"
         onClick={() => setShowSearch(!showSearch)}
         className="absolute top-4 right-4 z-[9999] bg-white p-2 rounded-full shadow hover:scale-105 transition"
       >
