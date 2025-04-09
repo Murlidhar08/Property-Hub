@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
-import { toast } from "react-toastify";
+import toast from "@/utils/ReactToastify.js";
 import clientService from "../../services/clientService";
 
 export default function AddUpdateClientPage() {

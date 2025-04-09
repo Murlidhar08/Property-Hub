@@ -1,9 +1,12 @@
+// Packages
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Pencil, Trash2, ArrowLeft } from "lucide-react";
 import requirementService from "@/services/requirementService";
-import { toast } from "react-toastify";
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from "@mui/material";
+
+// Utils
+import toast from "@/utils/ReactToastify.js";
 
 export default function RequirementDetailsPage() {
     const { id } = useParams();

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Pencil, Trash2, ArrowLeft } from "lucide-react";
 import clientService from "@/services/clientService";
-import { toast } from "react-toastify";
+import toast from "@/utils/ReactToastify.js";
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from "@mui/material";
 
 export default function ClientDisplayPage() {

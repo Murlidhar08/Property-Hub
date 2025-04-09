@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, Link, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import toast from "@/utils/ReactToastify.js";
 import authService from '@/services/authService';
 
 const UserVerified = () => {

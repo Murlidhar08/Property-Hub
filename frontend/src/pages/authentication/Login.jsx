@@ -4,13 +4,15 @@ import { FaFacebook } from "react-icons/fa";
 import { FiLogIn } from "react-icons/fi";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
 
 // Components
 import GoogleLogin from "@/pages/authentication/GoogleLogin.jsx";
 
 // Services
 import authService from "@/services/authService";
+
+// Utils
+import toast from "@/utils/ReactToastify.js";
 
 export default function Login() {
   const [identifier, setIdentifier] = useState("");
@@ -71,8 +73,6 @@ export default function Login() {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-blue-100 to-blue-300">
-      <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
-
       <motion.div
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}

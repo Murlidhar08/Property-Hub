@@ -9,7 +9,7 @@ import { useRef, useState, useEffect } from "react";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { Search, Mouse, Move } from "lucide-react";
-import { toast } from 'react-toastify';
+import toast from '@/utils/ReactToastify.js';
 
 // Default fallback coordinates (Kathmandu)
 const fallbackCoordinates = { lat: 27.7172, lng: 85.324 };

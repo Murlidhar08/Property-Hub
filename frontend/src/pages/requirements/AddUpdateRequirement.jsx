@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
-import { toast } from "react-toastify";
+import toast from "@/utils/ReactToastify.js";
 
 // Services
 import requirementService from "@/services/requirementService";

@@ -2,8 +2,7 @@ import { useState } from "react";
 import { FiUnlock } from "react-icons/fi";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import { ToastContainer } from "react-toastify";
+import toast from "@/utils/ReactToastify.js";
 import authService from "@/services/authService"; // Adjust based on your project structure
 
 export default function ForgotPassword() {
@@ -38,8 +37,6 @@ export default function ForgotPassword() {
       transition={{ duration: 0.6 }}
       className="flex items-center justify-center min-h-screen bg-gradient-to-b from-blue-100 to-blue-300"
     >
-      {/* Toast notifications container */}
-      <ToastContainer position="top-right" autoClose={3000} />
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}

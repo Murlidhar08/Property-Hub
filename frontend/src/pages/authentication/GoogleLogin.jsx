@@ -3,7 +3,7 @@ import { useGoogleLogin } from "@react-oauth/google";
 import { useNavigate } from 'react-router-dom';
 import { FaGoogle } from "react-icons/fa";
 import { motion } from "framer-motion";
-import { toast } from 'react-toastify';
+import toast from "@/utils/ReactToastify.js";
 
 // Services
 import authService from "@/services/authService";

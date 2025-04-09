@@ -3,7 +3,7 @@ import { FaGoogle, FaFacebook } from "react-icons/fa";
 import { FiUserPlus } from "react-icons/fi";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import toast from "@/utils/ReactToastify.js";
 import authService from "@/services/authService"
 
 export default function Register() {

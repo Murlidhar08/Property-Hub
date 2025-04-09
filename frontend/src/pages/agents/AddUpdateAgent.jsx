@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
-import { toast } from "react-toastify";
+import toast from "@/utils/ReactToastify.js";
 import agentService from "../../services/agentService";
 
 export default function AddUpdateAgentPage() {

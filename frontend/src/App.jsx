@@ -3,7 +3,7 @@ import { ToastContainer } from "react-toastify";
 
 // Styles
 import './styles/App.css';
-import 'react-toastify/dist/ReactToastify.css';
+import "react-toastify/dist/ReactToastify.css";
 
 // Authentication
 import Login from "./pages/authentication/Login";
@@ -54,10 +54,7 @@ function App() {
   return (
     <BrowserRouter>
       {/* fetching user details if loged In*/}
-      <AuthInitializer />
-
-      {/* Toast notifications container */}
-      <ToastContainer position="top-right" autoClose={3000} />
+      < AuthInitializer />
 
       <Routes>
         {/* Public Routes */}
@@ -117,7 +114,20 @@ function App() {
         <Route path="/token-expired" element={<TokenExpired />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
-    </BrowserRouter>
+
+      {/* Toast container */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme={"colored"}
+      />
+    </ BrowserRouter>
   );
 }
 

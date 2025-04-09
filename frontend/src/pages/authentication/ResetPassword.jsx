@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { FiLock } from "react-icons/fi";
 import { motion } from "framer-motion";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { toast } from "react-toastify";
+import toast from "@/utils/ReactToastify.js";
 import authService from "@/services/authService"; // Adjust based on project structure
 
 export default function ResetPassword() {

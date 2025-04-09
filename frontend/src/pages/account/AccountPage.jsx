@@ -7,7 +7,7 @@ import { Edit2, X } from "lucide-react";
 // Service
 import authService from "../../services/authService";
 import accountService from "../../services/accountService";
-import { toast } from 'react-toastify';
+import toast from "@/utils/ReactToastify.js";
 
 // Utils
 import commonFunction from '../../utils/commonFunction';
