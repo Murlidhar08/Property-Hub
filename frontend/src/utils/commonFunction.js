@@ -25,7 +25,19 @@ export const getDocumentPath = (path) => {
     return `${baseUrl}/${path.replace(/^\/+/, '')}`;
 }
 
+export const isEmptyObject = function (object) {
+    if (object == null) return true; // handles null and undefined
+    for (let key in object) {
+        if (Object.prototype.hasOwnProperty.call(object, key)) {
+            return false;
+        }
+    }
+    return true;
+};
+
+
 export default {
     getGreeting,
-    getDocumentPath
+    getDocumentPath,
+    isEmptyObject
 };

@@ -64,7 +64,7 @@ exports.addProperty = async (req, res) => {
             measurementTypeId,
             statusId,
             ownerId,
-            mapDetails,
+            mapDetails: mapDetails ?? null,
             description
         });
 

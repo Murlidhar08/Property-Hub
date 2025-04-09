@@ -14,6 +14,9 @@ import ImageUploadZone from "@/components/ImageUploadZone";
 // Components
 import LeafletMap from "@/components/LeafletMap";
 
+// Utils
+import { isEmptyObject } from "@/utils/commonFunction";
+
 export default function AddUpdatePropertyPage() {
     const navigate = useNavigate();
     const { id } = useParams();
@@ -131,7 +134,7 @@ export default function AddUpdatePropertyPage() {
         e.preventDefault();
         if (!propertyDetails.title || !propertyDetails.address || !propertyDetails.measurementValue ||
             !propertyDetails.measurementTypeId || !propertyDetails.propertyTypeId || !propertyDetails.pricePerUnit ||
-            !propertyDetails.priceTypeId || !propertyDetails.statusId || !propertyDetails.description) {
+            !propertyDetails.priceTypeId || !propertyDetails.statusId) {
             toast.error("All fields are required!");
             return;
         }
@@ -145,7 +148,11 @@ export default function AddUpdatePropertyPage() {
                 });
             }
             if (key === "mapDetails") {
-                formData.append(key, JSON.stringify(propertyDetails[key])); // Append map details as string
+                let mapDtl = propertyDetails[key];
+
+                // Add data if not null
+                if (!isEmptyObject(mapDtl))
+                    formData.append(key, JSON.stringify(mapDtl));
             }
             else {
                 formData.append(key, propertyDetails[key]);
