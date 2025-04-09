@@ -1,12 +1,20 @@
+// Packages
 const express = require("express");
-const propertyController = require("../controller/propertyController.js");
-const router = express.Router();
+
+// Middleware
+const { validatePropertyId, validatePropertyData } = require("../validators/propertyValidator.js");
 const { upload } = require("../lib/multerUpload.js");
 
-router.post("/", upload, propertyController.addProperty);
+// Controller
+const propertyController = require("../controller/propertyController.js");
+
+// Initialization
+const router = express.Router();
+
+router.post("/", upload, validatePropertyData, propertyController.addProperty);
 router.get("/", propertyController.getProperties);
 router.get("/:id", propertyController.getPropertyById);
-router.put("/:id", upload, propertyController.updateProperty);
+router.put("/:id", validatePropertyId, upload, validatePropertyData, propertyController.updateProperty);
 router.delete("/:id", propertyController.deleteProperty);
 
 module.exports = router;

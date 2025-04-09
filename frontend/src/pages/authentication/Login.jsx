@@ -36,7 +36,7 @@ export default function Login() {
 
       // Remove previous token if exists
       if (localStorage.getItem('token'))
-        localStorage.clear("token");
+        localStorage.removeItem('token');
 
       // Request to login
       const response = await authService.login({ identifier, password });

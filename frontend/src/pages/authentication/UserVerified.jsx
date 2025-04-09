@@ -25,6 +25,10 @@ const UserVerified = () => {
                     setLoading(false);
                     localStorage.setItem('token', data.token);
 
+                    // Remove email token from local storage
+                    if (localStorage.getItem('emailToken'))
+                        localStorage.removeItem('emailToken');
+
                     // Hard refresh and navigate to dashboard
                     window.location.href = '/';
                 }

@@ -4,48 +4,8 @@ const { moveMultipleFiles } = require("../config/fileOperations");
 const { getMastersIdByName } = require("../services/applicationService");
 const config = require("../config/config");
 
-// Utility function for validating property data
-const validatePropertyData = (data) => {
-    const { title, propertyTypeId, address, pricePerUnit, priceTypeId, measurementValue, measurementTypeId, statusId, description } = data;
-
-    if (!title || title.length < 3) {
-        return "Property title must be at least 3 characters long.";
-    }
-    if (!propertyTypeId || isNaN(propertyTypeId)) {
-        return "Invalid property type ID.";
-    }
-    if (!address || address.length < 5) {
-        return "Address must be at least 5 characters long.";
-    }
-    if (!pricePerUnit || isNaN(pricePerUnit) || pricePerUnit < 0) {
-        return "Price per unit must be a valid number.";
-    }
-    if (!priceTypeId || isNaN(priceTypeId)) {
-        return "Invalid price type ID.";
-    }
-    if (!measurementValue || isNaN(measurementValue) || measurementValue <= 0) {
-        return "Measurement value must be a positive number.";
-    }
-    if (!measurementTypeId || isNaN(measurementTypeId)) {
-        return "Invalid measurement type ID.";
-    }
-    if (!statusId || isNaN(statusId)) {
-        return "Invalid property status ID.";
-    }
-    if (!description || description.length < 10) {
-        return "Description must be at least 10 characters long.";
-    }
-    return null;
-};
-
 // Insert Property
 exports.addProperty = async (req, res) => {
-    // First, validate input data
-    const validationError = validatePropertyData(req.body);
-    if (validationError) {
-        return res.status(400).json({ success: false, message: validationError });
-    }
-
     // Get file paths of uploaded images
     const images = req.files ? req.files.map((file) => `/temp/${file.filename}`) : [];
 
@@ -125,26 +85,25 @@ exports.getPropertyById = async (req, res) => {
 // Update property
 exports.updateProperty = async (req, res) => {
     try {
-        const { id } = req.params;
+        let id = req.params.id;
+
+        // Details of the property to be updated
         let { title, propertyTypeId, address, pricePerUnit, priceTypeId, measurementValue, measurementTypeId, statusId, ownerId, mapDetails, description } = req.body;
 
-        if (!id || isNaN(id)) {
-            return res.status(400).json({ success: false, message: "Invalid property ID." });
-        }
-
-        // Validate input data
-        const validationError = validatePropertyData(req.body);
-        if (validationError) {
-            return res.status(400).json({ success: false, message: validationError });
-        }
-
+        // Database performed
         let updated = await propertyService.updateProperty({ id, title, propertyTypeId, address, pricePerUnit, priceTypeId, measurementValue, measurementTypeId, statusId, ownerId, mapDetails, description });
 
         if (!updated) {
-            return res.status(404).json({ success: false, message: "Property not found or not updated." });
+            return res.status(404).json({
+                success: false,
+                message: "Property not found or not updated."
+            });
         }
 
-        return res.json({ success: true, message: "Property updated successfully." });
+        return res.json({
+            success: true,
+            message: "Property updated successfully."
+        });
     } catch (err) {
         return res.status(500).json({ success: false, message: err.sqlMessage || err.message });
     }

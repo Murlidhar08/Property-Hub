@@ -14,7 +14,8 @@ const GoolgeLogin = () => {
         try {
             if (authResult["code"]) {
                 // Clear previous token
-                localStorage.clear("token");
+                if (localStorage.getItem('token'))
+                    localStorage.removeItem('token');
 
                 // Call the login function with the authResult code
                 const result = await authService.googleLogin(authResult.code);
