@@ -843,9 +843,7 @@ CREATE TABLE IF NOT EXISTS `userinfo` (
   UNIQUE KEY `email` (`email`),
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `provider_uid_unique` (`providerTypeId`,`providerUid`),
-  KEY `users_ibfk_1` (`roleId`),
-  CONSTRAINT `fk_users_provider` FOREIGN KEY (`providerTypeId`) REFERENCES `masters` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `fk_users_role` FOREIGN KEY (`roleId`) REFERENCES `masters` (`id`) ON DELETE CASCADE
+  KEY `users_ibfk_1` (`roleId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
