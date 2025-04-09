@@ -1,12 +1,22 @@
+// Packages
 import { useState, useEffect } from "react";
-import { Plus, Grid, List, MapPin, Ruler, DollarSign, User } from "lucide-react";
+import { Plus, Grid, List, MapPin, Ruler, IndianRupee, User } from "lucide-react";
 import { Link } from "react-router-dom";
+
+// Services
 import requirementService from '@/services/requirementService';
 
+// Redux
+import { useSelector, useDispatch } from "react-redux";
+import { setRequirementView } from "@/redux/slices/applicationSlice";
+
 export default function RequirementsPage() {
+    const application = useSelector((state) => state.application);
+    const dispatch = useDispatch();
+
     const [requirements, setRequirements] = useState([]);
     const [search, setSearch] = useState("");
-    const [view, setView] = useState("list");
+    const [view, setView] = useState(application.requirementView);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -31,6 +41,11 @@ export default function RequirementsPage() {
         req.clientName.toLowerCase().includes(search.toLowerCase())
     );
 
+    // Handlers
+    const handleViewChange = (viewName) => {
+        setView(viewName);
+        dispatch(setRequirementView(viewName));
+    };
 
     return (
         <div className="p-6 bg-gray-50 min-h-screen w-full">
@@ -60,14 +75,14 @@ export default function RequirementsPage() {
                 <div className="flex items-center">
                     <button
                         className={`p-2 rounded-l-md ${view === "list" ? "bg-purple-500 text-white" : "bg-gray-200"}`}
-                        onClick={() => setView("list")}
+                        onClick={() => handleViewChange("list")}
                         title="List View"
                     >
                         <List size={20} />
                     </button>
                     <button
                         className={`p-2 rounded-r-md ${view === "grid" ? "bg-purple-500 text-white" : "bg-gray-200"}`}
-                        onClick={() => setView("grid")}
+                        onClick={() => handleViewChange("grid")}
                         title="Grid View"
                     >
                         <Grid size={20} />
@@ -105,7 +120,7 @@ export default function RequirementsPage() {
                                         <Ruler size={16} /> <span className='truncate w-full'>{req.minMeasurement} - {req.maxMeasurement} {req.measurementType}</span>
                                     </p>
                                     <p className="flex items-center space-x-2 text-gray-600">
-                                        <DollarSign size={16} /> <span className='truncate w-full'>{req.minPrice} - {req.maxPrice} {req.priceType}</span>
+                                        <IndianRupee size={16} /> <span className='truncate w-full'>{req.minPrice} - {req.maxPrice} {req.priceType}</span>
                                     </p>
                                     <p className="flex items-center space-x-2 text-gray-600">
                                         <User size={16} /> <span className='truncate w-full'>{req.clientName}</span>

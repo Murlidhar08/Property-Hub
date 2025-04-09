@@ -1,12 +1,22 @@
+// Packages
 import { useState, useEffect } from "react";
 import { Plus, Grid, List, MapPin, Phone, User } from "lucide-react";
 import { Link } from "react-router-dom";
-import clientService from '../../services/clientService';
+
+// Services
+import clientService from '@/services/clientService';
+
+// Redux
+import { useSelector, useDispatch } from "react-redux";
+import { setClientView } from "@/redux/slices/applicationSlice";
 
 export default function ClientsPage() {
+  const application = useSelector((state) => state.application);
+  const dispatch = useDispatch();
+
   const [search, setSearch] = useState("");
   const [clients, setClients] = useState([]);
-  const [view, setView] = useState("list");
+  const [view, setView] = useState(application.clientView);
 
   // Fetch clients
   useEffect(() => {
@@ -21,9 +31,16 @@ export default function ClientsPage() {
       .catch(error => console.error("Error fetching clients:", error));
   }, []);
 
+  // Filter
   const filteredClients = clients.filter(client =>
     client.name.toLowerCase().includes(search.toLowerCase())
   );
+
+  // Handlers
+  const handleViewChange = (viewName) => {
+    setView(viewName);
+    dispatch(setClientView(viewName));
+  };
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen w-full">
@@ -53,14 +70,14 @@ export default function ClientsPage() {
         <div className="flex items-center">
           <button
             className={`p-2 rounded-l-md ${view === "list" ? "bg-purple-500 text-white" : "bg-gray-200"}`}
-            onClick={() => setView("list")}
+            onClick={() => handleViewChange("list")}
             title="List View"
           >
             <List size={20} />
           </button>
           <button
             className={`p-2 rounded-r-md ${view === "grid" ? "bg-purple-500 text-white" : "bg-gray-200"}`}
-            onClick={() => setView("grid")}
+            onClick={() => handleViewChange("grid")}
             title="Grid View"
           >
             <Grid size={20} />

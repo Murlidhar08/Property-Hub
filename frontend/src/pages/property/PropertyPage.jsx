@@ -1,13 +1,25 @@
+// Packages
 import { useState, useEffect } from "react";
 import { Plus, Grid, List, MapPin, Ruler, IndianRupee } from "lucide-react";
 import { Link } from "react-router-dom";
+
+// Services
 import propertyService from "@/services/propertyService";
-import commonFunction from '../../utils/commonFunction';
+
+// Utils
+import commonFunction from '@/utils/commonFunction';
+
+// Redux
+import { useSelector, useDispatch } from "react-redux";
+import { setPropertyView } from "@/redux/slices/applicationSlice";
 
 export default function PropertyPage() {
+  const application = useSelector((state) => state.application);
+  const dispatch = useDispatch();
+
   const [properties, setProperties] = useState([]);
   const [search, setSearch] = useState("");
-  const [view, setView] = useState("grid");
+  const [view, setView] = useState(() => application.propertyView);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -31,6 +43,12 @@ export default function PropertyPage() {
     property.title.toLowerCase().includes(search.toLowerCase()) ||
     property.location.toLowerCase().includes(search.toLowerCase())
   );
+
+  // Handlers
+  const handleViewChange = (viewName) => {
+    setView(viewName);
+    dispatch(setPropertyView(viewName));
+  };
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen w-full">
@@ -60,14 +78,14 @@ export default function PropertyPage() {
         <div className="flex items-center">
           <button
             className={`p-2 rounded-l-md ${view === "list" ? "bg-purple-500 text-white" : "bg-gray-200"}`}
-            onClick={() => setView("list")}
+            onClick={() => handleViewChange("list")}
             title="List View"
           >
             <List size={20} />
           </button>
           <button
             className={`p-2 rounded-r-md ${view === "grid" ? "bg-purple-500 text-white" : "bg-gray-200"}`}
-            onClick={() => setView("grid")}
+            onClick={() => handleViewChange("grid")}
             title="Grid View"
           >
             <Grid size={20} />

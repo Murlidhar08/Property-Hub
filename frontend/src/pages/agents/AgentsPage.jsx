@@ -1,12 +1,22 @@
+// Packages
 import { useState, useEffect } from "react";
 import { Plus, Grid, List, MapPin, Phone, Home } from "lucide-react";
 import { Link } from "react-router-dom";
+
+// Services
 import agentService from '@/services/agentService';
 
+// Redux
+import { useSelector, useDispatch } from "react-redux";
+import { setAgentView } from "@/redux/slices/applicationSlice";
+
 export default function AgentsPage() {
+  const application = useSelector((state) => state.application);
+  const dispatch = useDispatch();
+
   const [agents, setAgents] = useState([]);
   const [search, setSearch] = useState("");
-  const [view, setView] = useState("list");
+  const [view, setView] = useState(application.agentView);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -29,6 +39,12 @@ export default function AgentsPage() {
   const filteredAgents = agents.filter((agent) =>
     agent.name.toLowerCase().includes(search.toLowerCase())
   );
+
+  // Handlers
+  const handleViewChange = (viewName) => {
+    setView(viewName);
+    dispatch(setAgentView(viewName));
+  };
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen w-full">
@@ -58,14 +74,14 @@ export default function AgentsPage() {
         <div className="flex items-center">
           <button
             className={`p-2 rounded-l-md ${view === "list" ? "bg-purple-500 text-white" : "bg-gray-200"}`}
-            onClick={() => setView("list")}
+            onClick={() => handleViewChange("list")}
             title="List View"
           >
             <List size={20} />
           </button>
           <button
             className={`p-2 rounded-r-md ${view === "grid" ? "bg-purple-500 text-white" : "bg-gray-200"}`}
-            onClick={() => setView("grid")}
+            onClick={() => handleViewChange("grid")}
             title="Grid View"
           >
             <Grid size={20} />

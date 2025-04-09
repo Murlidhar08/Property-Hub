@@ -25,7 +25,7 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
     <div
       className={clsx(
         "h-screen bg-[#0A1624] text-white shadow-md flex flex-col transition-all duration-300 rounded-tr-2xl rounded-br-2xl",
-        isOpen ? "w-64 p-4" : "w-16 p-2"
+        isOpen ? "w-60 p-4" : "w-16 p-2"
       )}
     >
       <div className="flex items-center justify-between">

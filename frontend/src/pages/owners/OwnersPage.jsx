@@ -3,10 +3,18 @@ import { Plus, Grid, List, Phone, Home } from "lucide-react";
 import { Link } from "react-router-dom";
 import ownerService from '@/services/ownerService';
 
+// Redux
+import { useSelector, useDispatch } from "react-redux";
+import { setOwnerView } from "@/redux/slices/applicationSlice";
+
 export default function OwnersPage() {
+    const application = useSelector((state) => state.application);
+    const dispatch = useDispatch();
+
+    // States
     const [owners, setOwners] = useState([]);
     const [search, setSearch] = useState("");
-    const [view, setView] = useState("list");
+    const [view, setView] = useState(application.ownerView);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -29,6 +37,12 @@ export default function OwnersPage() {
     const filteredOwners = owners.filter((owner) =>
         owner.name.toLowerCase().includes(search.toLowerCase())
     );
+
+    // Handlers
+    const handleViewChange = (viewName) => {
+        setView(viewName);
+        dispatch(setOwnerView(viewName));
+    };
 
     return (
         <div className="p-6 bg-gray-50 min-h-screen w-full">
@@ -58,14 +72,14 @@ export default function OwnersPage() {
                 <div className="flex items-center">
                     <button
                         className={`p-2 rounded-l-md ${view === "list" ? "bg-purple-500 text-white" : "bg-gray-200"}`}
-                        onClick={() => setView("list")}
+                        onClick={() => handleViewChange("list")}
                         title="List View"
                     >
                         <List size={20} />
                     </button>
                     <button
                         className={`p-2 rounded-r-md ${view === "grid" ? "bg-purple-500 text-white" : "bg-gray-200"}`}
-                        onClick={() => setView("grid")}
+                        onClick={() => handleViewChange("grid")}
                         title="Grid View"
                     >
                         <Grid size={20} />

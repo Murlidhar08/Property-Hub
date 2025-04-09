@@ -5,12 +5,12 @@ import { logout, updateUser } from "@/redux/slices/userSlice";
 import { Edit2, X } from "lucide-react";
 
 // Service
-import authService from "../../services/authService";
-import accountService from "../../services/accountService";
+import authService from "@/services/authService";
+import accountService from "@/services/accountService";
 import toast from "@/utils/ReactToastify.js";
 
 // Utils
-import commonFunction from '../../utils/commonFunction';
+import commonFunction from '@/utils/commonFunction';
 
 const AccountPage = () => {
     const user = useSelector((state) => state.user);
