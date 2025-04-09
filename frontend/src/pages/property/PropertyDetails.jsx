@@ -138,12 +138,13 @@ export default function PropertyDisplayPage() {
           )}
 
           {/* MAP */}
-          <LeafletMap
-            hidden={!hasLocation}
-            zoom={property?.mapDetails?.zoom || 10}
-            coordinates={{ lat: property?.mapDetails?.lat, lng: property?.mapDetails?.lng }}
-            readOnly={true}
-          />
+          {hasLocation && (
+            <LeafletMap
+              zoom={property?.mapDetails?.zoom || 10}
+              coordinates={{ lat: property?.mapDetails?.lat, lng: property?.mapDetails?.lng }}
+              readOnly={true}
+            />
+          )}
         </div>
 
         {/* Action Buttons */}

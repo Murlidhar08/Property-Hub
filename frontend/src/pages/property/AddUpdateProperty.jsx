@@ -292,7 +292,6 @@ export default function AddUpdatePropertyPage() {
                             zoom={propertyDetails?.mapDetails?.zoom || 10}
                             coordinates={{ lat: propertyDetails?.mapDetails?.lat, lng: propertyDetails?.mapDetails?.lng }}
                             onLocationSelect={(data) => {
-                                console.log("Clicked: ", data);
                                 setPropertyDetails({ ...propertyDetails, "mapDetails": data });
                             }}
                         />
