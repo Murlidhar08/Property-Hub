@@ -50,6 +50,10 @@ export default function Login() {
         window.location.href = '/';
       }
       else if (response.message == 'pendingVerification') {
+        // Set email token
+        if (response.emailToken)
+          localStorage.setItem("emailToken", response.emailToken);
+
         navigate("/pending-verification");
       }
       else if (response.message == 'pendingApproval') {

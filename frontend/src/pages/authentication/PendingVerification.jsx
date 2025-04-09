@@ -1,8 +1,11 @@
+// Packages
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import authService from '../../services/authService';
+
+// Services
+import authService from '@/services/authService';
 
 const PendingVerification = () => {
     const navigate = useNavigate();
@@ -12,8 +15,11 @@ const PendingVerification = () => {
         setLoading(true);
 
         try {
+            // Email token
+            const emailToken = localStorage.getItem('emailToken');
+
             // Resend verification email
-            await authService.resendVerification();
+            await authService.resendVerification(emailToken);
 
             toast.success("Verification email has been resent. Please check your inbox.", {
                 position: "top-right",
@@ -25,7 +31,7 @@ const PendingVerification = () => {
                 theme: "colored",
             });
 
-            localStorage.removeItem('token');
+            localStorage.removeItem('emailToken');
             navigate('/login')
         } catch (error) {
             console.error("Failed to resend email. Please try again later.")

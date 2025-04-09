@@ -26,15 +26,15 @@ exports.login = async (req, res) => {
                 message: "Invalid credentials. Please Try Again."
             });
 
-        // Generate the JWT
-        const token = generateUserToken(user);
 
         // Validate email verification
         if (!user.isVerified) {
             return res.json({
                 success: false,
                 message: 'pendingVerification',
-                token: token
+                emailToken: generateUserToken({
+                    email: user.email
+                })
             });
         }
 
@@ -43,10 +43,12 @@ exports.login = async (req, res) => {
         if (user.status == val) {
             return res.json({
                 success: false,
-                message: 'pendingApproval',
-                token: token
+                message: 'pendingApproval'
             });
         }
+
+        // Generate the JWT
+        const token = generateUserToken(user);
 
         // Return the token and user details
         res.json({
@@ -283,6 +285,9 @@ exports.resendVerification = async (req, res) => {
 
         // send mail
         await sendAccountVerificationMail(emailAddress);
+
+        // Force expire token
+        await commonFunction.forceExpireToken(req.token);
 
         res.json({
             success: true,
