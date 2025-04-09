@@ -53,8 +53,14 @@ export default function LeafletMap({
   const mapRef = useRef(null);
 
   useEffect(() => {
-    setPosition(coordinates);
-    setZoom(zoomLevel);
+    if (
+      coordinates.lat !== position.lat ||
+      coordinates.lng !== position.lng ||
+      zoomLevel !== zoom
+    ) {
+      setPosition(coordinates);
+      setZoom(zoomLevel);
+    }
   }, [coordinates, zoomLevel]);
 
   const handleMapClick = ({ lat, lng, zoom }) => {
