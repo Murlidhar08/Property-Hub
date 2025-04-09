@@ -25,24 +25,24 @@ DELIMITER $$
 --
 -- Procedures
 --
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_agent_add` (IN `p_name` VARCHAR(255), IN `p_contact` VARCHAR(20), IN `p_address` VARCHAR(500), IN `p_area` VARCHAR(255), IN `p_image` VARCHAR(255), IN `p_description` TEXT)   BEGIN
+CREATE PROCEDURE `usp_agent_add` (IN `p_name` VARCHAR(255), IN `p_contact` VARCHAR(20), IN `p_address` VARCHAR(500), IN `p_area` VARCHAR(255), IN `p_image` VARCHAR(255), IN `p_description` TEXT)   BEGIN
     INSERT INTO agents (name, contact, address, area, description)
     VALUES (p_name, p_contact, p_address, p_area, p_description);
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_agent_delete` (IN `p_id` INT)   BEGIN
+CREATE PROCEDURE `usp_agent_delete` (IN `p_id` INT)   BEGIN
     DELETE FROM agents WHERE id = p_id;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_agent_get_all` ()   BEGIN
+CREATE PROCEDURE `usp_agent_get_all` ()   BEGIN
     SELECT * FROM agents ORDER BY createdAt DESC;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_agent_get_by_id` (IN `p_id` INT)   BEGIN
+CREATE PROCEDURE `usp_agent_get_by_id` (IN `p_id` INT)   BEGIN
     SELECT * FROM agents WHERE id = p_id;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_agent_update` (IN `p_id` INT, IN `p_name` VARCHAR(255), IN `p_contact` VARCHAR(20), IN `p_address` VARCHAR(500), IN `p_area` VARCHAR(255), IN `p_image` VARCHAR(255), IN `p_description` TEXT)   BEGIN
+CREATE PROCEDURE `usp_agent_update` (IN `p_id` INT, IN `p_name` VARCHAR(255), IN `p_contact` VARCHAR(20), IN `p_address` VARCHAR(500), IN `p_area` VARCHAR(255), IN `p_image` VARCHAR(255), IN `p_description` TEXT)   BEGIN
     UPDATE agents
     SET name = p_name,
         contact = p_contact,
@@ -53,24 +53,24 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_agent_update` (IN `p_id` INT, I
     WHERE id = p_id;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_client_add` (IN `p_name` VARCHAR(255), IN `p_contact` VARCHAR(20), IN `p_address` TEXT, IN `p_occupation` VARCHAR(255), IN `p_description` TEXT)   BEGIN
+CREATE PROCEDURE `usp_client_add` (IN `p_name` VARCHAR(255), IN `p_contact` VARCHAR(20), IN `p_address` TEXT, IN `p_occupation` VARCHAR(255), IN `p_description` TEXT)   BEGIN
     INSERT INTO clients (name, contact, address, occupation, description)
     VALUES (p_name, p_contact, p_address, p_occupation, p_description);
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_client_delete` (IN `p_id` INT)   BEGIN
+CREATE PROCEDURE `usp_client_delete` (IN `p_id` INT)   BEGIN
     DELETE FROM clients WHERE id = p_id;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_client_get_all` ()   BEGIN
+CREATE PROCEDURE `usp_client_get_all` ()   BEGIN
     SELECT * FROM clients ORDER BY createdAt DESC;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_client_get_by_id` (IN `p_id` INT)   BEGIN
+CREATE PROCEDURE `usp_client_get_by_id` (IN `p_id` INT)   BEGIN
     SELECT * FROM clients WHERE id = p_id;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_client_update` (IN `p_id` INT, IN `p_name` VARCHAR(255), IN `p_contact` VARCHAR(20), IN `p_address` TEXT, IN `p_occupation` VARCHAR(255), IN `p_description` TEXT)   BEGIN
+CREATE PROCEDURE `usp_client_update` (IN `p_id` INT, IN `p_name` VARCHAR(255), IN `p_contact` VARCHAR(20), IN `p_address` TEXT, IN `p_occupation` VARCHAR(255), IN `p_description` TEXT)   BEGIN
     UPDATE clients
     SET name = p_name,
         contact = p_contact,
@@ -80,7 +80,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_client_update` (IN `p_id` INT, 
     WHERE id = p_id;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_dashboard_getcounts` ()   BEGIN
+CREATE PROCEDURE `usp_dashboard_getcounts` ()   BEGIN
     -- Fetch total properties
     SELECT 
         (SELECT COUNT(*) FROM properties) AS totalProperties,
@@ -90,12 +90,12 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_dashboard_getcounts` ()   BEGIN
         (SELECT COUNT(*) FROM owners) AS totalOwners;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_expiredToken_add` (IN `p_token_hash` CHAR(64), IN `p_expires_at` INT(11))   BEGIN
+CREATE PROCEDURE `usp_expiredToken_add` (IN `p_token_hash` CHAR(64), IN `p_expires_at` INT(11))   BEGIN
     INSERT IGNORE INTO expiredtokens (tokenHash, expiresAt) 
     VALUES (p_token_hash, p_expires_at);
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_expiredToken_delete` ()   BEGIN
+CREATE PROCEDURE `usp_expiredToken_delete` ()   BEGIN
     -- Disable safe update mode
     SET SQL_SAFE_UPDATES = 0;
     
@@ -106,7 +106,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_expiredToken_delete` ()   BEGIN
     SET SQL_SAFE_UPDATES = 1;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_expiredToken_verify` (IN `p_token_hash` CHAR(64))   BEGIN
+CREATE PROCEDURE `usp_expiredToken_verify` (IN `p_token_hash` CHAR(64))   BEGIN
     DECLARE token_count INT;
 
     -- Check if token hash exists
@@ -120,11 +120,11 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_expiredToken_verify` (IN `p_tok
     SELECT token_count > 0 as isExpired;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_masters_getId_by_name` (IN `p_name` VARCHAR(255))   BEGIN
+CREATE PROCEDURE `usp_masters_getId_by_name` (IN `p_name` VARCHAR(255))   BEGIN
 	SELECT fn_get_masters_id_by_name(p_name) as id;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_masters_get_all_by_type` (IN `masterTypeName` VARCHAR(255))   BEGIN
+CREATE PROCEDURE `usp_masters_get_all_by_type` (IN `masterTypeName` VARCHAR(255))   BEGIN
     DECLARE s_masterTypeId INT;
 
     -- Get the masterTypeId using the function
@@ -134,24 +134,24 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_masters_get_all_by_type` (IN `m
     SELECT id, name FROM masters WHERE masterTypeId = s_masterTypeId;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_owner_add` (IN `p_name` VARCHAR(255), IN `p_contact` VARCHAR(20), IN `p_email` VARCHAR(255), IN `p_address` VARCHAR(500), IN `p_description` TEXT)   BEGIN
+CREATE PROCEDURE `usp_owner_add` (IN `p_name` VARCHAR(255), IN `p_contact` VARCHAR(20), IN `p_email` VARCHAR(255), IN `p_address` VARCHAR(500), IN `p_description` TEXT)   BEGIN
     INSERT INTO `owners` (`name`, `contact`, `email`, `address`, `description`)
     VALUES (p_name, p_contact, p_email, p_address, p_description);
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_owner_delete` (IN `p_id` INT)   BEGIN
+CREATE PROCEDURE `usp_owner_delete` (IN `p_id` INT)   BEGIN
     DELETE FROM `owners` WHERE `id` = p_id;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_owner_get_all` ()   BEGIN
+CREATE PROCEDURE `usp_owner_get_all` ()   BEGIN
     SELECT * FROM `owners`;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_owner_get_by_id` (IN `p_id` INT)   BEGIN
+CREATE PROCEDURE `usp_owner_get_by_id` (IN `p_id` INT)   BEGIN
     SELECT * FROM `owners` WHERE `id` = p_id;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_owner_update` (IN `p_id` INT, IN `p_name` VARCHAR(255), IN `p_contact` VARCHAR(20), IN `p_email` VARCHAR(255), IN `p_address` VARCHAR(500), IN `p_mapDetails` VARCHAR(500), IN `p_description` TEXT)   BEGIN
+CREATE PROCEDURE `usp_owner_update` (IN `p_id` INT, IN `p_name` VARCHAR(255), IN `p_contact` VARCHAR(20), IN `p_email` VARCHAR(255), IN `p_address` VARCHAR(500), IN `p_mapDetails` VARCHAR(500), IN `p_description` TEXT)   BEGIN
     UPDATE `owners`
     SET `name` = p_name,
         `contact` = p_contact,
@@ -162,7 +162,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_owner_update` (IN `p_id` INT, I
     WHERE `id` = p_id;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_propertydocument_create` (IN `p_documentRelativePaths` TEXT, IN `p_propertyId` INT, IN `p_documentTypeId` INT, IN `p_uploadedBy` INT)   BEGIN
+CREATE PROCEDURE `usp_propertydocument_create` (IN `p_documentRelativePaths` TEXT, IN `p_propertyId` INT, IN `p_documentTypeId` INT, IN `p_uploadedBy` INT)   BEGIN
     DECLARE done INT DEFAULT FALSE;
     DECLARE docPath VARCHAR(500);
     DECLARE cur CURSOR FOR 
@@ -190,17 +190,17 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_propertydocument_create` (IN `p
     CLOSE cur;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_propertydocument_delete` (IN `p_documentId` INT)   BEGIN
+CREATE PROCEDURE `usp_propertydocument_delete` (IN `p_documentId` INT)   BEGIN
     DELETE FROM propertydocuments WHERE id = p_documentId;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_propertydocument_get_by_propertyId` (IN `p_propertyId` INT)   BEGIN
+CREATE PROCEDURE `usp_propertydocument_get_by_propertyId` (IN `p_propertyId` INT)   BEGIN
     SELECT id, documentRelativePath, fn_get_mastertype_name_by_id(documentTypeId) AS documentType
     FROM propertydocuments
     WHERE propertyId = p_propertyId;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_property_add` (IN `p_title` VARCHAR(255), IN `p_propertyTypeId` INT, IN `p_address` VARCHAR(255), IN `p_pricePerUnit` DECIMAL(15,2), IN `p_priceTypeId` INT, IN `p_measurementValue` DECIMAL(10,2), IN `p_measurementTypeId` INT, IN `p_statusId` INT, IN `p_ownerId` INT, IN `p_mapDetails` VARCHAR(255), IN `p_description` TEXT)   BEGIN
+CREATE PROCEDURE `usp_property_add` (IN `p_title` VARCHAR(255), IN `p_propertyTypeId` INT, IN `p_address` VARCHAR(255), IN `p_pricePerUnit` DECIMAL(15,2), IN `p_priceTypeId` INT, IN `p_measurementValue` DECIMAL(10,2), IN `p_measurementTypeId` INT, IN `p_statusId` INT, IN `p_ownerId` INT, IN `p_mapDetails` VARCHAR(255), IN `p_description` TEXT)   BEGIN
     INSERT INTO properties (
         title, propertyTypeId, address, pricePerUnit, priceTypeId,
         measurementValue, measurementTypeId, statusId, ownerId, mapDetails, description
@@ -213,11 +213,11 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_property_add` (IN `p_title` VAR
     SELECT LAST_INSERT_ID() AS id;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_property_delete` (IN `p_id` INT)   BEGIN
+CREATE PROCEDURE `usp_property_delete` (IN `p_id` INT)   BEGIN
     DELETE FROM properties WHERE id = p_id;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_property_get_all` ()   BEGIN
+CREATE PROCEDURE `usp_property_get_all` ()   BEGIN
     SELECT 
         p.id,
         p.title,
@@ -251,7 +251,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_property_get_all` ()   BEGIN
     ) pd ON pd.propertyId = p.id;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_property_get_by_id` (IN `p_id` INT)   BEGIN
+CREATE PROCEDURE `usp_property_get_by_id` (IN `p_id` INT)   BEGIN
     SELECT 
         p.id,
         p.title,
@@ -294,7 +294,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_property_get_by_id` (IN `p_id` 
         p.id = p_id;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_property_update` (IN `p_id` INT, IN `p_title` VARCHAR(255), IN `p_propertyTypeId` INT, IN `p_address` VARCHAR(255), IN `p_pricePerUnit` DECIMAL(15,2), IN `p_priceTypeId` INT, IN `p_measurementValue` DECIMAL(10,2), IN `p_measurementTypeId` INT, IN `p_statusId` INT, IN `p_ownerId` INT, IN `p_mapDetails` VARCHAR(255), IN `p_description` TEXT)   BEGIN
+CREATE PROCEDURE `usp_property_update` (IN `p_id` INT, IN `p_title` VARCHAR(255), IN `p_propertyTypeId` INT, IN `p_address` VARCHAR(255), IN `p_pricePerUnit` DECIMAL(15,2), IN `p_priceTypeId` INT, IN `p_measurementValue` DECIMAL(10,2), IN `p_measurementTypeId` INT, IN `p_statusId` INT, IN `p_ownerId` INT, IN `p_mapDetails` VARCHAR(255), IN `p_description` TEXT)   BEGIN
     UPDATE properties 
     SET 
         title = p_title,
@@ -311,7 +311,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_property_update` (IN `p_id` INT
     WHERE id = p_id;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_requirements_add` (IN `p_title` VARCHAR(255), IN `p_requirementTypeId` INT, IN `p_location` VARCHAR(255), IN `p_measurementTypeId` INT, IN `p_minMeasurement` DECIMAL(10,2), IN `p_maxMeasurement` DECIMAL(10,2), IN `p_priceTypeId` INT, IN `p_minPrice` DECIMAL(15,2), IN `p_maxPrice` DECIMAL(15,2), IN `p_propertyForTypeId` INT, IN `p_clientId` INT, IN `p_description` TEXT)   BEGIN
+CREATE PROCEDURE `usp_requirements_add` (IN `p_title` VARCHAR(255), IN `p_requirementTypeId` INT, IN `p_location` VARCHAR(255), IN `p_measurementTypeId` INT, IN `p_minMeasurement` DECIMAL(10,2), IN `p_maxMeasurement` DECIMAL(10,2), IN `p_priceTypeId` INT, IN `p_minPrice` DECIMAL(15,2), IN `p_maxPrice` DECIMAL(15,2), IN `p_propertyForTypeId` INT, IN `p_clientId` INT, IN `p_description` TEXT)   BEGIN
     INSERT INTO requirements (
         title, requirementTypeId, location, measurementTypeId, 
         minMeasurement, maxMeasurement, priceTypeId, minPrice, 
@@ -324,11 +324,11 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_requirements_add` (IN `p_title`
     );
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_requirements_delete` (IN `p_id` INT)   BEGIN
+CREATE PROCEDURE `usp_requirements_delete` (IN `p_id` INT)   BEGIN
     DELETE FROM requirements WHERE id = p_id;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_requirements_get_all` ()   BEGIN
+CREATE PROCEDURE `usp_requirements_get_all` ()   BEGIN
     SELECT 
         r.id,
         r.title,
@@ -353,7 +353,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_requirements_get_all` ()   BEGI
     ORDER BY r.createdAt DESC;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_requirements_get_by_id` (IN `p_id` INT)   BEGIN
+CREATE PROCEDURE `usp_requirements_get_by_id` (IN `p_id` INT)   BEGIN
    SELECT 
 		    r.id,
         r.title,
@@ -386,7 +386,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_requirements_get_by_id` (IN `p_
     WHERE r.id = p_id;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_requirements_update` (IN `p_id` INT, IN `p_title` VARCHAR(255), IN `p_requirementTypeId` INT, IN `p_location` VARCHAR(255), IN `p_measurementTypeId` INT, IN `p_minMeasurement` DECIMAL(10,2), IN `p_maxMeasurement` DECIMAL(10,2), IN `p_priceTypeId` INT, IN `p_minPrice` DECIMAL(15,2), IN `p_maxPrice` DECIMAL(15,2), IN `p_clientId` INT, IN `p_description` TEXT, IN `p_propertyForTypeId` INT)   BEGIN
+CREATE PROCEDURE `usp_requirements_update` (IN `p_id` INT, IN `p_title` VARCHAR(255), IN `p_requirementTypeId` INT, IN `p_location` VARCHAR(255), IN `p_measurementTypeId` INT, IN `p_minMeasurement` DECIMAL(10,2), IN `p_maxMeasurement` DECIMAL(10,2), IN `p_priceTypeId` INT, IN `p_minPrice` DECIMAL(15,2), IN `p_maxPrice` DECIMAL(15,2), IN `p_clientId` INT, IN `p_description` TEXT, IN `p_propertyForTypeId` INT)   BEGIN
     UPDATE requirements 
     SET 
         title = p_title,
@@ -404,7 +404,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_requirements_update` (IN `p_id`
     WHERE id = p_id;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_userinfo_google_auth` (IN `p_providerUid` VARCHAR(255), IN `p_firstName` VARCHAR(255), IN `p_lastName` VARCHAR(255), IN `p_email` VARCHAR(255), IN `p_profilePicture` VARCHAR(500))   BEGIN
+CREATE PROCEDURE `usp_userinfo_google_auth` (IN `p_providerUid` VARCHAR(255), IN `p_firstName` VARCHAR(255), IN `p_lastName` VARCHAR(255), IN `p_email` VARCHAR(255), IN `p_profilePicture` VARCHAR(500))   BEGIN
 	DECLARE varRole INT;
     DECLARE varStatus INT;
     DECLARE varProviderTypeId INT;
@@ -453,7 +453,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_userinfo_google_auth` (IN `p_pr
 	WHERE email = p_email;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_userinfo_login` (IN `p_identifier` VARCHAR(255))   BEGIN
+CREATE PROCEDURE `usp_userinfo_login` (IN `p_identifier` VARCHAR(255))   BEGIN
     DECLARE varUserCount INT;
     DECLARE varUserId INT;
 
@@ -487,7 +487,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_userinfo_login` (IN `p_identifi
     WHERE userId = varUserId;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_userinfo_register` (IN `p_firstName` VARCHAR(100), IN `p_lastName` VARCHAR(100), IN `p_username` VARCHAR(100), IN `p_email` VARCHAR(255), IN `p_password` VARCHAR(255))   BEGIN
+CREATE PROCEDURE `usp_userinfo_register` (IN `p_firstName` VARCHAR(100), IN `p_lastName` VARCHAR(100), IN `p_username` VARCHAR(100), IN `p_email` VARCHAR(255), IN `p_password` VARCHAR(255))   BEGIN
     DECLARE varUserId INT;
     DECLARE varRole INT;
     DECLARE varStatus INT;
@@ -520,14 +520,14 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_userinfo_register` (IN `p_first
     SELECT LAST_INSERT_ID() AS userId;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_userinfo_update_password` (IN `p_email` VARCHAR(255), IN `p_password` VARCHAR(255))   BEGIN
+CREATE PROCEDURE `usp_userinfo_update_password` (IN `p_email` VARCHAR(255), IN `p_password` VARCHAR(255))   BEGIN
     -- Update password
     UPDATE userinfo 
     SET password = p_password 
     WHERE email = p_email;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_userinfo_update_profile` (IN `p_userId` INT, IN `p_firstName` VARCHAR(100), IN `p_lastName` VARCHAR(100), IN `p_username` VARCHAR(100))   BEGIN
+CREATE PROCEDURE `usp_userinfo_update_profile` (IN `p_userId` INT, IN `p_firstName` VARCHAR(100), IN `p_lastName` VARCHAR(100), IN `p_username` VARCHAR(100))   BEGIN
     -- Check if the username is already used by another user
     IF EXISTS (
         SELECT 1 FROM userinfo WHERE username = p_username AND userId != p_userId
@@ -545,14 +545,14 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_userinfo_update_profile` (IN `p
     END IF;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_userinfo_update_profile_picture` (IN `p_userId` INT, IN `p_profilePicture` VARCHAR(500))   BEGIN
+CREATE PROCEDURE `usp_userinfo_update_profile_picture` (IN `p_userId` INT, IN `p_profilePicture` VARCHAR(500))   BEGIN
     -- Update profile picture for the user
     UPDATE userinfo
     SET profilePicture = p_profilePicture
     WHERE userId = p_userId;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_userinfo_verify_user` (IN `p_email` VARCHAR(255))   BEGIN
+CREATE PROCEDURE `usp_userinfo_verify_user` (IN `p_email` VARCHAR(255))   BEGIN
 	UPDATE userInfo
     SET isVerified = 1
     WHERE email = p_email;
@@ -561,7 +561,7 @@ END$$
 --
 -- Functions
 --
-CREATE DEFINER=`root`@`localhost` FUNCTION `fn_get_masters_id_by_name` (`p_Name` VARCHAR(255)) RETURNS INT(11)  BEGIN
+CREATE FUNCTION `fn_get_masters_id_by_name` (`p_Name` VARCHAR(255)) RETURNS INT(11)  BEGIN
 	DECLARE v_id INT;
 
     -- Fetch the ID based on the provided value
@@ -570,7 +570,7 @@ CREATE DEFINER=`root`@`localhost` FUNCTION `fn_get_masters_id_by_name` (`p_Name`
     RETURN v_id;
 END$$
 
-CREATE DEFINER=`root`@`localhost` FUNCTION `fn_get_masters_name_by_id` (`p_id` INT) RETURNS VARCHAR(255) CHARSET utf8mb4 COLLATE utf8mb4_general_ci  BEGIN
+CREATE FUNCTION `fn_get_masters_name_by_id` (`p_id` INT) RETURNS VARCHAR(255) CHARSET utf8mb4 COLLATE utf8mb4_general_ci  BEGIN
 	DECLARE v_name VARCHAR(255);
 
     -- Fetch the ID based on the provided value
@@ -579,7 +579,7 @@ CREATE DEFINER=`root`@`localhost` FUNCTION `fn_get_masters_name_by_id` (`p_id` I
     RETURN v_name;
 END$$
 
-CREATE DEFINER=`root`@`localhost` FUNCTION `fn_get_mastertypes_id_by_name` (`p_value` VARCHAR(255)) RETURNS INT(11) DETERMINISTIC BEGIN
+CREATE FUNCTION `fn_get_mastertypes_id_by_name` (`p_value` VARCHAR(255)) RETURNS INT(11) DETERMINISTIC BEGIN
     DECLARE v_id INT;
 
     -- Fetch the ID based on the provided value
@@ -588,7 +588,7 @@ CREATE DEFINER=`root`@`localhost` FUNCTION `fn_get_mastertypes_id_by_name` (`p_v
     RETURN v_id;
 END$$
 
-CREATE DEFINER=`root`@`localhost` FUNCTION `fn_get_mastertype_name_by_id` (`p_id` INT(11)) RETURNS VARCHAR(255) CHARSET utf8mb4 COLLATE utf8mb4_general_ci DETERMINISTIC BEGIN
+CREATE FUNCTION `fn_get_mastertype_name_by_id` (`p_id` INT(11)) RETURNS VARCHAR(255) CHARSET utf8mb4 COLLATE utf8mb4_general_ci DETERMINISTIC BEGIN
     DECLARE v_name varchar(255);
 
     -- Fetch the ID based on the provided value
@@ -965,7 +965,7 @@ DELIMITER $$
 --
 -- Events
 --
-CREATE DEFINER=`root`@`localhost` EVENT `delete_expired_tokens` ON SCHEDULE EVERY 1 DAY STARTS '2025-03-26 18:41:29' ON COMPLETION NOT PRESERVE ENABLE DO CALL usp_expiredToken_delete()$$
+CREATE EVENT `delete_expired_tokens` ON SCHEDULE EVERY 1 DAY STARTS '2025-03-26 18:41:29' ON COMPLETION NOT PRESERVE ENABLE DO CALL usp_expiredToken_delete()$$
 
 DELIMITER ;
 COMMIT;
